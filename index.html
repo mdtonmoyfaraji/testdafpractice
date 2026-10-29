@@ -1,1 +1,386 @@
 
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Browse every file in the TestDaF Practice repository.">
+  <title>TestDaF Practice · File browser</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f8fc;
+      --panel: #ffffff;
+      --text: #172033;
+      --muted: #64708a;
+      --line: #e4e9f2;
+      --accent: #315efb;
+      --accent-soft: #edf2ff;
+      --folder: #d48b13;
+      --shadow: 0 18px 50px rgba(37, 53, 89, .09);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background: var(--bg);
+      color: var(--text);
+      font: 15px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    a { color: inherit; }
+    button, input { font: inherit; }
+
+    .shell { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 48px 0 72px; }
+
+    .hero {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--accent);
+      content: "";
+    }
+
+    h1 { margin: 9px 0 8px; font-size: clamp(30px, 5vw, 48px); line-height: 1.05; letter-spacing: -.04em; }
+    .intro { max-width: 670px; margin: 0; color: var(--muted); font-size: 16px; }
+
+    .github-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex: 0 0 auto;
+      padding: 11px 15px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(37, 53, 89, .04);
+    }
+
+    .github-link:hover { border-color: #b8c5e0; background: #fbfcff; }
+
+    .browser {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .search {
+      position: relative;
+      flex: 1;
+    }
+
+    .search-icon { position: absolute; top: 11px; left: 13px; color: var(--muted); pointer-events: none; }
+    #search {
+      width: 100%;
+      padding: 11px 14px 11px 39px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      outline: none;
+      color: var(--text);
+      background: #fbfcff;
+    }
+    #search:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+
+    .toolbar button, .action {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .toolbar button:hover, .action:hover { border-color: #b8c5e0; background: #fbfcff; }
+
+    .summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      padding: 13px 20px;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .summary strong { color: var(--text); }
+
+    #status { padding: 48px 24px; color: var(--muted); text-align: center; }
+    #status.error { color: #b42318; }
+
+    .tree { padding: 12px 14px 22px; }
+    .tree-list, .tree-list ul { margin: 0; padding: 0; list-style: none; }
+    .tree-list ul { margin-left: 25px; padding-left: 15px; border-left: 1px solid var(--line); }
+    .tree-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 43px;
+      padding: 5px 8px;
+      border-radius: 9px;
+    }
+    .tree-row:hover { background: #f7f9ff; }
+    .tree-row[hidden] { display: none; }
+    .toggle {
+      display: grid;
+      width: 22px;
+      height: 22px;
+      padding: 0;
+      place-items: center;
+      border: 0;
+      border-radius: 5px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .toggle:hover { background: var(--accent-soft); color: var(--accent); }
+    .toggle::before { content: "›"; font-size: 21px; line-height: 1; transition: transform .15s ease; }
+    .folder.open > .tree-row .toggle::before { transform: rotate(90deg); }
+    .icon { width: 20px; text-align: center; font-size: 17px; }
+    .folder .icon { color: var(--folder); }
+    .file .icon { color: var(--muted); }
+    .name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 650; }
+    .path { overflow: hidden; color: var(--muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+    .file-actions { display: flex; gap: 7px; margin-left: auto; opacity: 0; }
+    .tree-row:hover .file-actions, .file:focus-within .file-actions { opacity: 1; }
+    .action { padding: 5px 8px; font-size: 12px; text-decoration: none; }
+    .action.primary { border-color: #cbd6ff; background: var(--accent-soft); color: var(--accent); }
+    .empty { padding: 35px 20px; color: var(--muted); text-align: center; }
+
+    @media (max-width: 700px) {
+      .shell { width: min(100% - 20px, 1120px); padding-top: 28px; }
+      .hero { display: block; }
+      .github-link { margin-top: 18px; }
+      .toolbar { align-items: stretch; flex-wrap: wrap; }
+      .search { flex-basis: 100%; }
+      .file-actions { opacity: 1; }
+      .path { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div>
+        <div class="eyebrow">TestDaF Practice</div>
+        <h1>Everything in one place.</h1>
+        <p class="intro">Browse the repository by folder, open any file, or launch it in a new tab. Nested folders are shown at every level so the project stays easy to understand as it grows.</p>
+      </div>
+      <a class="github-link" href="https://github.com/mdtonmoyfaraji/testdafpractice" target="_blank" rel="noopener">View on GitHub <span aria-hidden="true">↗</span></a>
+    </header>
+
+    <section class="browser" aria-label="Repository file browser">
+      <div class="toolbar">
+        <label class="search" for="search">
+          <span class="search-icon" aria-hidden="true">⌕</span>
+          <input id="search" type="search" placeholder="Search files and folders…" autocomplete="off">
+        </label>
+        <button id="expand-all" type="button">Expand all</button>
+        <button id="collapse-all" type="button">Collapse all</button>
+      </div>
+      <div class="summary" id="summary" aria-live="polite">Loading repository tree…</div>
+      <div id="status" role="status">Loading files from GitHub…</div>
+      <div class="tree" id="tree" hidden></div>
+    </section>
+  </main>
+
+  <script>
+    const owner = "mdtonmoyfaraji";
+    const repo = "testdafpractice";
+    const branch = "main";
+    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`;
+    const rawBase = `https://raw.githubusercontent.com/${owner}/${repo}/${encodeURIComponent(branch)}/`;
+    const githubBase = `https://github.com/${owner}/${repo}/blob/${encodeURIComponent(branch)}/`;
+
+    const status = document.querySelector("#status");
+    const tree = document.querySelector("#tree");
+    const summary = document.querySelector("#summary");
+    const search = document.querySelector("#search");
+    let folders = [];
+    let allFiles = 0;
+    let allFolders = 0;
+
+    function safePath(path) {
+      return path.split("/").map(encodeURIComponent).join("/");
+    }
+
+    function displayName(path) {
+      return path.split("/").pop();
+    }
+
+    function createFolderNode(name, path) {
+      const item = document.createElement("li");
+      item.className = "folder open";
+      item.dataset.path = path;
+      const row = document.createElement("div");
+      row.className = "tree-row";
+      const toggle = document.createElement("button");
+      toggle.className = "toggle";
+      toggle.type = "button";
+      toggle.setAttribute("aria-label", `Toggle ${name}`);
+      toggle.addEventListener("click", () => item.classList.toggle("open"));
+      const icon = document.createElement("span");
+      icon.className = "icon";
+      icon.textContent = "▰";
+      const label = document.createElement("span");
+      label.className = "name";
+      label.textContent = name;
+      row.append(toggle, icon, label);
+      const children = document.createElement("ul");
+      item.append(row, children);
+      folders.push(item);
+      return { item, children };
+    }
+
+    function createFileNode(file) {
+      const item = document.createElement("li");
+      item.className = "file";
+      item.dataset.path = file.path.toLowerCase();
+      const row = document.createElement("div");
+      row.className = "tree-row";
+      const spacer = document.createElement("span");
+      spacer.className = "toggle";
+      spacer.setAttribute("aria-hidden", "true");
+      const icon = document.createElement("span");
+      icon.className = "icon";
+      icon.textContent = "•";
+      const name = document.createElement("span");
+      name.className = "name";
+      name.textContent = displayName(file.path);
+      name.title = file.path;
+      const path = document.createElement("span");
+      path.className = "path";
+      path.textContent = file.path;
+      const actions = document.createElement("span");
+      actions.className = "file-actions";
+      const open = document.createElement("a");
+      open.className = "action primary";
+      open.href = rawBase + safePath(file.path);
+      open.target = "_self";
+      open.textContent = "Open";
+      const newTab = document.createElement("a");
+      newTab.className = "action";
+      newTab.href = githubBase + safePath(file.path);
+      newTab.target = "_blank";
+      newTab.rel = "noopener";
+      newTab.textContent = "New tab";
+      actions.append(open, newTab);
+      row.append(spacer, icon, name, path, actions);
+      item.append(row);
+      return item;
+    }
+
+    function buildTree(entries) {
+      const root = { children: tree.appendChild(document.createElement("ul")) };
+      root.children.className = "tree-list";
+      const nodes = new Map([["", root]]);
+      entries.sort((a, b) => a.path.localeCompare(b.path, undefined, { numeric: true }));
+
+      for (const entry of entries) {
+        const parts = entry.path.split("/");
+        const name = parts.pop();
+        const parentPath = parts.join("/");
+        let parent = nodes.get(parentPath);
+        if (!parent) continue;
+
+        if (entry.type === "tree") {
+          const node = createFolderNode(name, entry.path);
+          parent.children.appendChild(node.item);
+          nodes.set(entry.path, node);
+          allFolders++;
+        } else if (entry.type === "blob") {
+          parent.children.appendChild(createFileNode(entry));
+          allFiles++;
+        }
+      }
+    }
+
+    function setStatus(message, isError = false) {
+      status.hidden = !message;
+      status.textContent = message;
+      status.classList.toggle("error", isError);
+    }
+
+    function applySearch() {
+      const query = search.value.trim().toLowerCase();
+      const items = tree.querySelectorAll("li");
+      if (!query) {
+        items.forEach(item => item.hidden = false);
+        summary.innerHTML = `<strong>${allFiles}</strong> files · <strong>${allFolders}</strong> folders · branch <strong>${branch}</strong>`;
+        return;
+      }
+      let matches = 0;
+      items.forEach(item => {
+        const match = item.dataset.path.toLowerCase().includes(query);
+        item.hidden = !match;
+        if (match) matches++;
+      });
+      summary.innerHTML = `<strong>${matches}</strong> matching items for “${query.replace(/</g, "&lt;")}”`;
+    }
+
+    function setFolders(open) {
+      folders.forEach(folder => folder.classList.toggle("open", open));
+    }
+
+    async function loadTree() {
+      try {
+        const response = await fetch(apiUrl, { headers: { Accept: "application/vnd.github+json" } });
+        if (!response.ok) throw new Error(`GitHub returned ${response.status}`);
+        const data = await response.json();
+        if (data.truncated) {
+          throw new Error("The GitHub tree is too large for one recursive request.");
+        }
+        buildTree(data.tree);
+        setStatus("");
+        tree.hidden = false;
+        summary.innerHTML = `<strong>${allFiles}</strong> files · <strong>${allFolders}</strong> folders · branch <strong>${branch}</strong>`;
+        if (!allFiles && !allFolders) {
+          tree.innerHTML = '<div class="empty">This repository does not contain any files yet.</div>';
+        }
+      } catch (error) {
+        setStatus(`Could not load the repository tree. Open the repository on GitHub to browse it directly. (${error.message})`, true);
+        summary.innerHTML = "Repository tree unavailable";
+      }
+    }
+
+    search.addEventListener("input", applySearch);
+    document.querySelector("#expand-all").addEventListener("click", () => setFolders(true));
+    document.querySelector("#collapse-all").addEventListener("click", () => setFolders(false));
+    loadTree();
+  </script>
+</body>
+</html>
