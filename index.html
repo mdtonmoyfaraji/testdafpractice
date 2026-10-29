@@ -145,6 +145,7 @@
     .tree { padding: 12px 14px 22px; }
     .tree-list, .tree-list ul { margin: 0; padding: 0; list-style: none; }
     .tree-list ul { margin-left: 25px; padding-left: 15px; border-left: 1px solid var(--line); }
+    .folder:not(.open) > ul { display: none; }
     .tree-row {
       display: flex;
       align-items: center;
@@ -170,6 +171,8 @@
     .toggle:hover { background: var(--accent-soft); color: var(--accent); }
     .toggle::before { content: "›"; font-size: 21px; line-height: 1; transition: transform .15s ease; }
     .folder.open > .tree-row .toggle::before { transform: rotate(90deg); }
+    .file .toggle { cursor: default; }
+    .file .toggle::before { content: ""; }
     .icon { width: 20px; text-align: center; font-size: 17px; }
     .folder .icon { color: var(--folder); }
     .file .icon { color: var(--muted); }
@@ -200,7 +203,7 @@
         <h1>Everything in one place.</h1>
         <p class="intro">Browse the repository by folder, open any file, or launch it in a new tab. Nested folders are shown at every level so the project stays easy to understand as it grows.</p>
       </div>
-      <a class="github-link" href="https://github.com/mdtonmoyfaraji/testdafpractice" target="_blank" rel="noopener">View on GitHub <span aria-hidden="true">↗</span></a>
+      <a class="github-link" id="github-link" target="_blank" rel="noopener">View on GitHub <span aria-hidden="true">↗</span></a>
     </header>
 
     <section class="browser" aria-label="Repository file browser">
@@ -219,17 +222,22 @@
   </main>
 
   <script>
-    const owner = "mdtonmoyfaraji";
-    const repo = "testdafpractice";
+    const configuredOwner = "mdtonmoyfaraji";
+    const configuredRepo = "testdafpractice";
     const branch = "main";
+    const pagesHost = window.location.hostname.match(/^(.+)\.github\.io$/i);
+    const pathParts = window.location.pathname.split("/").filter(Boolean);
+    const owner = pagesHost?.[1] || configuredOwner;
+    const repo = pagesHost && pathParts[0] && !pathParts[0].includes(".") ? pathParts[0] : configuredRepo;
+    const siteBase = pagesHost ? `${window.location.origin}/${repo}/` : new URL("./", window.location.href).href;
     const apiUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`;
-    const rawBase = `https://raw.githubusercontent.com/${owner}/${repo}/${encodeURIComponent(branch)}/`;
     const githubBase = `https://github.com/${owner}/${repo}/blob/${encodeURIComponent(branch)}/`;
 
     const status = document.querySelector("#status");
     const tree = document.querySelector("#tree");
     const summary = document.querySelector("#summary");
     const search = document.querySelector("#search");
+    document.querySelector("#github-link").href = `https://github.com/${owner}/${repo}`;
     let folders = [];
     let allFiles = 0;
     let allFolders = 0;
@@ -252,7 +260,11 @@
       toggle.className = "toggle";
       toggle.type = "button";
       toggle.setAttribute("aria-label", `Toggle ${name}`);
-      toggle.addEventListener("click", () => item.classList.toggle("open"));
+      toggle.setAttribute("aria-expanded", "true");
+      toggle.addEventListener("click", () => {
+        const isOpen = item.classList.toggle("open");
+        toggle.setAttribute("aria-expanded", String(isOpen));
+      });
       const icon = document.createElement("span");
       icon.className = "icon";
       icon.textContent = "▰";
@@ -289,7 +301,7 @@
       actions.className = "file-actions";
       const open = document.createElement("a");
       open.className = "action primary";
-      open.href = rawBase + safePath(file.path);
+      open.href = siteBase + safePath(file.path);
       open.target = "_self";
       open.textContent = "Open";
       const newTab = document.createElement("a");
@@ -353,7 +365,10 @@
     }
 
     function setFolders(open) {
-      folders.forEach(folder => folder.classList.toggle("open", open));
+      folders.forEach(folder => {
+        folder.classList.toggle("open", open);
+        folder.querySelector(":scope > .tree-row .toggle").setAttribute("aria-expanded", String(open));
+      });
     }
 
     async function loadTree() {
