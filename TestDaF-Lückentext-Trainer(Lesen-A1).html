@@ -1,0 +1,364 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>TestDaF Lückentext-Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap">
+<style>
+:root{
+  --ground:#F2F5F7; --surface:#FFFFFF; --sunken:#E7ECF0; --ink:#17212B; --muted:#56626E;
+  --line:#CBD4DC; --accent:#285A86; --accent-soft:#DCE8F3; --on-accent:#FFFFFF;
+  --ok:#23724A; --ok-soft:#DDF0E5; --bad:#B03A28; --bad-soft:#F7E1DC; --warn:#A5620B;
+  --shadow:0 1px 2px rgba(23,33,43,.06),0 4px 14px rgba(23,33,43,.07);
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#10161C; --surface:#18212A; --sunken:#0C1116; --ink:#E4EAF0; --muted:#98A5B1;
+    --line:#2F3B47; --accent:#7FB0DD; --accent-soft:#1F3347; --on-accent:#0C1620;
+    --ok:#6CC795; --ok-soft:#173226; --bad:#EE8A77; --bad-soft:#3A1E19; --warn:#E6A650;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#10161C; --surface:#18212A; --sunken:#0C1116; --ink:#E4EAF0; --muted:#98A5B1;
+  --line:#2F3B47; --accent:#7FB0DD; --accent-soft:#1F3347; --on-accent:#0C1620;
+  --ok:#6CC795; --ok-soft:#173226; --bad:#EE8A77; --bad-soft:#3A1E19; --warn:#E6A650;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1,h2{font-family:var(--serif);text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:clamp(1.5rem,3.2vw,2rem)}
+h2{font-size:1.35rem}
+.eyebrow{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+header.top p{margin:4px 0 0;color:var(--muted);max-width:66ch}
+header.top a{color:var(--accent)}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.nav{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 12px;font-size:.85rem;display:inline-flex;gap:6px;align-items:center}
+.chip .n{font-family:var(--mono);font-size:.78rem;color:var(--muted)}
+.chip[aria-current="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.chip[aria-current="true"] .n{color:var(--on-accent)}
+.chip .best{font-family:var(--mono);font-size:.72rem;padding:0 6px;border-radius:999px;background:var(--ok-soft);color:var(--ok)}
+.chip[aria-current="true"] .best{background:var(--on-accent);color:var(--accent)}
+
+details.tips{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+details.tips summary{cursor:pointer;font-weight:600}
+details.tips ul{margin:10px 0 4px;padding-left:1.2em;display:grid;gap:4px;max-width:80ch}
+
+.exam{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+.bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;padding:12px 18px;background:var(--sunken);border-bottom:1px solid var(--line);border-radius:12px 12px 0 0}
+.bar .what{display:flex;flex-direction:column}
+.timer{font-family:var(--mono);font-size:1.15rem;font-variant-numeric:tabular-nums;padding:4px 10px;border-radius:6px;border:1px solid var(--line);background:var(--surface)}
+.timer.low{color:var(--warn);border-color:var(--warn)}
+.timer.over{color:var(--bad);border-color:var(--bad)}
+.instr{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:2px}
+.instr p{margin:0}
+
+.textbox{padding:22px 18px 10px;position:relative}
+.textbox h3{font-family:var(--serif);font-size:1.2rem;margin:0 0 10px;text-wrap:balance}
+.text{font-family:var(--serif);font-size:1.08rem;line-height:1.95;max-width:68ch;margin:0}
+.gap{display:inline-flex;align-items:baseline;gap:6px;border:1.5px solid var(--line);background:var(--sunken);color:var(--ink);border-radius:6px;padding:0 8px;min-width:8.5em;font-family:var(--sans);font-size:.95rem;line-height:1.7;vertical-align:baseline}
+.gap .gn{font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+.gap .gw{color:var(--muted)}
+.gap.filled{background:var(--accent-soft);border-color:var(--accent)}
+.gap.filled .gw{color:var(--ink);font-weight:500}
+.gap.open{outline:2px solid var(--accent);outline-offset:1px}
+.gap.ok{background:var(--ok-soft);border-color:var(--ok)}
+.gap.bad{background:var(--bad-soft);border-color:var(--bad)}
+.gap.ok .gw,.gap.bad .gw{color:var(--ink)}
+.gap .fix{font-size:.8rem;color:var(--ok);font-weight:600}
+.gap.locked{cursor:default}
+
+.menu{position:absolute;z-index:20;background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:0 10px 28px rgba(0,0,0,.18);padding:6px;display:flex;flex-direction:column;min-width:190px}
+.menu button{border:none;background:transparent;color:var(--ink);text-align:left;padding:8px 10px;border-radius:5px;font-size:.95rem}
+.menu button:hover,.menu button:focus-visible{background:var(--accent-soft)}
+.menu button[aria-checked="true"]{font-weight:600;color:var(--accent)}
+
+.actions{display:flex;flex-wrap:wrap;gap:10px;padding:8px 18px 18px}
+.btn{border-radius:8px;padding:9px 16px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-weight:500}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+.result{border-top:1px solid var(--line);padding:18px;display:flex;flex-direction:column;gap:14px}
+.score{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline}
+.score strong{font-family:var(--serif);font-size:1.7rem}
+.score span{color:var(--muted)}
+ol.expl{margin:0;padding:0;list-style:none;display:grid;gap:14px}
+ol.expl li{display:grid;grid-template-columns:32px 1fr;gap:10px}
+ol.expl .pos{font-family:var(--mono);color:var(--muted);padding-top:1px}
+ol.expl .ans{font-weight:600}
+ol.expl .opts{font-size:.85rem;color:var(--muted);font-family:var(--mono)}
+ol.expl .why{margin-top:2px;max-width:75ch}
+ol.expl .tag{display:inline-block;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:0 6px;margin-left:6px;vertical-align:1px}
+footer.src{font-size:.82rem;color:var(--muted);padding:0 18px 16px}
+footer.src a{color:var(--accent)}
+.note{font-size:.82rem;color:var(--muted);max-width:80ch}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Digitaler TestDaF · Lesen · Aufgabe 1</div>
+    <h1>Lückentext ergänzen</h1>
+    <p>Acht Übungstexte nach Artikeln von wissenschaft.de, im Niveau der offiziellen Demo-Aufgabe: 120–150 Wörter, 5 Lücken, je 4 Wörter derselben Form, 4 Minuten. Die Übungen zu Aufgabe 2 finden Sie im <a href="https://claude.ai/artifact/9QHAGoi38HX5GjjtMDyd4W" target="_blank" rel="noopener">Textabschnitte-Trainer</a>.</p>
+  </header>
+
+  <nav class="nav" id="nav" aria-label="Übungen"></nav>
+
+  <details class="tips">
+    <summary>Strategie: Wie finde ich das richtige Wort?</summary>
+    <ul>
+      <li><b>Grammatik hilft kaum:</b> Alle vier Wörter haben dieselbe Wortart und Endung. Entscheidend sind Bedeutung und <b>Kollokation</b> (welche Wörter zusammen gehen: <i>Stress auslösen</i>, <i>Proben entnehmen</i>).</li>
+      <li><b>Den ganzen Satz lesen:</b> Achten Sie auf die Präposition oder den Kasus nach der Lücke (<i>an</i> etwas erkranken, <i>der</i> Versuchung widerstehen).</li>
+      <li><b>Trennbare Verben:</b> Steht am Satzende ein kleines Wort wie <i>ein, ab, durch</i>? Dann gehört es zum Verb in der Lücke.</li>
+      <li><b>Vorsicht bei ähnlich aussehenden Wörtern:</b> <i>ausgewertet / umgewertet</i>, <i>gealtert / veraltet</i>. Das bekannteste Wort ist nicht automatisch richtig.</li>
+      <li><b>Über den Satz hinaus lesen:</b> Mindestens eine Lücke pro Text lässt sich nur mit dem Satz davor oder danach lösen (z. B. <i>obwohl</i>, <i>jedoch</i>).</li>
+      <li><b>Zeit:</b> Bei 4 Minuten bleiben etwa 45 Sekunden pro Lücke. Lesen Sie zuerst den ganzen Text einmal zügig.</li>
+    </ul>
+  </details>
+
+  <section class="exam" id="exam"></section>
+
+  <p class="note">Hinweis: Die Texte sind neu geschrieben und stützen sich auf den Inhalt der verlinkten Artikel, so wie Prüfungstexte im TestDaF gekürzt und bearbeitet werden. Die Optionen stehen wie in der Demo-Version alphabetisch. Tippen oder klicken Sie auf eine Lücke, um die vier Wörter zu sehen; mit den Tasten 1–4 können Sie auch direkt wählen.</p>
+</div>
+
+<script>
+const EX = [
+ {topic:"Musik gegen Stress", src:{t:"Wie Musik Stress lindert", a:"Elena Bernard", d:"11.09.2026", u:"https://wissenschaft.de/artikel/wie-musik-stress-lindert"},
+  text:"Musik kann Gefühle wecken und uns zum Tanzen bringen. Viele Menschen hören sie außerdem, um nach einem anstrengenden Tag zur Ruhe zu kommen. Ob Musik dabei tatsächlich stärker wirkt als andere ruhige Geräusche, war bislang jedoch nicht {0}. Ein Forschungsteam aus Peking hat dies nun genauer untersucht. Die Versuchspersonen mussten zunächst unter Zeitdruck Rechenaufgaben lösen, was bei ihnen Stress {1}. Anschließend hörte eine Gruppe Entspannungsmusik, die andere Meeresrauschen oder das Plätschern eines Wasserfalls. Das Ergebnis: In der Musikgruppe {2} sich Herzfrequenz, Cortisolspiegel und Stimmung deutlich schneller wieder ein. Aufnahmen im Hirnscanner zeigten zudem, dass der für Musik typische Wechsel von Spannung und Auflösung die Verbindung zwischen Hörrinde und stressverarbeitenden Hirnregionen {3}. Nach Ansicht der Forschenden ist Musik daher mehr als eine bloße {4}.",
+  g:[
+   {o:["behoben","erledigt","geklärt","verwirklicht"],a:2,tag:"Kollokation",w:"Eine Frage (hier: <i>ob …</i>) ist <b>geklärt</b>. <i>Behoben</i> wird ein Schaden oder Fehler, <i>erledigt</i> eine Aufgabe, <i>verwirklicht</i> ein Plan."},
+   {o:["auslöste","einleitete","erregte","hervorhob"],a:0,tag:"Kollokation",w:"<b>Stress / Angst / eine Reaktion auslösen</b>. <i>Einleiten</i> passt zu Maßnahmen oder Verfahren, <i>erregen</i> zu Aufsehen oder Aufmerksamkeit, <i>hervorheben</i> bedeutet „betonen“."},
+   {o:["fanden","pendelten","prägten","richteten"],a:1,tag:"Trennbares Verb",w:"Das <i>ein</i> am Satzende gehört zum Verb: <b>sich wieder einpendeln</b> = sich normalisieren. Alle Distraktoren bilden auch Verben mit <i>ein</i>: <i>sich einfinden</i> (erscheinen), <i>sich einprägen</i> (merken), <i>sich einrichten</i> (Wohnung, Situation)."},
+   {o:["beansprucht","beeinflusst","befürwortet","behauptet"],a:1,tag:"Bedeutung",w:"Der Wechsel in der Musik <b>beeinflusst</b> eine Verbindung im Gehirn. <i>Beanspruchen</i> = fordern / Zeit kosten, <i>befürworten</i> = eine Idee unterstützen, <i>behaupten</i> = etwas sagen – alle brauchen eine Person als Subjekt."},
+   {o:["Ablenkung","Anordnung","Bedingung","Verzögerung"],a:0,tag:"Textzusammenhang",w:"Die Studie verglich Musik mit anderen ruhigen Geräuschen und fand eine eigene Wirkung im Gehirn. Musik ist also mehr als <b>bloße Ablenkung</b>. Die anderen Nomen ergeben mit „mehr als eine bloße …“ keinen Sinn."}
+  ]},
+ {topic:"Feinstaub und Augen", src:{t:"Luftverschmutzung lässt die Sehkraft schwinden", a:"Nadja Podbregar", d:"15.09.2026", u:"https://wissenschaft.de/artikel/luftverschmutzung-laesst-die-sehkraft-schwinden"},
+  text:"Luftverschmutzung gehört weltweit zu den größten Gesundheitsrisiken. Dass Feinstaub Lunge und Herz schädigt, ist gut {0}. Über die Folgen für die Augen wusste man dagegen bisher wenig. Ein Team aus Saudi-Arabien hat deshalb 41 Studien mit Daten von mehreren Millionen Menschen {1}. Dabei zeigte sich: Wer in stark belasteten Regionen lebt, hat ein bis zu 70 Prozent höheres Risiko, am Grünen Star zu {2}. Auch das Risiko für den Grauen Star nahm mit der Schadstoffbelastung zu. Die Forschenden vermuten, dass die winzigen Partikel Entzündungen auslösen, die über Jahre den Sehnerv und die Linse {3}. Hinzu kommt, dass die Oberfläche des Auges der Luft direkt ausgesetzt ist. Die Ergebnisse liefern nach Ansicht des Teams ein weiteres Argument für strengere {4}.",
+  g:[
+   {o:["datiert","diktiert","dokumentiert","dosiert"],a:2,tag:"Bedeutung",w:"Eine Tatsache ist <b>gut dokumentiert</b> (durch viele Belege nachgewiesen). <i>Datiert</i> = mit Datum versehen, <i>diktiert</i> = vorgesprochen, <i>dosiert</i> = in einer bestimmten Menge gegeben."},
+   {o:["ausgewertet","ausgewiesen","eingewiesen","umgewertet"],a:0,tag:"Kollokation",w:"<b>Studien / Daten auswerten</b>. Vorsicht bei den ähnlichen Formen: <i>ausgewiesen</i> (aus einem Land geschickt / offiziell bezeichnet), <i>eingewiesen</i> (ins Krankenhaus / in eine Arbeit), <i>umgewertet</i> (neu bewertet)."},
+   {o:["ergrauen","erkranken","ermüden","erwachen"],a:1,tag:"Rektion",w:"<b>an etwas erkranken</b> (hier: <i>am</i> Grünen Star). Die anderen Verben verbinden sich nicht mit <i>an</i> + Krankheit."},
+   {o:["abgreifen","angreifen","aufgreifen","zugreifen"],a:1,tag:"Kollokation",w:"Entzündungen <b>greifen</b> Nerven und Gewebe <b>an</b> (= schädigen sie). <i>Aufgreifen</i> = ein Thema übernehmen, <i>abgreifen</i> = abnutzen / ugs. einsammeln, <i>zugreifen</i> hat kein Akkusativobjekt."},
+   {o:["Durchschnittswerte","Grenzwerte","Messwerte","Stellenwerte"],a:1,tag:"Textzusammenhang",w:"Politische Konsequenz aus einem Gesundheitsrisiko: <b>strengere Grenzwerte</b>. Messwerte und Durchschnittswerte kann man nicht „strenger“ machen; <i>Stellenwert</i> = Bedeutung."}
+  ]},
+ {topic:"Elefanten unter Versuchung", src:{t:"Elefanten können spontane Impulse unterdrücken", a:"Elena Bernard", d:"11.09.2026", u:"https://wissenschaft.de/artikel/elefanten-koennen-spontane-impulse-unterdruecken"},
+  text:"Elefanten leben in komplexen Familienverbänden und können sogar Werkzeuge benutzen. Über ihre Fähigkeit, spontane Impulse zu unterdrücken, ist jedoch wenig bekannt. Ein Team aus New York hat diese Form der Selbstkontrolle nun bei 16 Asiatischen Elefanten in Thailand {0}. Die Tiere lernten zunächst, von unten in eine undurchsichtige Box zu greifen, in der ein Apfel lag. Danach bekamen sie eine durchsichtige Box. Obwohl die Frucht nun zu sehen und zu riechen war, {1} die Elefanten der Versuchung, direkt von vorne zuzugreifen, und nutzten weiterhin die Öffnung unten. Schwieriger wurde es, als die Forschenden die Öffnung auf die Seite verlegten. Vor allem ältere Tiere suchten mehrmals an der gewohnten Stelle, bevor sie ihr Verhalten an die neue Situation {2}. Die Ergebnisse könnten helfen, Konflikte zwischen Menschen und Elefanten zu {3}: Wildelefanten überwinden häufig Elektrozäune, um auf Felder zu gelangen. Wer ihr Verhalten versteht, kann wirksamere {4} entwickeln.",
+  g:[
+   {o:["unterdrückt","untersucht","untertrieben","unterzeichnet"],a:1,tag:"Bedeutung",w:"Ein Forschungsteam <b>untersucht</b> eine Fähigkeit. Falle: <i>unterdrückt</i> steht schon im Satz davor – dort geht es aber um Impulse. <i>Untertrieben</i> = kleiner dargestellt, <i>unterzeichnet</i> = unterschrieben."},
+   {o:["erlagen","gehorchten","wichen","widerstanden"],a:3,tag:"Textzusammenhang",w:"<i>Obwohl</i> die Frucht sichtbar war, nutzten die Tiere <i>weiterhin</i> die Öffnung unten – sie <b>widerstanden der Versuchung</b>. <i>Erlagen / wichen / gehorchten</i> passen grammatisch (Dativ), bedeuten aber das Gegenteil."},
+   {o:["anpassten","anrechneten","anschlossen","anzeigten"],a:0,tag:"Rektion",w:"<b>etwas an eine Situation anpassen</b>. <i>Anrechnen</i> = berücksichtigen (Kosten, Zeit), <i>sich anschließen</i> braucht ein Reflexivpronomen, <i>anzeigen</i> = melden."},
+   {o:["verlängern","verringern","verschieben","verzeichnen"],a:1,tag:"Kollokation",w:"Hilfreiche Ergebnisse sollen <b>Konflikte verringern</b>. <i>Verlängern</i> wäre negativ, <i>verschieben</i> passt zu Terminen, <i>verzeichnen</i> = registrieren."},
+   {o:["Lernstrategien","Schutzstrategien","Suchstrategien","Werbestrategien"],a:1,tag:"Textzusammenhang",w:"Elefanten überwinden Zäune, um auf Felder zu gelangen – also braucht man bessere <b>Schutzstrategien</b> für die Felder."}
+  ]},
+ {topic:"KI und Sprachvielfalt", src:{t:"Wie künstliche Intelligenz unsere Sprache verarmt", a:"Nadja Podbregar", d:"07.09.2026", u:"https://wissenschaft.de/artikel/wie-kuenstliche-intelligenz-unsere-sprache-verarmt"},
+  text:"Chatbots wie ChatGPT sind für viele Menschen zu einem alltäglichen Werkzeug beim Schreiben geworden. Doch welche Folgen hat es für unsere Sprache, wenn immer mehr Texte von einer KI verfasst oder überarbeitet werden? Um diese Frage zu {0}, analysierte ein Team aus Los Angeles mehr als 880.000 englischsprachige Texte, die vor und nach der Einführung von ChatGPT entstanden waren. Dabei {1} sich ein deutlicher Trend ab: Die sprachliche Vielfalt ging in allen Textsorten zurück, und die Texte glichen einander immer stärker. In einem zusätzlichen Experiment ließen die Forschenden 1.000 menschliche Texte von KI-Modellen umformulieren. Der Inhalt blieb dabei weitgehend {2}, die sprachliche Komplexität der überarbeiteten Texte sank jedoch um bis zu 50 Prozent. Die Forschenden sehen darin eine {3} Entwicklung: Da Sprache und Denken eng miteinander verbunden sind, könnte langfristig auch die Vielfalt unseres Denkens {4}.",
+  g:[
+   {o:["beanspruchen","beantragen","beantworten","beauftragen"],a:2,tag:"Kollokation",w:"<b>eine Frage beantworten</b>. Vier ähnlich aussehende <i>be-</i>-Verben: <i>beanspruchen</i> (Zeit, Rechte), <i>beantragen</i> (Visum, Stipendium), <i>beauftragen</i> (jemanden mit einer Aufgabe)."},
+   {o:["fand","gab","wandte","zeichnete"],a:3,tag:"Trennbares Verb",w:"Das <i>ab</i> nach „Trend“ gehört zum Verb: <b>sich abzeichnen</b> = langsam sichtbar werden. <i>Sich abfinden</i> = akzeptieren, <i>sich abgeben</i> = sich beschäftigen, <i>sich abwenden</i> = sich wegdrehen."},
+   {o:["erhalten","erhoben","erlaubt","erzogen"],a:0,tag:"Textzusammenhang",w:"Kontrast mit <i>jedoch</i>: Der Inhalt blieb <b>erhalten</b> (unverändert), <i>jedoch</i> sank die Komplexität. <i>Erhoben</i> (Daten erheben / Hand heben), <i>erlaubt</i> und <i>erzogen</i> passen nicht zu „Inhalt“."},
+   {o:["bedächtige","bedenkliche","bedürftige","behagliche"],a:1,tag:"Bedeutung",w:"Nach dem Doppelpunkt folgt eine Warnung → eine <b>bedenkliche</b> (Sorge erregende) Entwicklung. <i>Bedächtig</i> = langsam und ruhig, <i>bedürftig</i> = arm, <i>behaglich</i> = gemütlich."},
+   {o:["abnehmen","absagen","abstimmen","abwarten"],a:0,tag:"Bedeutung",w:"Die Vielfalt kann <b>abnehmen</b> (kleiner werden). <i>Absagen</i> (Termin), <i>abstimmen</i> (Wahl) und <i>abwarten</i> brauchen eine Person als Subjekt."}
+  ]},
+ {topic:"Methan aus Gletschern", src:{t:"Schmelzende Gletscher setzen uraltes Methan frei", a:"Elena Bernard", d:"10.09.2026", u:"https://wissenschaft.de/artikel/schmelzende-gletscher-setzen-uraltes-methan-frei"},
+  text:"Wenn Permafrostböden tauen und Gletscher schmelzen, können lange gespeicherte Treibhausgase in die Atmosphäre gelangen. Welche Rolle das Schmelzwasser von Gletschern dabei spielt, wurde bislang kaum {0}. Forschende aus Norwegen haben deshalb 148 Wasserproben aus 19 Flüssen auf Spitzbergen {1}. Alle Proben enthielten deutlich mehr Methan als erwartet, im Extremfall das 425-Fache. Mithilfe von Isotopenanalysen konnte das Team auch die {2} des Gases bestimmen: Es stammt nicht von Mikroben, sondern aus Schiefergestein, in dem sich über Jahrmillionen Erdgas gebildet hat. Das Schmelzwasser nimmt das Gas auf, wenn es durch Spalten bis zum Grund des Gletschers {3}. Im Vergleich zu den Emissionen des Menschen sind die Mengen zwar gering. Sie weisen jedoch auf eine Rückkopplung hin, die sich mit der Erwärmung der Arktis weiter {4} könnte.",
+  g:[
+   {o:["erbeten","erforscht","erfunden","erhofft"],a:1,tag:"Bedeutung",w:"Eine offene wissenschaftliche Frage wurde <b>kaum erforscht</b> → deshalb die neue Studie. <i>Erbeten</i> = höflich verlangt, <i>erfunden</i> = neu geschaffen / ausgedacht, <i>erhofft</i> = gewünscht."},
+   {o:["entnommen","übernommen","vernommen","zugenommen"],a:0,tag:"Kollokation",w:"<b>Proben (aus etwas) entnehmen</b>. <i>Übernehmen</i> = Verantwortung / Firma, <i>vernehmen</i> = hören / Zeugen befragen, <i>zunehmen</i> = mehr werden (ohne Objekt)."},
+   {o:["Ankunft","Auskunft","Herkunft","Zukunft"],a:2,tag:"Textzusammenhang",w:"Der Satz nach dem Doppelpunkt sagt, woher das Gas <i>stammt</i> → <b>Herkunft</b>. Alle vier Nomen enden auf <i>-kunft</i>."},
+   {o:["sichert","sichtet","sickert","siedet"],a:2,tag:"Bedeutung",w:"Wasser <b>sickert</b> langsam durch Spalten nach unten. <i>Sichern</i> = schützen, <i>sichten</i> = sehen / durchsehen, <i>sieden</i> = kochen."},
+   {o:["verständigen","verstärken","verstecken","versteigern"],a:1,tag:"Kollokation",w:"<b>Eine Rückkopplung / ein Effekt verstärkt sich</b> mit der Erwärmung. <i>Sich verständigen</i> = kommunizieren, <i>sich verstecken</i> = sich verbergen, <i>versteigern</i> = auf einer Auktion verkaufen."}
+  ]},
+ {topic:"Warum wir aufschieben", src:{t:"Prokrastination: Welcher Aufschiebe-Typ bin ich?", a:"Nadja Podbregar", d:"14.09.2026", u:"https://wissenschaft.de/artikel/prokrastination-welcher-aufschiebe-typ-bin-ich"},
+  text:"Fast jeder schiebt unangenehme Aufgaben gelegentlich vor sich her. Die Folgen reichen von verpassten Fristen bis zu schlechteren Prüfungsergebnissen. Viele halten das Aufschieben für ein Problem mangelnder Motivation. Der Psychologe Itamar Shatz von der University of Cambridge {0} dieser Annahme jedoch. Er hat rund hundert Studien ausgewertet und kommt zu dem Schluss, dass beim Aufschieben vor allem zwei Neigungen {1}: der Wunsch, Unangenehmes zu vermeiden, und die Tendenz, sich auf das Unmittelbare zu konzentrieren. In solchen Momenten {2} sich meist das kurzfristig Angenehmere gegen langfristige Ziele durch. Shatz unterscheidet außerdem neun Typen von Aufschiebern, zum Beispiel den Perfektionisten oder den Träumer, und empfiehlt für jeden eigene Strategien. Perfektionisten etwa sollten große Aufgaben in kleine Schritte {3} und sich mit einem „gut genug“ zufriedengeben. Letztlich gehe es nicht um maximale Produktivität, betont Shatz, sondern darum, ohne {4} handeln zu können.",
+  g:[
+   {o:["entspricht","gehorcht","widerspricht","widersteht"],a:2,tag:"Textzusammenhang",w:"<i>jedoch</i> zeigt einen Gegensatz zu „Viele halten …“ → Shatz <b>widerspricht</b> der Annahme. <i>Entspricht</i> wäre das Gegenteil; <i>widersteht</i> passt zu einer Versuchung, <i>gehorcht</i> zu einer Regel oder Person."},
+   {o:["zusammenbrechen","zusammenfassen","zusammenwirken","zusammenzählen"],a:2,tag:"Textzusammenhang",w:"Beide Neigungen (Unangenehmes vermeiden, auf das Unmittelbare schauen) führen in dieselbe Richtung – zum Aufschieben. Sie <b>wirken zusammen</b>. <i>Zusammenfassen</i> und <i>zusammenzählen</i> brauchen ein Objekt, <i>zusammenbrechen</i> = kollabieren."},
+   {o:["bringt","führt","liest","setzt"],a:3,tag:"Trennbares Verb",w:"Das <i>durch</i> am Satzende gehört zum Verb: <b>sich (gegen etwas) durchsetzen</b> = gewinnen. <i>Sich durchbringen</i> = mit wenig Geld leben; <i>durchführen</i> und <i>durchlesen</i> sind nicht reflexiv."},
+   {o:["zerbrechen","zerlegen","zerstören","zerstreuen"],a:1,tag:"Kollokation",w:"<b>eine Aufgabe in Schritte zerlegen</b> (in Teile aufteilen). <i>Zerbrechen</i> = kaputt gehen (Glas), <i>zerstören</i> = kaputt machen, <i>zerstreuen</i> = verteilen / ablenken."},
+   {o:["Schuldgefühle","Schuldscheine","Schuldsprüche","Schuldzinsen"],a:0,tag:"Bedeutung",w:"Frei handeln <b>ohne Schuldgefühle</b> (schlechtes Gewissen). Die anderen Komposita gehören zu Recht und Finanzen: <i>Schuldschein</i> (Kreditvertrag), <i>Schuldspruch</i> (Urteil), <i>Schuldzinsen</i> (Kreditkosten)."}
+  ]},
+ {topic:"Das Gedächtnis des Fettgewebes", src:{t:"Wie Immunzellen im Fettgewebe das Abnehmen erschweren", a:"Elena Bernard", d:"10.09.2026", u:"https://wissenschaft.de/artikel/wie-immunzellen-im-fettgewebe-das-abnehmen-erschweren"},
+  text:"Viele Menschen mit starkem Übergewicht nehmen nach einer Diät rasch wieder zu. Dieser sogenannte Jojo-Effekt lässt sich offenbar teilweise durch ein „Gedächtnis“ des Fettgewebes {0}. Eine wichtige Rolle spielen dabei Makrophagen. Diese Fresszellen beseitigen absterbende Zellen und geben einen Botenstoff ab, der die Fettverbrennung {1}. Ein japanisches Forschungsteam machte Mäuse mit fettreichem Futter übergewichtig und setzte sie anschließend auf Diät. Bei den übergewichtigen Tieren war ein bestimmtes Protein kaum aktiv. Die Makrophagen konnten dadurch ihre {2} nur schlechter erfüllen und setzten weniger von dem Botenstoff frei. Diese Störung blieb selbst nach der Gewichtsabnahme {3}. Da der Mechanismus bislang vor allem an Mäusen gezeigt wurde, lassen sich die Ergebnisse allerdings nicht ohne Weiteres auf den Menschen {4}.",
+  g:[
+   {o:["begleichen","erklären","erlassen","ernähren"],a:1,tag:"Bedeutung",w:"Ein Effekt <b>lässt sich durch etwas erklären</b>. Falle: <i>ernähren</i> passt zum Thema Diät, aber nicht zum Satz. <i>Begleichen</i> = eine Rechnung bezahlen, <i>erlassen</i> = ein Gesetz verabschieden / Schulden streichen."},
+   {o:["anordnet","anredet","anregt","anreichert"],a:2,tag:"Kollokation",w:"Ein Botenstoff <b>regt die Fettverbrennung an</b> (= fördert sie). <i>Anordnen</i> = befehlen, <i>anreden</i> = ansprechen, <i>anreichern</i> = den Anteil erhöhen (z. B. Uran)."},
+   {o:["Aufgaben","Aufnahmen","Ausgaben","Aussagen"],a:0,tag:"Kollokation",w:"<b>seine Aufgaben erfüllen</b>. Der Satz davor nennt die Aufgaben der Makrophagen (Zellen beseitigen, Botenstoff abgeben). <i>Aufnahmen</i> = Fotos, <i>Ausgaben</i> = Kosten, <i>Aussagen</i> = Äußerungen."},
+   {o:["unbeantwortet","unverändert","unversucht","unvollendet"],a:1,tag:"Bedeutung",w:"Die Störung <b>bleibt unverändert</b> = sie besteht auch nach der Diät weiter. <i>Unbeantwortet</i> (Frage), <i>unversucht</i> (nichts unversucht lassen), <i>unvollendet</i> (Werk)."},
+   {o:["übergeben","überlassen","übersetzen","übertragen"],a:3,tag:"Kollokation",w:"<b>Ergebnisse (von Mäusen) auf den Menschen übertragen</b>. <i>Übergeben</i> = aushändigen, <i>überlassen</i> = jemandem etwas geben / entscheiden lassen, <i>übersetzen</i> = in eine andere Sprache."}
+  ]},
+ {topic:"Geld für Mütter", src:{t:"Extra-Geld für Mütter könnte Kindergesundheit fördern", a:"Nadja Podbregar", d:"14.09.2026", u:"https://wissenschaft.de/artikel/extra-geld-fuer-muetter-koennte-kindergesundheit-foerdern"},
+  text:"Kinder aus armen Familien sind häufiger chronisch krank und haben eine geringere Lebenserwartung. In ihrem Erbgut finden sich zudem Spuren, die auf ein beschleunigtes biologisches Altern {0}. Ob Armut diese Veränderungen tatsächlich verursacht, war jedoch unklar. Ein internationales Team hat nun Daten einer US-Studie ausgewertet, an der rund 1.000 einkommensschwache Mütter {1}. 400 von ihnen erhielten ab der Geburt ihres Kindes jeden Monat 333 Dollar, ohne dafür Bedingungen erfüllen zu müssen. Die übrigen bekamen lediglich 20 Dollar. Im Alter von vier Jahren waren die Kinder aus der 333-Dollar-Gruppe epigenetisch weniger {2} als die Kinder der Vergleichsgruppe. Bei den Müttern selbst ließ sich dagegen kein solcher Effekt {3}. Obwohl der Unterschied bei den Kindern klein ist, halten die Forschenden ihn für bedeutsam: Da sich beschleunigtes Altern im Laufe des Lebens {4}, könnten schon kleine Veränderungen in der Kindheit langfristig viel bewirken.",
+  g:[
+   {o:["hindeuten","hinnehmen","hinterfragen","hinzufügen"],a:0,tag:"Rektion",w:"<b>auf etwas hindeuten</b> = ein Hinweis auf etwas sein. <i>Hinnehmen</i> = akzeptieren, <i>hinterfragen</i> = kritisch prüfen, <i>hinzufügen</i> = ergänzen – keins davon steht mit <i>auf</i>."},
+   {o:["abnahmen","festhielten","teilnahmen","zweifelten"],a:2,tag:"Rektion",w:"<b>an einer Studie teilnehmen</b>. Falle: <i>an etwas festhalten</i> und <i>an etwas zweifeln</i> haben auch <i>an</i>, ergeben aber keinen Sinn – die Mütter erhielten Geld in der Studie."},
+   {o:["entfaltet","erkaltet","gealtert","veraltet"],a:2,tag:"Bedeutung",w:"Menschen und Zellen <b>altern</b> → <i>gealtert</i>. Falle: <i>veraltet</i> sagt man über Technik oder Wissen. <i>Entfaltet</i> = geöffnet / entwickelt, <i>erkaltet</i> = kalt geworden."},
+   {o:["nachahmen","nachholen","nachschlagen","nachweisen"],a:3,tag:"Kollokation",w:"<b>einen Effekt nachweisen</b> (wissenschaftlich belegen). <i>Nachahmen</i> = imitieren, <i>nachholen</i> = später machen, <i>nachschlagen</i> = in einem Buch suchen."},
+   {o:["saniert","sondiert","sortiert","summiert"],a:3,tag:"Textzusammenhang",w:"Kleine Veränderungen können <i>langfristig viel bewirken</i>, weil sich Altern <b>summiert</b> (Stück für Stück addiert). <i>Sanieren</i> = renovieren / finanziell retten, <i>sondieren</i> = vorsichtig erkunden, <i>sortieren</i> = ordnen."}
+  ]}
+];
+
+const TIME = 240;
+let best = {};
+try { best = JSON.parse(localStorage.getItem("tdaf1-best") || "{}") || {}; } catch(e) { best = {}; }
+const state = EX.map(ex => ({pick: ex.g.map(() => null), checked:false, left:TIME}));
+let cur = 0;
+try { const c = parseInt(localStorage.getItem("tdaf1-cur"),10); if (c>=0 && c<EX.length) cur = c; } catch(e){}
+let openGap = null;
+
+const $nav = document.getElementById("nav"), $exam = document.getElementById("exam");
+const fmt = s => { s = Math.abs(s); return Math.floor(s/60) + ":" + String(s%60).padStart(2,"0"); };
+const LET = ["a","b","c","d"];
+
+function renderNav(){
+  $nav.innerHTML = "";
+  EX.forEach((ex,i) => {
+    const b = document.createElement("button");
+    b.className = "chip"; b.type = "button"; b.id = "chip-"+i;
+    b.setAttribute("aria-current", i===cur ? "true" : "false");
+    b.innerHTML = `<span class="n">${i+1}</span>${ex.topic}` + (best[i]!=null ? `<span class="best">${best[i]}/5</span>` : "");
+    b.onclick = () => go(i);
+    $nav.appendChild(b);
+  });
+}
+function go(i){ cur = i; openGap = null; try{localStorage.setItem("tdaf1-cur", i);}catch(e){} render(); }
+
+function gapHTML(ex, st, k){
+  const p = st.pick[k];
+  let cls = "gap" + (p!==null ? " filled" : "");
+  let extra = "";
+  if (st.checked){
+    cls += " locked " + (p === ex.g[k].a ? "ok" : "bad");
+    if (p !== ex.g[k].a) extra = ` <span class="fix">→ ${ex.g[k].o[ex.g[k].a]}</span>`;
+  }
+  const word = p!==null ? ex.g[k].o[p] : "……………";
+  return `<button type="button" class="${cls}${openGap===k?" open":""}" id="gap-${k}" data-g="${k}" aria-haspopup="menu" aria-label="Lücke ${k+1}"><span class="gn">${k+1}</span><span class="gw">${word}</span>${extra}</button>`;
+}
+
+function render(){
+  renderNav();
+  const ex = EX[cur], st = state[cur];
+  const body = ex.text.replace(/\{(\d)\}/g, (_,k) => gapHTML(ex, st, +k));
+  $exam.innerHTML = `
+    <div class="bar">
+      <div class="what"><span class="eyebrow">Übung ${cur+1} von ${EX.length}</span><h2>${ex.topic}</h2></div>
+      <div class="timer" id="timer" aria-label="Verbleibende Zeit"></div>
+    </div>
+    <div class="instr">
+      <p>Lesen Sie den Lückentext.</p>
+      <p>Klicken Sie in die Lücken und entscheiden Sie, welches Wort passt.</p>
+      <p>Für jede Lücke gibt es genau eine richtige Lösung.</p>
+      <p>Sie haben 4 Minuten Zeit.</p>
+    </div>
+    <div class="textbox" id="textbox">
+      <p class="text">${body}</p>
+    </div>
+    <div class="actions">
+      <button class="btn primary" id="check" type="button" ${st.checked?"disabled":""}>Auswerten</button>
+      <button class="btn" id="reset" type="button">Neu beginnen</button>
+      ${cur < EX.length-1 ? `<button class="btn" id="next" type="button">Nächste Übung →</button>` : ""}
+    </div>
+    <div id="result"></div>
+    <footer class="src">Textgrundlage: „<a href="${ex.src.u}" target="_blank" rel="noopener">${ex.src.t}</a>“ von ${ex.src.a}, wissenschaft.de, ${ex.src.d} (neu geschrieben und gekürzt).</footer>`;
+  document.getElementById("check").onclick = check;
+  document.getElementById("reset").onclick = () => { state[cur] = {pick: ex.g.map(() => null), checked:false, left:TIME}; openGap=null; render(); };
+  const nx = document.getElementById("next"); if (nx) nx.onclick = () => { go(cur+1); window.scrollTo({top:0}); };
+  if (openGap !== null) showMenu(openGap);
+  if (st.checked) renderResult();
+  updateTimer();
+}
+
+function showMenu(k){
+  const ex = EX[cur], st = state[cur];
+  const box = document.getElementById("textbox"), gap = document.getElementById("gap-"+k);
+  const m = document.createElement("div");
+  m.className = "menu"; m.setAttribute("role","menu"); m.id = "menu";
+  ex.g[k].o.forEach((w,i) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.setAttribute("role","menuitemradio");
+    b.setAttribute("aria-checked", st.pick[k]===i ? "true":"false");
+    b.textContent = w;
+    b.onclick = ev => { ev.stopPropagation(); st.pick[k] = i; openGap = null; render(); const g = document.getElementById("gap-"+k); if (g) g.focus(); };
+    m.appendChild(b);
+  });
+  box.appendChild(m);
+  const br = box.getBoundingClientRect(), gr = gap.getBoundingClientRect();
+  let left = gr.left - br.left;
+  const maxLeft = box.clientWidth - m.offsetWidth - 8;
+  m.style.left = Math.max(8, Math.min(left, maxLeft)) + "px";
+  m.style.top = (gr.bottom - br.top + 4) + "px";
+  const first = m.querySelector('[aria-checked="true"]') || m.querySelector("button");
+  first.focus({preventScroll:true});
+}
+
+$exam.addEventListener("click", e => {
+  e.stopPropagation();
+  const gap = e.target.closest(".gap");
+  if (gap && !state[cur].checked){
+    const k = +gap.dataset.g;
+    openGap = openGap === k ? null : k;
+    render(); return;
+  }
+  if (!e.target.closest(".menu") && openGap !== null){ openGap = null; render(); }
+});
+document.addEventListener("click", e => { if (openGap!==null && !$exam.contains(e.target)){ openGap = null; render(); } });
+document.addEventListener("keydown", e => {
+  if (openGap === null) return;
+  if (e.key === "Escape"){ const k = openGap; openGap = null; render(); const g = document.getElementById("gap-"+k); if (g) g.focus(); }
+  if (/^[1-4]$/.test(e.key)){ state[cur].pick[openGap] = +e.key-1; openGap = null; render(); }
+  if (e.key === "ArrowDown" || e.key === "ArrowUp"){
+    const items = [...document.querySelectorAll("#menu button")]; const i = items.indexOf(document.activeElement);
+    const n = e.key === "ArrowDown" ? (i+1)%items.length : (i-1+items.length)%items.length;
+    items[n].focus(); e.preventDefault();
+  }
+});
+
+function check(){
+  const ex = EX[cur], st = state[cur];
+  st.checked = true; openGap = null;
+  st.score = st.pick.filter((p,k) => p === ex.g[k].a).length;
+  st.used = TIME - st.left;
+  if (best[cur]==null || st.score > best[cur]) { best[cur] = st.score; try{ localStorage.setItem("tdaf1-best", JSON.stringify(best)); }catch(e){} }
+  render();
+  document.getElementById("result").scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"});
+}
+
+function renderResult(){
+  const ex = EX[cur], st = state[cur];
+  const used = st.used;
+  const timeTxt = used <= TIME ? `Zeit: ${fmt(used)} von 4:00` : `Zeit: ${fmt(used)} (${fmt(used-TIME)} über dem Limit)`;
+  const msg = st.score===5 ? "Alles richtig." : st.score>=3 ? "Gut – lesen Sie die Erklärungen zu den roten Lücken." : "Lesen Sie die Erklärungen und versuchen Sie es noch einmal.";
+  const items = ex.g.map((g,k) => {
+    const yours = st.pick[k]===null ? "keine Antwort" : g.o[st.pick[k]];
+    const right = st.pick[k] === g.a;
+    return `<li><span class="pos">${k+1}</span><div>
+      <div><span class="ans">${g.o[g.a]}</span><span class="tag">${g.tag}</span>${right ? "" : ` <span style="color:var(--bad)">· Ihre Antwort: ${yours}</span>`}</div>
+      <div class="opts">${g.o.map((o,i)=>`${LET[i]}) ${o}`).join("  ")}</div>
+      <div class="why">${g.w}</div></div></li>`;
+  }).join("");
+  document.getElementById("result").innerHTML = `
+    <div class="result">
+      <div class="score"><strong>${st.score} / 5</strong><span>${msg}</span><span>${timeTxt}</span></div>
+      <ol class="expl">${items}</ol>
+    </div>`;
+}
+
+function updateTimer(){
+  const t = document.getElementById("timer"); if (!t) return;
+  const st = state[cur];
+  t.textContent = st.left >= 0 ? fmt(st.left) : "Zeit abgelaufen +" + fmt(st.left);
+  t.classList.toggle("low", st.left <= 60 && st.left >= 0);
+  t.classList.toggle("over", st.left < 0);
+}
+setInterval(() => { const st = state[cur]; if (!st.checked && !document.hidden) { st.left--; updateTimer(); } }, 1000);
+
+render();
+</script>
+
+</body></html>

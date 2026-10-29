@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prüfungsheft — TestDaF Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f0eee8;
+    --paper-raised:#f8f7f3;
+    --ink:#1b2a4a;
+    --ink-soft:#3c4a68;
+    --text:#2a2721;
+    --text-muted:#6b6459;
+    --rule:#d8d3c6;
+    --gold:#c99a3b;   /* TDN 5 */
+    --teal:#3e7c74;   /* TDN 4 */
+    --clay:#b5652e;   /* TDN 3 */
+    --red:#a23e32;    /* unter TDN 3 */
+    --uebung:#3e7c74;
+    --pruef:#a23e32;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--text);
+    font-family:'IBM Plex Sans', sans-serif;
+    line-height:1.5;
+    min-height:100vh;
+  }
+  h1,h2,h3,.serif{ font-family:'Source Serif 4', serif; }
+  ::selection{ background:var(--gold); color:#fff; }
+  a{ color:var(--ink); }
+
+  /* ---------- layout shell ---------- */
+  .shell{ display:flex; min-height:100vh; }
+  .sidebar{
+    width:230px; flex-shrink:0;
+    background:var(--ink);
+    color:#e9e6dd;
+    padding:28px 0;
+    position:sticky; top:0; height:100vh; overflow-y:auto;
+  }
+  .brand{ padding:0 22px 22px 22px; border-bottom:1px solid rgba(255,255,255,.14); margin-bottom:10px;}
+  .brand .mark{ font-family:'Source Serif 4', serif; font-weight:700; font-size:1.5rem; letter-spacing:.3px; }
+  .brand .sub{ font-size:.78rem; color:#b9c2d6; margin-top:4px; }
+  nav.tabs{ display:flex; flex-direction:column; }
+  nav.tabs button{
+    all:unset; cursor:pointer;
+    padding:13px 22px; font-size:.95rem; color:#cfd6e6;
+    border-left:3px solid transparent;
+    display:flex; align-items:center; gap:10px;
+  }
+  nav.tabs button .num{ font-family:'IBM Plex Mono', monospace; font-size:.72rem; color:#7c88a6; width:16px;}
+  nav.tabs button:hover{ background:rgba(255,255,255,.06); color:#fff; }
+  nav.tabs button.active{ background:rgba(255,255,255,.09); color:#fff; border-left-color:var(--gold); font-weight:600; }
+  .sidebar .divider{ height:1px; background:rgba(255,255,255,.14); margin:14px 22px; }
+
+  .main{ flex:1; min-width:0; padding:36px 44px 80px; }
+  .paper{
+    background:var(--paper-raised);
+    border:1px solid var(--rule);
+    max-width:900px;
+    margin:0 auto;
+    padding:34px 40px;
+    position:relative;
+  }
+  .paper + .paper{ margin-top:26px; }
+
+  .topline{
+    display:flex; align-items:center; justify-content:space-between;
+    max-width:900px; margin:0 auto 18px; gap:16px; flex-wrap:wrap;
+  }
+  .topline h2{ margin:0; font-size:1.5rem; color:var(--ink); }
+  .topline .desc{ color:var(--text-muted); font-size:.9rem; margin-top:2px;}
+
+  /* mode switch, styled as a stamp toggle */
+  .mode-switch{ display:flex; border:1.5px solid var(--ink); }
+  .mode-switch button{
+    all:unset; cursor:pointer; padding:8px 16px; font-size:.82rem; font-weight:600;
+    font-family:'IBM Plex Mono', monospace; letter-spacing:.02em; color:var(--ink);
+  }
+  .mode-switch button + button{ border-left:1.5px solid var(--ink); }
+  .mode-switch button.active.uebung{ background:var(--uebung); color:#fff; }
+  .mode-switch button.active.pruefung{ background:var(--pruef); color:#fff; }
+
+  .stamp{
+    position:absolute; top:22px; right:34px;
+    border:2px solid; padding:5px 12px; font-family:'IBM Plex Mono',monospace;
+    font-size:.72rem; letter-spacing:.06em; transform:rotate(3deg);
+    opacity:.85;
+  }
+  .stamp.uebung{ color:var(--uebung); border-color:var(--uebung); }
+  .stamp.pruefung{ color:var(--pruef); border-color:var(--pruef); }
+
+  /* ---------- home / dashboard ---------- */
+  .skills-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; margin-top:22px; }
+  .skill-card{ border:1px solid var(--rule); background:var(--paper-raised); padding:20px; cursor:pointer; transition:border-color .15s; }
+  .skill-card:hover{ border-color:var(--ink); }
+  .skill-card h3{ margin:0 0 6px; font-size:1.15rem; }
+  .skill-card p{ margin:0; color:var(--text-muted); font-size:.85rem; }
+  .skill-card .badge-row{ margin-top:14px; }
+
+  .tdn-badge{
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:'IBM Plex Mono', monospace; font-size:.78rem; font-weight:600;
+    padding:4px 10px; border:1.5px solid; letter-spacing:.02em;
+  }
+  .tdn-badge.tdn5{ color:var(--gold); border-color:var(--gold); }
+  .tdn-badge.tdn4{ color:var(--teal); border-color:var(--teal); }
+  .tdn-badge.tdn3{ color:var(--clay); border-color:var(--clay); }
+  .tdn-badge.tdn0{ color:var(--red); border-color:var(--red); }
+  .tdn-badge.pending{ color:var(--text-muted); border-color:var(--rule); }
+
+  /* ---------- exercise list ---------- */
+  .ex-list{ display:flex; flex-direction:column; gap:10px; margin-top:18px; }
+  .ex-item{
+    display:flex; align-items:center; justify-content:space-between; gap:14px;
+    border:1px solid var(--rule); padding:14px 18px; background:var(--paper-raised);
+  }
+  .ex-item .meta{ font-size:.8rem; color:var(--text-muted); margin-top:2px; }
+  .btn{
+    all:unset; cursor:pointer; font-weight:600; font-size:.85rem;
+    padding:9px 18px; border:1.5px solid var(--ink); color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+  }
+  .btn:hover{ background:var(--ink); color:#fff; }
+  .btn.primary{ background:var(--ink); color:#fff; }
+  .btn.primary:hover{ opacity:.85; }
+  .btn.ghost{ border-color:var(--rule); color:var(--text-muted); }
+  .btn.ghost:hover{ background:transparent; color:var(--text); border-color:var(--text); }
+  .btn[disabled]{ opacity:.4; cursor:not-allowed; }
+  .btn[disabled]:hover{ background:transparent; color:var(--ink); }
+
+  /* ---------- timer ---------- */
+  .exam-timer{
+    display:flex; align-items:center; gap:14px; margin-bottom:22px;
+    padding:14px 18px; border:1.5px solid var(--pruef); background:#fff8f6;
+  }
+  .exam-timer .clock{ font-family:'IBM Plex Mono', monospace; font-size:1.6rem; font-weight:600; color:var(--pruef); min-width:78px; }
+  .exam-timer .track{ flex:1; height:6px; background:#f0d9d2; position:relative; }
+  .exam-timer .track .fill{ height:100%; background:var(--pruef); width:100%; transition:width 1s linear; }
+  .exam-timer .label{ font-size:.78rem; color:var(--text-muted); font-family:'IBM Plex Mono',monospace; }
+
+  /* ---------- reading / listening text ---------- */
+  .passage{
+    font-family:'Source Serif 4', serif; font-size:1.05rem; line-height:1.7;
+    max-width:70ch; color:var(--text); border-left:3px solid var(--rule); padding-left:20px; margin:18px 0 28px;
+  }
+  .qblock{ margin-bottom:26px; padding-bottom:22px; border-bottom:1px solid var(--rule); }
+  .qblock:last-child{ border-bottom:none; }
+  .qblock .qnum{ font-family:'IBM Plex Mono',monospace; color:var(--text-muted); font-size:.8rem; }
+  .qblock .qtext{ font-weight:600; margin:4px 0 12px; }
+  .options{ display:flex; flex-direction:column; gap:8px; }
+  .option{
+    display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--rule);
+    cursor:pointer; font-size:.92rem;
+  }
+  .option:hover{ border-color:var(--ink-soft); }
+  .option.selected{ border-color:var(--ink); background:#eef0f6; }
+  .option.correct{ border-color:var(--teal); background:#e9f3f1; }
+  .option.incorrect{ border-color:var(--red); background:#fbeceA; }
+  .option input{ accent-color:var(--ink); }
+  .explain{ margin-top:10px; font-size:.85rem; color:var(--text-muted); background:#f4f2ec; padding:10px 12px; border-left:3px solid var(--gold); display:none; }
+  .explain.show{ display:block; }
+
+  .tf-row{ display:flex; gap:8px; margin-top:4px; }
+  .tf-row button{
+    all:unset; cursor:pointer; padding:8px 14px; border:1px solid var(--rule); font-size:.85rem;
+  }
+  .tf-row button.selected{ border-color:var(--ink); background:#eef0f6; font-weight:600; }
+  .tf-row button.correct{ border-color:var(--teal); background:#e9f3f1; }
+  .tf-row button.incorrect{ border-color:var(--red); background:#fbeceA; }
+
+  .match-row{ display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+  .match-row .para-label{ width:110px; flex-shrink:0; font-family:'IBM Plex Mono',monospace; font-size:.8rem; color:var(--text-muted); }
+  .match-row select{ flex:1; padding:8px; border:1px solid var(--rule); font-family:'IBM Plex Sans'; }
+  .match-row select.correct{ border-color:var(--teal); }
+  .match-row select.incorrect{ border-color:var(--red); }
+
+  .hint-btn{ font-size:.78rem; color:var(--ink-soft); background:none; border:none; text-decoration:underline; cursor:pointer; padding:0; margin-top:6px;}
+
+  /* ---------- audio control (Hören) ---------- */
+  .audio-box{ display:flex; align-items:center; gap:14px; border:1px solid var(--rule); padding:16px 18px; margin:18px 0 24px; background:#fff; }
+  .play-btn{
+    all:unset; cursor:pointer; width:46px; height:46px; border-radius:50%; background:var(--ink); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0;
+  }
+  .play-btn:hover{ opacity:.85; }
+  .audio-meta{ flex:1; }
+  .audio-meta .title{ font-weight:600; font-size:.92rem; }
+  .audio-meta .plays{ font-size:.78rem; color:var(--text-muted); margin-top:2px; }
+
+  /* ---------- writing ---------- */
+  .graphic-box{ border:1px solid var(--rule); background:#fff; padding:20px; margin:18px 0; }
+  textarea.write-area{
+    width:100%; min-height:320px; padding:16px; border:1px solid var(--rule); font-family:'Source Serif 4', serif;
+    font-size:1rem; line-height:1.6; resize:vertical;
+  }
+  .write-meta{ display:flex; justify-content:space-between; margin-top:8px; font-size:.82rem; color:var(--text-muted); font-family:'IBM Plex Mono',monospace; }
+  .checklist{ margin-top:18px; display:flex; flex-direction:column; gap:8px; }
+  .checklist label{ display:flex; align-items:center; gap:10px; font-size:.9rem; }
+  .rubric{ margin-top:24px; }
+  .rubric-row{ display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--rule); }
+  .rubric-row .crit{ font-weight:600; font-size:.9rem; }
+  .rubric-row .crit .h{ font-weight:400; color:var(--text-muted); font-size:.8rem; display:block; margin-top:2px;}
+  .scale{ display:flex; gap:6px; }
+  .scale button{ all:unset; cursor:pointer; width:32px; height:32px; border:1px solid var(--rule); text-align:center; font-family:'IBM Plex Mono',monospace; font-size:.85rem; }
+  .scale button.selected{ background:var(--ink); color:#fff; border-color:var(--ink); }
+
+  /* ---------- speaking ---------- */
+  .speak-stage{ text-align:center; padding:30px 20px; border:1px solid var(--rule); background:#fff; margin-top:18px;}
+  .speak-phase{ font-family:'IBM Plex Mono',monospace; font-size:.78rem; letter-spacing:.08em; color:var(--text-muted); text-transform:uppercase; }
+  .speak-timer{ font-family:'IBM Plex Mono',monospace; font-size:3rem; font-weight:600; color:var(--ink); margin:10px 0; }
+  .speak-task{ font-family:'Source Serif 4', serif; font-size:1.15rem; max-width:60ch; margin:16px auto; line-height:1.6;}
+  .rec-dot{ display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--red); margin-right:8px; animation:pulse 1s infinite; }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.3;} }
+  audio{ margin-top:14px; width:100%; max-width:420px; }
+
+  .result-box{ margin-top:24px; padding:20px; border:1.5px solid var(--ink); background:#fff; }
+  .result-box .big-tdn{ font-family:'Source Serif 4',serif; font-size:2.2rem; font-weight:700; }
+  .result-box .score-line{ color:var(--text-muted); font-size:.9rem; margin-top:4px; }
+
+  /* ---------- progress ---------- */
+  .progress-grid{ display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:20px; }
+  .progress-card{ border:1px solid var(--rule); padding:20px; background:var(--paper-raised); }
+  .progress-card h3{ margin:0 0 10px; font-size:1rem; }
+  .bar-row{ display:flex; align-items:center; gap:10px; margin-bottom:8px; font-size:.85rem; }
+  .bar-row .label{ width:90px; flex-shrink:0; color:var(--text-muted); }
+  .bar-track{ flex:1; height:10px; background:#e6e2d6; position:relative; }
+  .bar-fill{ height:100%; }
+  .attempt-log{ margin-top:10px; max-height:180px; overflow-y:auto; font-size:.8rem; color:var(--text-muted); }
+  .attempt-log div{ padding:4px 0; border-bottom:1px dashed var(--rule); }
+  .empty-note{ color:var(--text-muted); font-size:.88rem; font-style:italic; }
+
+  .req-check{ margin-top:26px; padding:18px; border:1px dashed var(--rule); font-size:.88rem; color:var(--text-muted); }
+  .req-check b{ color:var(--text); }
+
+  footer.note{ max-width:900px; margin:30px auto 0; font-size:.78rem; color:var(--text-muted); line-height:1.6; }
+
+  @media(max-width:820px){
+    .shell{ flex-direction:column; }
+    .sidebar{ width:100%; height:auto; position:relative; padding:16px 0;}
+    nav.tabs{ flex-direction:row; overflow-x:auto; }
+    nav.tabs button{ border-left:none; border-bottom:3px solid transparent; white-space:nowrap;}
+    nav.tabs button.active{ border-bottom-color:var(--gold); }
+    .main{ padding:22px 16px 60px; }
+    .paper{ padding:22px 18px; }
+    .progress-grid{ grid-template-columns:1fr; }
+  }
+  :focus-visible{ outline:2.5px solid var(--gold); outline-offset:2px; }
+  @media (prefers-reduced-motion: reduce){ *{ animation:none !important; transition:none !important; } }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="mark">Prüfungsheft</div>
+      <div class="sub">TestDaF-Trainer · TDN 3–5</div>
+    </div>
+    <nav class="tabs" id="navTabs">
+      <button data-view="home" class="active"><span class="num">00</span> Übersicht</button>
+      <button data-view="hoeren"><span class="num">01</span> Hören</button>
+      <button data-view="lesen"><span class="num">02</span> Lesen</button>
+      <button data-view="schreiben"><span class="num">03</span> Schreiben</button>
+      <button data-view="sprechen"><span class="num">04</span> Sprechen</button>
+      <div class="divider"></div>
+      <button data-view="pruefung"><span class="num">05</span> Komplettprüfung</button>
+      <button data-view="fortschritt"><span class="num">06</span> Fortschritt</button>
+    </nav>
+  </aside>
+
+  <main class="main" id="mainView"></main>
+</div>
+
+<script>
+/* =========================================================================
+   DATA — original practice content, modelled on official TestDaF task types
+   ========================================================================= */
+
+const STORAGE_KEY = "testdaf_trainer_v1";
+
+function loadStore(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return { results:{ hoeren:[], lesen:[], schreiben:[], sprechen:[] } };
+}
+function saveStore(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(store)); }catch(e){} }
+let store = loadStore();
+
+/* ---- TDN mapping helpers ---- */
+function tdnFromPercent(pct){
+  if(pct>=85) return 5;
+  if(pct>=68) return 4;
+  if(pct>=48) return 3;
+  return 0; // "unter TDN 3"
+}
+function tdnFromRubric(totalPoints, maxPoints){ // rubric scale 0-3 per criterion, 4 criteria => max 12
+  const pct = (totalPoints/maxPoints)*100;
+  return tdnFromPercent(pct);
+}
+function tdnLabel(t){ return t===0? "unter TDN 3" : "TDN "+t; }
+function tdnClass(t){ return t===5?"tdn5": t===4?"tdn4": t===3?"tdn3":"tdn0"; }
+function tdnColor(t){ return t===5?"var(--gold)": t===4?"var(--teal)": t===3?"var(--clay)":"var(--red)"; }
+
+/* ---- LESEN data ---- */
+const readingSets = [
+{
+  id:"lesen1", title:"Lesen · Set 1 — Homeoffice & Arbeitswelt", timeLimitSec: 18*60,
+  parts:[
+    { type:"mc", heading:"Teil 1 — Alltagstext: Umfrage zum Homeoffice",
+      text:`Eine Online-Umfrage unter 2.400 Beschäftigten in Deutschland hat untersucht, wie Arbeitnehmerinnen und Arbeitnehmer das Arbeiten von zu Hause aus bewerten. 61 Prozent der Befragten gaben an, dass sie mindestens zweimal pro Woche im Homeoffice arbeiten. Als größten Vorteil nannten die Teilnehmenden die Zeitersparnis durch den Wegfall des Arbeitswegs. Gleichzeitig berichtete knapp ein Drittel von Schwierigkeiten, Berufliches und Privates klar zu trennen. Besonders jüngere Beschäftigte unter 30 Jahren wünschten sich mehr informellen Austausch mit Kolleginnen und Kollegen, den sie im Büro vermissen. Unternehmen reagieren unterschiedlich: Manche schreiben feste Bürotage vor, andere überlassen die Entscheidung den Teams selbst.`,
+      questions:[
+        { q:"Wie viel Prozent der Befragten arbeiten mindestens zweimal wöchentlich im Homeoffice?",
+          options:["Etwa ein Drittel","Über 60 Prozent","Fast alle Befragten","Weniger als 20 Prozent"], correct:1,
+          explain:"Der Text nennt ausdrücklich 61 Prozent, die mindestens zweimal pro Woche im Homeoffice arbeiten." },
+        { q:"Was empfinden die Befragten als größten Vorteil des Homeoffice?",
+          options:["Mehr Kontakt zu Kolleginnen und Kollegen","Bessere technische Ausstattung","Die eingesparte Zeit für den Arbeitsweg","Ein höheres Gehalt"], correct:2,
+          explain:"Die Zeitersparnis durch den Wegfall des Arbeitswegs wird als größter Vorteil genannt." },
+        { q:"Welche Gruppe vermisst laut Text besonders den informellen Austausch im Büro?",
+          options:["Beschäftigte über 50","Führungskräfte","Beschäftigte unter 30","Teilzeitkräfte"], correct:2,
+          explain:"Im Text steht, dass besonders jüngere Beschäftigte unter 30 Jahren mehr informellen Austausch vermissen." }
+      ]
+    },
+    { type:"tf", heading:"Teil 2 — Meinungsbeitrag: Ist ständige Erreichbarkeit ein Problem?",
+      text:`Mit der Verbreitung von Homeoffice und mobilen Geräten wächst auch die Debatte über ständige Erreichbarkeit. Kritiker warnen, dass die Grenze zwischen Arbeit und Freizeit zunehmend verschwimmt und dies langfristig zu Erschöpfung führen kann. Befürworter halten dagegen, dass flexible Erreichbarkeit auch Freiräume schafft, etwa um private Termine tagsüber wahrzunehmen und die Arbeit abends nachzuholen. Einige Unternehmen haben inzwischen ein "Recht auf Nichterreichbarkeit" eingeführt, das E-Mails außerhalb der Arbeitszeit blockiert. Studien zu den langfristigen gesundheitlichen Folgen ständiger Erreichbarkeit liegen bislang nur vereinzelt vor, sodass eine abschließende wissenschaftliche Bewertung noch aussteht.`,
+      questions:[
+        { q:"Kritiker sehen in ständiger Erreichbarkeit vor allem eine Gefahr für die Gesundheit.", correct:"R",
+          explain:"Kritiker warnen ausdrücklich, dass dies langfristig zu Erschöpfung führen kann." },
+        { q:"Alle Unternehmen in Deutschland haben inzwischen ein Recht auf Nichterreichbarkeit eingeführt.", correct:"F",
+          explain:"Der Text sagt 'einige Unternehmen', nicht alle." },
+        { q:"Befürworter argumentieren, flexible Erreichbarkeit schaffe auch mehr Freiräume am Tag.", correct:"R",
+          explain:"Das steht direkt im Text: Freiräume für private Termine tagsüber." },
+        { q:"Es liegen bereits umfassende Langzeitstudien zu den gesundheitlichen Folgen vor.", correct:"N",
+          explain:"Der Text sagt, Studien lägen bislang nur vereinzelt vor — eine abschließende Bewertung fehlt noch." }
+      ]
+    },
+    { type:"match", heading:"Teil 3 — Wissenschaftlicher Text: Produktivität im Homeoffice",
+      text:`(A) Mehrere Studien haben untersucht, ob die Arbeitsproduktivität im Homeoffice steigt oder sinkt. Die Ergebnisse fallen je nach Tätigkeitsfeld unterschiedlich aus.
+(B) Bei stark strukturierten, planbaren Aufgaben berichten Forschende häufig von einer leicht erhöhten Produktivität, da Unterbrechungen durch Kolleginnen und Kollegen entfallen.
+(C) Bei Tätigkeiten, die intensive Zusammenarbeit erfordern, etwa kreative Projektarbeit, zeigen Untersuchungen dagegen oft eine geringere Effizienz, da spontane Absprachen erschwert werden.
+(D) Ein weiterer Faktor ist die häusliche Arbeitsumgebung: Wer über einen ruhigen, abgetrennten Arbeitsplatz verfügt, schneidet in Befragungen deutlich besser ab als Personen mit beengten Wohnverhältnissen.
+(E) Insgesamt raten Forschende Unternehmen daher zu einem aufgabenabhängigen, hybriden Modell statt einer pauschalen Regelung für alle Beschäftigten.`,
+      paragraphs:["A","B","C","D","E"],
+      headings:["Empfehlung für ein gemischtes Modell","Uneinheitliche Ergebnisse je nach Tätigkeit","Vorteil bei planbaren Einzelaufgaben","Bedeutung der Wohnsituation","Nachteil bei kooperativer Arbeit"],
+      correctMap:[1,2,4,3,0] // paragraph index -> heading index
+    }
+  ]
+},
+{
+  id:"lesen2", title:"Lesen · Set 2 — Digitalisierung & Bildung", timeLimitSec: 18*60,
+  parts:[
+    { type:"mc", heading:"Teil 1 — Alltagstext: Digitale Endgeräte an Schulen",
+      text:`Eine Befragung von Schulleitungen ergab, dass mittlerweile 78 Prozent der weiterführenden Schulen über WLAN in allen Klassenräumen verfügen. Dennoch beklagen viele Lehrkräfte, dass die technische Ausstattung allein nicht ausreiche: Es fehle vor allem an Fortbildungsangeboten, um digitale Werkzeuge sinnvoll in den Unterricht einzubinden. Auch der technische Support sei häufig unterbesetzt, sodass Defekte an Geräten teils wochenlang nicht behoben würden. Die Schulleitungen fordern deshalb, dass Investitionen in Hardware künftig stärker mit Investitionen in Personal und Schulungen gekoppelt werden.`,
+      questions:[
+        { q:"Wie viel Prozent der weiterführenden Schulen haben WLAN in allen Klassenräumen?",
+          options:["58 Prozent","78 Prozent","98 Prozent","38 Prozent"], correct:1,
+          explain:"Der Text nennt genau 78 Prozent." },
+        { q:"Was fehlt laut Lehrkräften vor allem, obwohl Technik vorhanden ist?",
+          options:["Neuere Endgeräte","Fortbildungsangebote","Mehr Unterrichtsstunden","Schnelleres Internet"], correct:1,
+          explain:"Es fehle vor allem an Fortbildungsangeboten, um digitale Werkzeuge sinnvoll einzubinden." },
+        { q:"Was fordern die Schulleitungen für die Zukunft?",
+          options:["Weniger Geräte pro Klasse","Investitionen in Hardware gekoppelt mit Personal und Schulungen","Den Verzicht auf digitale Medien","Ausschließlich private Finanzierung"], correct:1,
+          explain:"Sie fordern, Hardware-Investitionen stärker mit Personal und Schulungen zu koppeln." }
+      ]
+    },
+    { type:"tf", heading:"Teil 2 — Meinungsbeitrag: Sollten Schulen auf eigene Laptops setzen?",
+      text:`In der bildungspolitischen Debatte wird zunehmend diskutiert, ob Schulen eigene Endgeräte für alle Schülerinnen und Schüler bereitstellen sollten, anstatt private Geräte zu nutzen ("Bring Your Own Device"). Befürworter einheitlicher Schulgeräte argumentieren, dies schaffe Chancengleichheit unabhängig vom Elternhaus. Gegner verweisen auf die hohen Anschaffungs- und Wartungskosten sowie darauf, dass Schülerinnen und Schüler mit privaten Geräten oft bereits vertraut seien. Einige Bundesländer haben Förderprogramme aufgelegt, die einkommensschwachen Familien die Anschaffung erleichtern sollen; eine bundesweit einheitliche Regelung existiert bislang jedoch nicht.`,
+      questions:[
+        { q:"Befürworter einheitlicher Schulgeräte sehen darin einen Beitrag zur Chancengleichheit.", correct:"R",
+          explain:"Das wird explizit als Argument der Befürworter genannt." },
+        { q:"Alle Bundesländer haben bereits eine einheitliche Regelung zur Geräteausstattung eingeführt.", correct:"F",
+          explain:"Der Text sagt ausdrücklich, eine bundesweit einheitliche Regelung existiere bislang nicht." },
+        { q:"Gegner der Schulgeräte verweisen unter anderem auf hohe Kosten.", correct:"R",
+          explain:"Das steht direkt im Text." },
+        { q:"Der Text nennt konkrete Zahlen dazu, wie viele Familien die Förderprogramme bereits genutzt haben.", correct:"N",
+          explain:"Dazu enthält der Text keine Angabe." }
+      ]
+    },
+    { type:"match", heading:"Teil 3 — Wissenschaftlicher Text: Lernerfolg mit digitalen Medien",
+      text:`(A) Zahlreiche Studien untersuchen, unter welchen Bedingungen digitale Medien den Lernerfolg tatsächlich verbessern.
+(B) Ein zentrales Ergebnis ist, dass der bloße Einsatz von Tablets oder Laptops ohne didaktisches Konzept keinen messbaren Vorteil bringt.
+(C) Positive Effekte zeigen sich hingegen, wenn digitale Werkzeuge gezielt für interaktive Übungen und individuelles Feedback genutzt werden.
+(D) Kritisch beurteilen Forschende den unreflektierten Einsatz von Videos als reinen Zeitfüller im Unterricht.
+(E) Die Autoren schlussfolgern, dass die pädagogische Einbettung entscheidender ist als die Menge der eingesetzten Technik.`,
+      paragraphs:["A","B","C","D","E"],
+      headings:["Technik allein bringt keinen Vorteil","Fazit: Konzept wichtiger als Technikmenge","Ausgangsfrage der Forschung","Kritik an gedankenlosem Videoeinsatz","Positive Wirkung bei gezieltem Einsatz"],
+      correctMap:[2,0,4,3,1]
+    }
+  ]
+}
+];
+
+/* ---- HÖREN data (scripts read aloud via speech synthesis) ---- */
+const listeningSets = [
+{
+  id:"hoeren1", title:"Hören · Set 1 — Im Studierendensekretariat & Elektromobilität",
+  parts:[
+    { type:"short", heading:"Teil 1 — Alltagsgespräch: Im Studierendensekretariat", maxPlays_uebung:3, maxPlays_pruefung:1,
+      script:`Guten Tag, mein Name ist Herr Brandt. Ich habe eine Frage zur Rückmeldung für das kommende Semester. Guten Tag, Herr Brandt. Die Rückmeldefrist endet dieses Semester am 15. Februar. Sie können den Semesterbeitrag entweder online überweisen oder per Lastschrift einziehen lassen. Wichtig ist: Ohne fristgerechte Zahlung wird die Rückmeldung nicht wirksam, und Sie werden automatisch exmatrikuliert. Falls Sie den Beitrag aus finanziellen Gründen nicht rechtzeitig zahlen können, gibt es die Möglichkeit, beim Studierendenwerk eine Ratenzahlung zu beantragen. Der Antrag dafür muss spätestens eine Woche vor Fristende eingereicht werden.`,
+      questions:[
+        { q:"Bis wann endet die Rückmeldefrist?", type:"text", accept:["15. februar","15 februar","fünfzehnten februar"], explain:"Genannt wird der 15. Februar." },
+        { q:"Was passiert, wenn man nicht fristgerecht zahlt?", type:"text", accept:["exmatrikulation","man wird exmatrikuliert","automatische exmatrikulation"], explain:"Ohne fristgerechte Zahlung erfolgt eine automatische Exmatrikulation." },
+        { q:"Wie viele Tage vor Fristende muss der Ratenzahlungsantrag spätestens eingereicht werden?", type:"text", accept:["7","sieben","eine woche"], explain:"Der Antrag muss spätestens eine Woche vor Fristende eingereicht werden." }
+      ]
+    },
+    { type:"mc", heading:"Teil 2 — Interview: Expertin zur Elektromobilität", maxPlays_uebung:2, maxPlays_pruefung:1,
+      script:`Frau Dr. Ahrens, wie schätzen Sie die aktuelle Entwicklung bei Elektrofahrzeugen ein? Die Reichweiten haben sich in den letzten fünf Jahren deutlich verbessert, im Durchschnitt von etwa 200 auf über 400 Kilometer. Trotzdem bleibt die Ladeinfrastruktur der limitierende Faktor, besonders in ländlichen Regionen, wo Schnellladesäulen noch selten sind. Ein weiteres Problem ist die ungleiche Verteilung: In Ballungsräumen gibt es inzwischen ein dichtes Netz, während viele Landkreise noch deutlich unterversorgt sind. Politisch wird diskutiert, den Ausbau der Ladeinfrastruktur an Fördermittel für Kommunen zu koppeln, um diese Lücke gezielt zu schließen. Aus meiner Sicht ist das ein sinnvoller Ansatz, weil er finanzielle Anreize direkt mit der tatsächlichen Versorgungslücke verknüpft.`,
+      questions:[
+        { q:"Wie hat sich die durchschnittliche Reichweite laut Expertin entwickelt?",
+          options:["Von 400 auf 200 Kilometer gesunken","Von etwa 200 auf über 400 Kilometer gestiegen","Sie ist unverändert geblieben","Genaue Zahlen werden nicht genannt"], correct:1,
+          explain:"Die Reichweite ist im Schnitt von etwa 200 auf über 400 Kilometer gestiegen." },
+        { q:"Was bezeichnet die Expertin als den limitierenden Faktor?",
+          options:["Den Fahrzeugpreis","Die Batterietechnik","Die Ladeinfrastruktur","Die Reichweite der Motoren"], correct:2,
+          explain:"Sie nennt die Ladeinfrastruktur als limitierenden Faktor." },
+        { q:"Wie bewertet die Expertin den Vorschlag, Fördermittel an den Ausbau zu koppeln?",
+          options:["Als wenig sinnvoll","Als sinnvoll, weil er die Versorgungslücke gezielt adressiert","Als politisch nicht umsetzbar","Sie äußert dazu keine Meinung"], correct:1,
+          explain:"Sie sagt ausdrücklich, das sei aus ihrer Sicht ein sinnvoller Ansatz." }
+      ]
+    },
+    { type:"tf", heading:"Teil 3 — Vortrag: Batterietechnologie der Zukunft", maxPlays_uebung:2, maxPlays_pruefung:1,
+      script:`Im heutigen Vortrag geht es um Feststoffbatterien als mögliche Nachfolgetechnologie der heutigen Lithium-Ionen-Akkus. Feststoffbatterien verwenden einen festen statt eines flüssigen Elektrolyten, was theoretisch höhere Energiedichten und eine geringere Brandgefahr ermöglicht. Mehrere Hersteller haben Prototypen vorgestellt, eine Serienproduktion in großem Maßstab wird jedoch von den meisten Experten erst gegen Ende des Jahrzehnts erwartet, da die Herstellungsverfahren noch nicht ausreichend skalierbar sind. Ein häufig genanntes Ziel ist eine Verdopplung der Energiedichte im Vergleich zu heutigen Zellen, was die Reichweite von Elektrofahrzeugen bei gleichem Gewicht erheblich steigern würde. Kritiker weisen jedoch darauf hin, dass die Produktionskosten aktuell noch deutlich über denen klassischer Zellen liegen.`,
+      questions:[
+        { q:"Feststoffbatterien nutzen einen flüssigen Elektrolyten.", correct:"F", explain:"Sie nutzen einen festen statt eines flüssigen Elektrolyten." },
+        { q:"Eine Serienproduktion im großen Maßstab wird laut Vortrag noch in diesem Jahr erwartet.", correct:"F", explain:"Sie wird erst gegen Ende des Jahrzehnts erwartet." },
+        { q:"Ein Ziel ist die Verdopplung der Energiedichte im Vergleich zu heutigen Zellen.", correct:"R", explain:"Das wird ausdrücklich als häufig genanntes Ziel erwähnt." },
+        { q:"Die Produktionskosten von Feststoffbatterien liegen bereits unter denen klassischer Zellen.", correct:"F", explain:"Kritiker weisen darauf hin, dass die Kosten noch deutlich darüber liegen." }
+      ]
+    }
+  ]
+}
+];
+
+/* ---- SCHREIBEN data ---- */
+const writingTasks = [
+{
+  id:"schreiben1", title:"Schreiben · Aufgabe 1 — Homeoffice-Nutzung 2016–2024", timeLimitSec:60*60,
+  chartTitle:"Anteil der Beschäftigten in Deutschland, die regelmäßig im Homeoffice arbeiten (in %)",
+  chartData:[ {year:"2016",val:12}, {year:"2018",val:14}, {year:"2020",val:36}, {year:"2022",val:29}, {year:"2024",val:26} ],
+  prompt:`Beschreiben Sie die Grafik: Wie hat sich der Anteil der Beschäftigten im Homeoffice zwischen 2016 und 2024 entwickelt? Gehen Sie auf die wichtigsten Veränderungen und mögliche Ursachen ein. Nehmen Sie anschließend Stellung zu folgender Aussage: "Homeoffice sollte gesetzlich als Recht für alle Arbeitnehmer verankert werden." Begründen Sie Ihre Position mit Argumenten und Beispielen. (ca. 350 Wörter)`,
+  minWords:320
+},
+{
+  id:"schreiben2", title:"Schreiben · Aufgabe 2 — Studierende mit Nebenjob 2015–2023", timeLimitSec:60*60,
+  chartTitle:"Anteil der Studierenden in Deutschland mit regelmäßigem Nebenjob während des Semesters (in %)",
+  chartData:[ {year:"2015",val:61}, {year:"2017",val:58}, {year:"2019",val:55}, {year:"2021",val:47}, {year:"2023",val:52} ],
+  prompt:`Beschreiben Sie die Grafik: Wie hat sich der Anteil der Studierenden mit Nebenjob zwischen 2015 und 2023 entwickelt? Erläutern Sie mögliche Gründe für die Veränderungen. Nehmen Sie anschließend Stellung zu folgender Aussage: "Studierende sollten während des Studiums möglichst nicht nebenbei arbeiten." Begründen Sie Ihre Position mit Argumenten und Beispielen. (ca. 350 Wörter)`,
+  minWords:320
+}
+];
+
+/* ---- SPRECHEN data (7 official-style task types) ---- */
+const speakingTasks = [
+{ id:1, title:"Aufgabe 1 — Persönliche Angaben weitergeben", prep:10, speak:30,
+  task:"Ein Bekannter möchte sich an Ihrer Universität für ein Auslandssemester bewerben und fragt Sie, wie das Bewerbungsverfahren an Ihrer Hochschule abläuft. Geben Sie ihm die wichtigsten Informationen weiter." },
+{ id:2, title:"Aufgabe 2 — Information weitergeben (Alltag)", prep:20, speak:40,
+  task:"Eine Kommilitonin konnte nicht zur Sprechstunde eines Dozenten kommen und bittet Sie, ihr die wichtigsten Informationen dazu weiterzugeben, wie man online einen Termin für die Sprechstunde bucht und was dabei zu beachten ist." },
+{ id:3, title:"Aufgabe 3 — Information anhand einer Grafik weitergeben", prep:30, speak:40,
+  task:"Erklären Sie einem Kommilitonen anhand der folgenden Angaben, wie sich die Studierendenzahlen an deutschen Hochschulen in den letzten zehn Jahren nach Fachbereich entwickelt haben: Ingenieurwissenschaften: deutlich gestiegen. Geisteswissenschaften: leicht gesunken. Informatik: stark gestiegen. Lehramt: nahezu konstant." },
+{ id:4, title:"Aufgabe 4 — Vermutungen äußern", prep:30, speak:40,
+  task:"Die Grafik aus Aufgabe 3 zeigt deutliche Unterschiede zwischen den Fachbereichen. Äußern Sie Vermutungen darüber, warum die Informatik so stark gewachsen ist, während die Geisteswissenschaften leicht rückläufig sind." },
+{ id:5, title:"Aufgabe 5 — Meinung äußern zu einer kontroversen Aussage", prep:20, speak:60,
+  task:"In einem Seminar wird folgende Aussage diskutiert: 'Vorlesungen sollten grundsätzlich als Video-Aufzeichnung angeboten werden, damit Studierende selbst entscheiden können, wann sie lernen.' Äußern Sie Ihre Meinung dazu und begründen Sie diese." },
+{ id:6, title:"Aufgabe 6 — Alternativen abwägen / Vorschlag machen", prep:20, speak:60,
+  task:"Eine Studiengruppe kann sich nicht einigen, ob sie eine Präsentation gemeinsam vor Ort oder online per Videokonferenz vorbereiten soll. Machen Sie einen Vorschlag, wie die Gruppe vorgehen könnte, und begründen Sie Ihren Vorschlag." },
+{ id:7, title:"Aufgabe 7 — Stellung nehmen zu zwei Positionen", prep:60, speak:60,
+  task:"Zwei Positionen werden diskutiert: Position A: 'Anwesenheitspflicht in Seminaren fördert den Lernerfolg.' Position B: 'Anwesenheitspflicht schränkt die Selbstständigkeit der Studierenden unnötig ein.' Nehmen Sie zu beiden Positionen Stellung und erläutern Sie, welcher Sie eher zustimmen." }
+];
+
+/* =========================================================================
+   STATE
+   ========================================================================= */
+let currentView = "home";
+let mode = "uebung"; // or "pruefung"
+let activeTimer = null; // interval id
+
+function setMode(m){
+  mode = m;
+  render();
+}
+
+/* =========================================================================
+   RENDER ROUTER
+   ========================================================================= */
+const mainEl = document.getElementById("mainView");
+
+document.getElementById("navTabs").addEventListener("click", (e)=>{
+  const btn = e.target.closest("button[data-view]");
+  if(!btn) return;
+  clearActiveTimer();
+  currentView = btn.dataset.view;
+  document.querySelectorAll("#navTabs button").forEach(b=>b.classList.toggle("active", b===btn));
+  render();
+});
+
+function clearActiveTimer(){ if(activeTimer){ clearInterval(activeTimer); activeTimer=null; } }
+
+function bestTdn(skill){
+  const arr = store.results[skill] || [];
+  if(arr.length===0) return null;
+  return Math.max(...arr.map(r=>r.tdn));
+}
+
+function render(){
+  if(currentView==="home") return renderHome();
+  if(currentView==="hoeren") return renderSkillList("hoeren");
+  if(currentView==="lesen") return renderSkillList("lesen");
+  if(currentView==="schreiben") return renderSkillList("schreiben");
+  if(currentView==="sprechen") return renderSkillList("sprechen");
+  if(currentView==="pruefung") return renderExamHub();
+  if(currentView==="fortschritt") return renderProgress();
+}
+
+function tdnBadgeHtml(skill){
+  const t = bestTdn(skill);
+  if(t===null) return `<span class="tdn-badge pending">noch offen</span>`;
+  return `<span class="tdn-badge ${tdnClass(t)}">${tdnLabel(t)}</span>`;
+}
+
+function renderHome(){
+  mainEl.innerHTML = `
+    <div class="topline">
+      <div>
+        <h2>Willkommen im Prüfungsheft</h2>
+        <div class="desc">Trainieren Sie alle vier TestDaF-Module — mit Übungsmodus und Prüfungsmodus, ausgewertet auf der TDN-Skala (3–5).</div>
+      </div>
+    </div>
+    <div class="paper">
+      <p style="margin-top:0;color:var(--text-muted);font-size:.92rem;">
+        Das TestDaF-Institut bewertet jede der vier Fertigkeiten separat auf einer Skala von <b>TDN 3</b> (grundlegend) bis <b>TDN 5</b> (sehr gut).
+        Für viele Studiengänge ist mindestens TDN 4 in allen vier Modulen erforderlich. Wählen Sie unten ein Modul, um zu üben, oder starten Sie
+        rechts in der Navigation eine vollständige Komplettprüfung unter realen Zeitbedingungen.
+      </p>
+      <div class="skills-grid">
+        ${skillCard("hoeren","Hören","3 Hörtexte, ansteigender Schwierigkeitsgrad — Alltagsgespräch, Experteninterview, Vortrag.")}
+        ${skillCard("lesen","Lesen","3 Lesetexte mit Multiple Choice, Richtig/Falsch/Nicht im Text und Zuordnungsaufgaben.")}
+        ${skillCard("schreiben","Schreiben","Grafik beschreiben und Stellung nehmen — mit Wortzähler, Struktur-Checkliste und Bewertungsraster.")}
+        ${skillCard("sprechen","Sprechen","7 Sprechaufgaben mit Vorbereitungs- und Sprechzeit, Aufnahmefunktion und Selbsteinschätzung.")}
+      </div>
+    </div>
+    <footer class="note">
+      Hinweis: Die TDN-Einstufungen in diesem Trainer sind Näherungswerte zu Übungszwecken und basieren auf den öffentlich bekannten
+      Bewertungsprinzipien des TestDaF-Instituts. Sie ersetzen keine offizielle Prüfung.
+    </footer>
+  `;
+}
+function skillCard(key,name,desc){
+  return `<div class="skill-card" onclick="document.querySelector('button[data-view=${key}]').click()">
+    <h3>${name}</h3><p>${desc}</p>
+    <div class="badge-row">${tdnBadgeHtml(key)}</div>
+  </div>`;
+}
+
+/* ---------- SKILL LIST VIEWS ---------- */
+function renderSkillList(skill){
+  clearActiveTimer();
+  const titleMap = { hoeren:"Hören", lesen:"Lesen", schreiben:"Schreiben", sprechen:"Sprechen" };
+  let itemsHtml = "";
+  if(skill==="lesen") itemsHtml = readingSets.map(s=>exItemHtml(skill,s.id,s.title,`${s.parts.length} Teile · ~${Math.round(s.timeLimitSec/60)} Min. im Prüfungsmodus`)).join("");
+  if(skill==="hoeren") itemsHtml = listeningSets.map(s=>exItemHtml(skill,s.id,s.title,`${s.parts.length} Teile · Audio per Sprachsynthese`)).join("");
+  if(skill==="schreiben") itemsHtml = writingTasks.map(s=>exItemHtml(skill,s.id,s.title,`Grafik + Stellungnahme · ${Math.round(s.timeLimitSec/60)} Min.`)).join("");
+  if(skill==="sprechen") itemsHtml = `<div class="ex-item"><div><div style="font-weight:600;">Vollständiger Sprechteil</div><div class="meta">7 Aufgaben · Vorbereitungs- &amp; Sprechzeit wie in der echten Prüfung</div></div><button class="btn primary" onclick="startSpeaking()">Starten</button></div>`;
+
+  mainEl.innerHTML = `
+    <div class="topline">
+      <div>
+        <h2>${titleMap[skill]}</h2>
+        <div class="desc">Bestes Ergebnis bisher: ${tdnBadgeHtml(skill)}</div>
+      </div>
+      <div class="mode-switch">
+        <button class="${mode==='uebung'?'active uebung':''}" onclick="setMode('uebung')">Übungsmodus</button>
+        <button class="${mode==='pruefung'?'active pruefung':''}" onclick="setMode('pruefung')">Prüfungsmodus</button>
+      </div>
+    </div>
+    <div class="paper">
+      <p style="margin-top:0;color:var(--text-muted);font-size:.9rem;">${modeExplainer(skill)}</p>
+      <div class="ex-list">${itemsHtml}</div>
+    </div>
+    ${attemptLogHtml(skill)}
+  `;
+}
+function modeExplainer(skill){
+  if(mode==="uebung") return "Übungsmodus: kein Zeitdruck, Erklärungen nach jeder Frage, Wiederholungen erlaubt — ideal zum Lernen der Aufgabentypen.";
+  return "Prüfungsmodus: reale Zeitvorgaben, Erklärungen erst nach Abgabe, begrenzte Wiedergaben — simuliert die echte Prüfungssituation.";
+}
+function exItemHtml(skill,id,title,meta){
+  return `<div class="ex-item">
+    <div><div style="font-weight:600;">${title}</div><div class="meta">${meta}</div></div>
+    <button class="btn primary" onclick="start('${skill}','${id}')">Starten</button>
+  </div>`;
+}
+function attemptLogHtml(skill){
+  const arr = store.results[skill]||[];
+  if(arr.length===0) return "";
+  const rows = arr.slice(-6).reverse().map(r=>`<div>${r.date} — ${r.label}: <b style="color:${tdnColor(r.tdn)}">${tdnLabel(r.tdn)}</b> (${r.mode})</div>`).join("");
+  return `<div class="paper"><h3 style="margin-top:0;font-size:1rem;">Letzte Versuche</h3><div class="attempt-log">${rows}</div></div>`;
+}
+
+function start(skill,id){
+  if(skill==="lesen") return renderReading(id);
+  if(skill==="hoeren") return renderListening(id);
+  if(skill==="schreiben") return renderWriting(id);
+}
+function startSpeaking(){ renderSpeaking(); }
+
+function recordResult(skill,label,tdn,extra){
+  store.results[skill] = store.results[skill]||[];
+  store.results[skill].push({ date:new Date().toLocaleDateString('de-DE'), label, tdn, mode, ...extra });
+  saveStore();
+}
+
+/* =========================================================================
+   LESEN
+   ========================================================================= */
+function renderReading(id){
+  const set = readingSets.find(s=>s.id===id);
+  const answers = {}; // key part-q -> value
+  let submitted = false;
+
+  function computeScore(){
+    let correct=0, total=0;
+    set.parts.forEach((part,pi)=>{
+      if(part.type==="mc"||part.type==="tf"){
+        part.questions.forEach((q,qi)=>{
+          total++;
+          const key = pi+"-"+qi;
+          if(part.type==="mc" && answers[key]===q.correct) correct++;
+          if(part.type==="tf" && answers[key]===q.correct) correct++;
+        });
+      } else if(part.type==="match"){
+        part.paragraphs.forEach((p,pgi)=>{
+          total++;
+          const key = pi+"-m"+pgi;
+          if(answers[key]!==undefined && Number(answers[key])===part.correctMap[pgi]) correct++;
+        });
+      }
+    });
+    return {correct,total};
+  }
+
+  function partHtml(part, pi){
+    let inner = `<h3 style="margin-bottom:6px;">${part.heading}</h3><div class="passage">${part.text.replace(/\n/g,"<br><br>")}</div>`;
+    if(part.type==="mc"){
+      inner += part.questions.map((q,qi)=>{
+        const key=pi+"-"+qi;
+        const opts = q.options.map((o,oi)=>{
+          let cls="option";
+          if(submitted){
+            if(oi===q.correct) cls+=" correct";
+            else if(answers[key]===oi) cls+=" incorrect";
+          } else if(answers[key]===oi) cls+=" selected";
+          return `<label class="${cls}" onclick="${submitted?'':`window._lesenSelect('${key}',${oi})`}">
+            <input type="radio" name="${key}" ${answers[key]===oi?'checked':''} ${submitted?'disabled':''}/> ${o}</label>`;
+        }).join("");
+        return `<div class="qblock"><div class="qnum">Frage ${qi+1}</div><div class="qtext">${q.q}</div>
+          <div class="options">${opts}</div>
+          <div class="explain ${submitted?'show':''}">${q.explain}</div></div>`;
+      }).join("");
+    } else if(part.type==="tf"){
+      inner += part.questions.map((q,qi)=>{
+        const key=pi+"-"+qi;
+        const opts = ["R","F","N"].map(v=>{
+          let cls="";
+          if(submitted){ if(v===q.correct) cls="correct"; else if(answers[key]===v) cls="incorrect"; }
+          else if(answers[key]===v) cls="selected";
+          const lbl = v==="R"?"Richtig": v==="F"?"Falsch":"Nicht im Text";
+          return `<button class="${cls}" ${submitted?'disabled':''} onclick="window._lesenSelect('${key}','${v}')">${lbl}</button>`;
+        }).join("");
+        return `<div class="qblock"><div class="qnum">Aussage ${qi+1}</div><div class="qtext">${q.q}</div>
+          <div class="tf-row">${opts}</div>
+          <div class="explain ${submitted?'show':''}">${q.explain}</div></div>`;
+      }).join("");
+    } else if(part.type==="match"){
+      inner += `<div class="qtext" style="margin-bottom:12px;">Ordnen Sie jedem Abschnitt die passende Überschrift zu.</div>`;
+      inner += part.paragraphs.map((p,pgi)=>{
+        const key = pi+"-m"+pgi;
+        const isCorrect = submitted && answers[key]!==undefined && Number(answers[key])===part.correctMap[pgi];
+        const isWrong = submitted && answers[key]!==undefined && Number(answers[key])!==part.correctMap[pgi];
+        const opts = part.headings.map((h,hi)=>`<option value="${hi}" ${Number(answers[key])===hi?'selected':''}>${h}</option>`).join("");
+        return `<div class="match-row"><span class="para-label">Abschnitt ${p}</span>
+          <select class="${isCorrect?'correct':isWrong?'incorrect':''}" ${submitted?'disabled':''} onchange="window._lesenSelect('${key}',this.value)">
+            <option value="" ${answers[key]===undefined?'selected':''}>— wählen —</option>${opts}
+          </select></div>`;
+      }).join("");
+      if(submitted){
+        inner += `<div class="explain show">Korrekte Zuordnung: ${part.paragraphs.map((p,i)=>p+"→"+part.headings[part.correctMap[i]]).join(" · ")}</div>`;
+      }
+    }
+    return `<div class="paper">${inner}</div>`;
+  }
+
+  function draw(){
+    let timerHtml = "";
+    mainEl.innerHTML = `
+      <div class="topline">
+        <div><h2>${set.title}</h2><div class="desc">${mode==='pruefung'?'Prüfungsmodus':'Übungsmodus'}</div></div>
+        <button class="btn ghost" onclick="renderSkillList('lesen')">&larr; Zurück zur Übersicht</button>
+      </div>
+      <div id="timerSlot"></div>
+      ${set.parts.map((p,pi)=>partHtml(p,pi)).join("")}
+      <div class="paper" style="display:flex;justify-content:flex-end;gap:12px;">
+        ${submitted? `<button class="btn primary" onclick="renderReading('${id}')">Nochmal versuchen</button>` :
+          `<button class="btn primary" onclick="window._lesenSubmit()">Abgeben &amp; auswerten</button>`}
+      </div>
+      <div id="resultSlot"></div>
+    `;
+    if(mode==="pruefung" && !submitted) mountTimer("timerSlot", set.timeLimitSec, ()=>window._lesenSubmit());
+    if(submitted){
+      const {correct,total} = computeScore();
+      const pct = Math.round((correct/total)*100);
+      const t = tdnFromPercent(pct);
+      document.getElementById("resultSlot").innerHTML = `
+        <div class="paper result-box">
+          <div class="big-tdn" style="color:${tdnColor(t)}">${tdnLabel(t)}</div>
+          <div class="score-line">${correct} von ${total} Punkten richtig (${pct}%)</div>
+        </div>`;
+      recordResult("lesen", set.title, t, {correct,total});
+    }
+  }
+  window._lesenSelect = (key,val)=>{ answers[key]=val; draw(); };
+  window._lesenSubmit = ()=>{ clearActiveTimer(); submitted=true; draw(); };
+  draw();
+}
+
+/* =========================================================================
+   HÖREN
+   ========================================================================= */
+function speakText(text, onend){
+  if(!('speechSynthesis' in window)){
+    alert("Ihr Browser unterstützt leider keine Sprachsynthese. Bitte nutzen Sie einen aktuellen Chrome-, Edge- oder Safari-Browser.");
+    if(onend) onend();
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = "de-DE";
+  utter.rate = 0.98;
+  const voices = window.speechSynthesis.getVoices();
+  const de = voices.find(v=>v.lang && v.lang.startsWith("de"));
+  if(de) utter.voice = de;
+  if(onend) utter.onend = onend;
+  window.speechSynthesis.speak(utter);
+}
+
+function renderListening(id){
+  const set = listeningSets.find(s=>s.id===id);
+  const answers = {};
+  const plays = {};
+  let submitted = false;
+
+  function maxPlays(part){ return mode==="pruefung" ? part.maxPlays_pruefung : part.maxPlays_uebung; }
+
+  function normalize(s){ return (s||"").toLowerCase().trim().replace(/[.,!?]/g,""); }
+
+  function computeScore(){
+    let correct=0,total=0;
+    set.parts.forEach((part,pi)=>{
+      part.questions.forEach((q,qi)=>{
+        total++;
+        const key=pi+"-"+qi;
+        if(part.type==="mc"){ if(answers[key]===q.correct) correct++; }
+        else if(part.type==="tf"){ if(answers[key]===q.correct) correct++; }
+        else if(part.type==="short"){
+          const val = normalize(answers[key]);
+          if(val && q.accept.some(a=>normalize(a)===val)) correct++;
+        }
+      });
+    });
+    return {correct,total};
+  }
+
+  function partHtml(part,pi){
+    plays[pi]=plays[pi]||0;
+    const remaining = maxPlays(part)-plays[pi];
+    let inner = `<h3 style="margin-bottom:6px;">${part.heading}</h3>
+      <div class="audio-box">
+        <button class="play-btn" ${remaining<=0?'disabled':''} onclick="window._hoerenPlay(${pi})">&#9658;</button>
+        <div class="audio-meta">
+          <div class="title">Audiotext abspielen</div>
+          <div class="plays">${remaining>0? remaining+' Wiedergabe(n) übrig' : 'Keine Wiedergaben mehr übrig'}</div>
+        </div>
+      </div>`;
+    if(part.type==="mc"){
+      inner += part.questions.map((q,qi)=>{
+        const key=pi+"-"+qi;
+        const opts = q.options.map((o,oi)=>{
+          let cls="option";
+          if(submitted){ if(oi===q.correct) cls+=" correct"; else if(answers[key]===oi) cls+=" incorrect"; }
+          else if(answers[key]===oi) cls+=" selected";
+          return `<label class="${cls}" onclick="${submitted?'':`window._hoerenSelect('${key}',${oi})`}">
+            <input type="radio" name="${key}" ${answers[key]===oi?'checked':''} ${submitted?'disabled':''}/> ${o}</label>`;
+        }).join("");
+        return `<div class="qblock"><div class="qnum">Frage ${qi+1}</div><div class="qtext">${q.q}</div><div class="options">${opts}</div>
+          <div class="explain ${submitted?'show':''}">${q.explain}</div></div>`;
+      }).join("");
+    } else if(part.type==="tf"){
+      inner += part.questions.map((q,qi)=>{
+        const key=pi+"-"+qi;
+        const opts=["R","F","N"].map(v=>{
+          let cls="";
+          if(submitted){ if(v===q.correct) cls="correct"; else if(answers[key]===v) cls="incorrect"; }
+          else if(answers[key]===v) cls="selected";
+          const lbl = v==="R"?"Richtig": v==="F"?"Falsch":"Nicht im Text";
+          return `<button class="${cls}" ${submitted?'disabled':''} onclick="window._hoerenSelect('${key}','${v}')">${lbl}</button>`;
+        }).join("");
+        return `<div class="qblock"><div class="qnum">Aussage ${qi+1}</div><div class="qtext">${q.q}</div><div class="tf-row">${opts}</div>
+          <div class="explain ${submitted?'show':''}">${q.explain}</div></div>`;
+      }).join("");
+    } else if(part.type==="short"){
+      inner += part.questions.map((q,qi)=>{
+        const key=pi+"-"+qi;
+        const val = answers[key]||"";
+        const isCorrect = submitted && q.accept.some(a=>normalize(a)===normalize(val));
+        return `<div class="qblock"><div class="qnum">Frage ${qi+1}</div><div class="qtext">${q.q}</div>
+          <input type="text" style="width:100%;padding:8px;border:1px solid ${submitted?(isCorrect?'var(--teal)':'var(--red)'):'var(--rule)'};" placeholder="Antwort eintragen…"
+            value="${val.replace(/"/g,'&quot;')}" ${submitted?'disabled':''} onchange="window._hoerenSelect('${key}',this.value)"/>
+          <div class="explain ${submitted?'show':''}">${q.explain}</div></div>`;
+      }).join("");
+    }
+    return `<div class="paper" id="hpart-${pi}">${inner}</div>`;
+  }
+
+  function draw(){
+    mainEl.innerHTML = `
+      <div class="topline">
+        <div><h2>${set.title}</h2><div class="desc">${mode==='pruefung'?'Prüfungsmodus — begrenzte Wiedergaben':'Übungsmodus — mehrfaches Anhören möglich'}</div></div>
+        <button class="btn ghost" onclick="renderSkillList('hoeren')">&larr; Zurück zur Übersicht</button>
+      </div>
+      ${set.parts.map((p,pi)=>partHtml(p,pi)).join("")}
+      <div class="paper" style="display:flex;justify-content:flex-end;gap:12px;">
+        ${submitted? `<button class="btn primary" onclick="renderListening('${id}')">Nochmal versuchen</button>` :
+          `<button class="btn primary" onclick="window._hoerenSubmit()">Abgeben &amp; auswerten</button>`}
+      </div>
+      <div id="resultSlot"></div>
+    `;
+    if(submitted){
+      const {correct,total} = computeScore();
+      const pct = Math.round((correct/total)*100);
+      const t = tdnFromPercent(pct);
+      document.getElementById("resultSlot").innerHTML = `
+        <div class="paper result-box">
+          <div class="big-tdn" style="color:${tdnColor(t)}">${tdnLabel(t)}</div>
+          <div class="score-line">${correct} von ${total} Punkten richtig (${pct}%)</div>
+        </div>`;
+      recordResult("hoeren", set.title, t, {correct,total});
+    }
+  }
+  window._hoerenPlay = (pi)=>{
+    const part = set.parts[pi];
+    plays[pi]=(plays[pi]||0)+1;
+    speakText(part.script);
+    draw();
+  };
+  window._hoerenSelect = (key,val)=>{ answers[key]=val; draw(); };
+  window._hoerenSubmit = ()=>{ window.speechSynthesis && window.speechSynthesis.cancel(); submitted=true; draw(); };
+  draw();
+}
+
+/* =========================================================================
+   SCHREIBEN
+   ========================================================================= */
+function drawBarChart(data, title){
+  const w=560,h=220,pad=36,maxVal=Math.max(...data.map(d=>d.val))*1.2;
+  const barW = (w-pad*2)/data.length*0.6;
+  const gap = (w-pad*2)/data.length;
+  let bars = data.map((d,i)=>{
+    const x = pad + i*gap + (gap-barW)/2;
+    const bh = (d.val/maxVal)*(h-pad*2);
+    const y = h-pad-bh;
+    return `<rect x="${x}" y="${y}" width="${barW}" height="${bh}" fill="#1b2a4a"/>
+      <text x="${x+barW/2}" y="${y-8}" text-anchor="middle" font-size="13" font-family="IBM Plex Mono, monospace" fill="#1b2a4a">${d.val}%</text>
+      <text x="${x+barW/2}" y="${h-pad+18}" text-anchor="middle" font-size="12" font-family="IBM Plex Sans, sans-serif" fill="#6b6459">${d.year}</text>`;
+  }).join("");
+  return `<svg viewBox="0 0 ${w} ${h+10}" style="width:100%;max-width:560px;">
+    <line x1="${pad}" y1="${h-pad}" x2="${w-pad}" y2="${h-pad}" stroke="#d8d3c6"/>
+    ${bars}
+  </svg>`;
+}
+
+function renderWriting(id){
+  const task = writingTasks.find(t=>t.id===id);
+  let submitted = false;
+  const checks = { einleitung:false, grafik:false, vergleich:false, stellung:false, schluss:false };
+  const rubricCriteria = [
+    { key:"bearbeitung", label:"Bearbeitung der Aufgabe", hint:"Werden Grafikbeschreibung und Stellungnahme vollständig bearbeitet?" },
+    { key:"koharenz", label:"Kohärenz & Textaufbau", hint:"Ist der Text logisch strukturiert, mit passenden Konnektoren?" },
+    { key:"woschatz", label:"Wortschatz", hint:"Ist der Wortschatz vielfältig und präzise, inkl. Fachbegriffen zur Grafik?" },
+    { key:"grammatik", label:"Grammatik & Ausdruck", hint:"Sind komplexe Sätze überwiegend korrekt und variabel gebildet?" }
+  ];
+  const rubricScores = {};
+
+  function wordCount(text){ return (text.trim().match(/\S+/g)||[]).length; }
+
+  function draw(){
+    const textarea = document.getElementById("writeArea");
+    const text = textarea ? textarea.value : "";
+    const wc = wordCount(text);
+    mainEl.innerHTML = `
+      <div class="topline">
+        <div><h2>${task.title}</h2><div class="desc">${mode==='pruefung'?'Prüfungsmodus':'Übungsmodus'}</div></div>
+        <button class="btn ghost" onclick="renderSkillList('schreiben')">&larr; Zurück zur Übersicht</button>
+      </div>
+      <div id="timerSlot"></div>
+      <div class="paper">
+        <h3 style="margin-top:0;">${task.chartTitle}</h3>
+        <div class="graphic-box">${drawBarChart(task.chartData, task.chartTitle)}</div>
+        <p style="font-family:'Source Serif 4',serif;line-height:1.6;">${task.prompt}</p>
+        <textarea id="writeArea" class="write-area" placeholder="Beginnen Sie hier zu schreiben…" ${submitted?'disabled':''} oninput="window._wcUpdate()">${text}</textarea>
+        <div class="write-meta"><span>${wc} Wörter (Ziel: ca. ${task.minWords}+)</span><span>${wc>=task.minWords? '✓ Richtlänge erreicht' : 'noch '+(task.minWords-wc)+' Wörter'}</span></div>
+        ${mode==='uebung'? `
+        <div class="checklist">
+          <div style="font-weight:600;margin-top:16px;margin-bottom:4px;">Struktur-Checkliste (Übungsmodus)</div>
+          ${Object.entries({einleitung:"Einleitung nennt Thema und Quelle der Grafik", grafik:"Wichtigste Werte und Trends der Grafik beschrieben", vergleich:"Auffällige Vergleiche / Höchst- und Tiefstwerte genannt", stellung:"Eigene Position klar erkennbar und begründet", schluss:"Abschließendes Fazit vorhanden"}).map(([k,label])=>`
+            <label><input type="checkbox" ${checks[k]?'checked':''} onchange="window._checkToggle('${k}')"/> ${label}</label>`).join("")}
+        </div>` : ""}
+        ${!submitted? `<div style="margin-top:20px;text-align:right;"><button class="btn primary" onclick="window._writeSubmit()">Abgeben &amp; selbst bewerten</button></div>` : ""}
+      </div>
+      ${submitted ? rubricHtml() : ""}
+    `;
+    if(mode==="pruefung" && !submitted) mountTimer("timerSlot", task.timeLimitSec, ()=>window._writeSubmit());
+  }
+
+  function rubricHtml(){
+    const rows = rubricCriteria.map(c=>{
+      const sel = rubricScores[c.key];
+      const scale = [0,1,2,3].map(v=>`<button class="${sel===v?'selected':''}" onclick="window._rubricSet('${c.key}',${v})">${v}</button>`).join("");
+      return `<div class="rubric-row"><div class="crit">${c.label}<span class="h">${c.hint}</span></div><div class="scale">${scale}</div></div>`;
+    }).join("");
+    const total = rubricCriteria.reduce((s,c)=>s+(rubricScores[c.key]||0),0);
+    const allScored = rubricCriteria.every(c=>rubricScores[c.key]!==undefined);
+    const t = allScored? tdnFromRubric(total,12) : null;
+    return `<div class="paper">
+      <h3 style="margin-top:0;">Selbsteinschätzung nach TestDaF-Bewertungskriterien</h3>
+      <p style="color:var(--text-muted);font-size:.88rem;">Bewerten Sie Ihren eigenen Text ehrlich auf einer Skala von 0 (nicht erreicht) bis 3 (sehr gut erreicht) — idealerweise gemeinsam mit einer Lehrkraft oder einem Sprachpartner.</p>
+      <div class="rubric">${rows}</div>
+      ${allScored? `<div class="result-box" style="margin-top:20px;">
+          <div class="big-tdn" style="color:${tdnColor(t)}">${tdnLabel(t)}</div>
+          <div class="score-line">${total} von 12 Punkten in der Selbsteinschätzung</div>
+        </div>` : `<p class="empty-note">Bewerten Sie alle vier Kriterien, um eine TDN-Einschätzung zu erhalten.</p>`}
+      <div style="margin-top:18px;text-align:right;"><button class="btn ghost" onclick="renderWriting('${id}')">Neuen Versuch starten</button></div>
+    </div>`;
+  }
+
+  window._wcUpdate = ()=>{
+    const wc = wordCount(document.getElementById("writeArea").value);
+    document.querySelector(".write-meta").innerHTML = `<span>${wc} Wörter (Ziel: ca. ${task.minWords}+)</span><span>${wc>=task.minWords? '✓ Richtlänge erreicht' : 'noch '+(task.minWords-wc)+' Wörter'}</span>`;
+  };
+  window._checkToggle = (k)=>{ checks[k]=!checks[k]; draw(); };
+  window._writeSubmit = ()=>{ clearActiveTimer(); submitted=true; draw(); };
+  window._rubricSet = (k,v)=>{
+    rubricScores[k]=v;
+    draw();
+    const allScored = rubricCriteria.every(c=>rubricScores[c.key]!==undefined);
+    if(allScored){
+      const total = rubricCriteria.reduce((s,c)=>s+(rubricScores[c.key]||0),0);
+      recordResult("schreiben", task.title, tdnFromRubric(total,12), {total});
+    }
+  };
+  draw();
+}
+
+/* =========================================================================
+   SPRECHEN
+   ========================================================================= */
+function renderSpeaking(){
+  let idx = 0;
+  let phase = "ready"; // ready -> prep -> speak -> done
+  let timeLeft = 0;
+  let mediaRecorder=null, chunks=[], recordings={};
+  let stream=null;
+
+  function currentTask(){ return speakingTasks[idx]; }
+
+  async function ensureStream(){
+    if(stream) return stream;
+    try{
+      stream = await navigator.mediaDevices.getUserMedia({audio:true});
+      return stream;
+    }catch(e){ return null; }
+  }
+
+  function tick(){
+    timeLeft--;
+    if(timeLeft<=0){
+      clearActiveTimer();
+      if(phase==="prep"){ startSpeak(); }
+      else if(phase==="speak"){ stopRecording(); }
+    } else draw();
+  }
+
+  function startPrep(){
+    phase="prep"; timeLeft=currentTask().prep;
+    draw();
+    clearActiveTimer();
+    activeTimer = setInterval(tick,1000);
+  }
+  async function startSpeak(){
+    phase="speak"; timeLeft=currentTask().speak;
+    chunks=[];
+    const s = await ensureStream();
+    if(s){
+      try{
+        mediaRecorder = new MediaRecorder(s);
+        mediaRecorder.ondataavailable = e=>chunks.push(e.data);
+        mediaRecorder.start();
+      }catch(e){ mediaRecorder=null; }
+    }
+    draw();
+    clearActiveTimer();
+    activeTimer = setInterval(tick,1000);
+  }
+  function stopRecording(){
+    clearActiveTimer();
+    if(mediaRecorder && mediaRecorder.state!=="inactive"){
+      mediaRecorder.onstop = ()=>{
+        const blob = new Blob(chunks,{type:"audio/webm"});
+        recordings[idx] = URL.createObjectURL(blob);
+        phase="done"; draw();
+      };
+      mediaRecorder.stop();
+    } else { phase="done"; draw(); }
+  }
+
+  function nextTask(){
+    if(idx < speakingTasks.length-1){ idx++; phase="ready"; draw(); }
+    else { finishAll(); }
+  }
+  function finishAll(){
+    // simple completion "certificate": user did all 7 tasks -> self-rate overall like writing
+    phase = "summary"; draw();
+  }
+
+  const rubricCriteria = [
+    { key:"aufgabe", label:"Aufgabenbewältigung", hint:"Wurden alle Teilaufgaben inhaltlich passend erfüllt?" },
+    { key:"koharenz", label:"Kohärenz", hint:"War der Redefluss zusammenhängend und gut strukturiert?" },
+    { key:"wortschatz", label:"Wortschatz & Register", hint:"Passender, abwechslungsreicher Wortschatz je nach Sprechsituation?" },
+    { key:"aussprache", label:"Aussprache & Grammatik", hint:"Verständliche Aussprache, überwiegend korrekte Grammatik?" }
+  ];
+  const rubricScores = {};
+
+  function draw(){
+    if(phase==="summary"){
+      const rows = rubricCriteria.map(c=>{
+        const sel = rubricScores[c.key];
+        const scale=[0,1,2,3].map(v=>`<button class="${sel===v?'selected':''}" onclick="window._spkRubric('${c.key}',${v})">${v}</button>`).join("");
+        return `<div class="rubric-row"><div class="crit">${c.label}<span class="h">${c.hint}</span></div><div class="scale">${scale}</div></div>`;
+      }).join("");
+      const total = rubricCriteria.reduce((s,c)=>s+(rubricScores[c.key]||0),0);
+      const allScored = rubricCriteria.every(c=>rubricScores[c.key]!==undefined);
+      const t = allScored? tdnFromRubric(total,12): null;
+      mainEl.innerHTML = `
+        <div class="topline"><div><h2>Sprechen — Zusammenfassung</h2><div class="desc">Alle 7 Aufgaben abgeschlossen</div></div>
+          <button class="btn ghost" onclick="renderSkillList('sprechen')">&larr; Zurück zur Übersicht</button></div>
+        <div class="paper">
+          <p style="color:var(--text-muted);">Hören Sie sich Ihre Aufnahmen an und bewerten Sie sich anschließend selbst — idealerweise mit einer Lehrkraft oder Sprachpartnerin/einem Sprachpartner.</p>
+          ${speakingTasks.map((t,i)=>recordings[i]? `<div style="margin-bottom:14px;"><b>${t.title}</b><audio controls src="${recordings[i]}"></audio></div>`:'').join("")}
+          <h3>Selbsteinschätzung</h3>
+          <div class="rubric">${rows}</div>
+          ${allScored? `<div class="result-box" style="margin-top:16px;"><div class="big-tdn" style="color:${tdnColor(t)}">${tdnLabel(t)}</div><div class="score-line">${total} von 12 Punkten</div></div>`
+            : `<p class="empty-note">Bewerten Sie alle vier Kriterien für eine TDN-Einschätzung.</p>`}
+        </div>`;
+      return;
+    }
+
+    const task = currentTask();
+    let phaseLabel = phase==="ready"?"Bereit": phase==="prep"?"Vorbereitungszeit": phase==="speak"?"Sprechzeit":"Aufnahme beendet";
+    let body = "";
+    if(phase==="ready"){
+      body = `<div class="speak-phase">${task.title}</div>
+        <div class="speak-task">${task.task}</div>
+        <p style="color:var(--text-muted);font-size:.85rem;">Vorbereitungszeit: ${task.prep}s · Sprechzeit: ${task.speak}s ${mode==='pruefung'?'(Prüfungsmodus — Timer läuft automatisch weiter)':''}</p>
+        <button class="btn primary" onclick="window._spkStart()">Aufgabe starten</button>`;
+    } else if(phase==="prep"){
+      body = `<div class="speak-phase">${phaseLabel}</div><div class="speak-timer">${timeLeft}s</div>
+        <div class="speak-task">${task.task}</div>`;
+    } else if(phase==="speak"){
+      body = `<div class="speak-phase"><span class="rec-dot"></span>${phaseLabel}</div><div class="speak-timer">${timeLeft}s</div>
+        <div class="speak-task">${task.task}</div>`;
+    } else if(phase==="done"){
+      body = `<div class="speak-phase">Aufnahme beendet</div>
+        ${recordings[idx]? `<audio controls src="${recordings[idx]}"></audio>` : `<p class="empty-note">Kein Mikrofonzugriff — Sie können die Aufgabe dennoch mündlich üben.</p>`}
+        <div style="margin-top:18px;">
+          <button class="btn ghost" onclick="window._spkRetry()">Nochmal aufnehmen</button>
+          <button class="btn primary" onclick="window._spkNext()">${idx<speakingTasks.length-1? 'Nächste Aufgabe →':'Abschließen'}</button>
+        </div>`;
+    }
+    mainEl.innerHTML = `
+      <div class="topline">
+        <div><h2>Sprechen — Aufgabe ${idx+1} von ${speakingTasks.length}</h2><div class="desc">${mode==='pruefung'?'Prüfungsmodus':'Übungsmodus'}</div></div>
+        <button class="btn ghost" onclick="cleanupSpeaking();renderSkillList('sprechen')">&larr; Zurück zur Übersicht</button>
+      </div>
+      <div class="speak-stage">${body}</div>
+    `;
+  }
+  window._spkStart = ()=>startPrep();
+  window._spkRetry = ()=>startPrep();
+  window._spkNext = ()=>nextTask();
+  window._spkRubric = (k,v)=>{
+    rubricScores[k]=v; draw();
+    const allScored = rubricCriteria.every(c=>rubricScores[c.key]!==undefined);
+    if(allScored){
+      const total = rubricCriteria.reduce((s,c)=>s+(rubricScores[c.key]||0),0);
+      recordResult("sprechen","Vollständiger Sprechteil", tdnFromRubric(total,12), {total});
+    }
+  };
+  window.cleanupSpeaking = ()=>{ clearActiveTimer(); if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; } };
+  draw();
+}
+
+/* =========================================================================
+   TIMER (generic, used by Lesen / Hören(optional) / Schreiben in Prüfungsmodus)
+   ========================================================================= */
+function mountTimer(slotId, totalSec, onExpire){
+  clearActiveTimer();
+  let remaining = totalSec;
+  const slot = document.getElementById(slotId);
+  function fmt(s){ const m=Math.floor(s/60); const ss=String(s%60).padStart(2,'0'); return m+":"+ss; }
+  function draw(){
+    if(!slot) return;
+    const pct = Math.max(0,(remaining/totalSec)*100);
+    slot.innerHTML = `<div class="exam-timer">
+      <div class="clock">${fmt(Math.max(0,remaining))}</div>
+      <div style="flex:1;">
+        <div class="label">Verbleibende Prüfungszeit</div>
+        <div class="track"><div class="fill" style="width:${pct}%;"></div></div>
+      </div>
+    </div>`;
+  }
+  draw();
+  activeTimer = setInterval(()=>{
+    remaining--;
+    if(remaining<=0){ clearActiveTimer(); draw(); onExpire(); }
+    else draw();
+  },1000);
+}
+
+/* =========================================================================
+   KOMPLETTPRÜFUNG hub
+   ========================================================================= */
+function renderExamHub(){
+  clearActiveTimer();
+  mainEl.innerHTML = `
+    <div class="topline"><div><h2>Komplettprüfung</h2><div class="desc">Alle vier Module nacheinander, wie am echten Prüfungstag.</div></div></div>
+    <div class="paper">
+      <p style="color:var(--text-muted);">Empfohlene Reihenfolge und reale Richtzeiten des TestDaF:</p>
+      <div class="ex-list">
+        <div class="ex-item"><div><div style="font-weight:600;">1. Leseverstehen</div><div class="meta">ca. 60 Minuten</div></div><button class="btn primary" onclick="setMode('pruefung');renderSkillList('lesen')">Zu Lesen</button></div>
+        <div class="ex-item"><div><div style="font-weight:600;">2. Hörverstehen</div><div class="meta">ca. 40 Minuten</div></div><button class="btn primary" onclick="setMode('pruefung');renderSkillList('hoeren')">Zu Hören</button></div>
+        <div class="ex-item"><div><div style="font-weight:600;">3. Schriftlicher Ausdruck</div><div class="meta">60 Minuten</div></div><button class="btn primary" onclick="setMode('pruefung');renderSkillList('schreiben')">Zu Schreiben</button></div>
+        <div class="ex-item"><div><div style="font-weight:600;">4. Mündlicher Ausdruck</div><div class="meta">ca. 35 Minuten</div></div><button class="btn primary" onclick="setMode('pruefung');renderSkillList('sprechen')">Zu Sprechen</button></div>
+      </div>
+      <div class="req-check">
+        <b>Zulassungsvoraussetzung vieler Hochschulen:</b> mindestens TDN 4 in allen vier Modulen (teils TDN 3 ausreichend, je nach Studiengang und Hochschule — bitte im Einzelfall prüfen).
+        ${examReadinessHtml()}
+      </div>
+    </div>
+  `;
+}
+function examReadinessHtml(){
+  const skills=["hoeren","lesen","schreiben","sprechen"];
+  const names={hoeren:"Hören",lesen:"Lesen",schreiben:"Schreiben",sprechen:"Sprechen"};
+  const rows = skills.map(s=>{
+    const t = bestTdn(s);
+    return `<div style="display:flex;justify-content:space-between;padding:4px 0;"><span>${names[s]}</span>${t===null?'<span class="tdn-badge pending">noch offen</span>':`<span class="tdn-badge ${tdnClass(t)}">${tdnLabel(t)}</span>`}</div>`;
+  }).join("");
+  return `<div style="margin-top:12px;">${rows}</div>`;
+}
+
+/* =========================================================================
+   FORTSCHRITT
+   ========================================================================= */
+function renderProgress(){
+  clearActiveTimer();
+  const skills=["hoeren","lesen","schreiben","sprechen"];
+  const names={hoeren:"Hören",lesen:"Lesen",schreiben:"Schreiben",sprechen:"Sprechen"};
+  const cards = skills.map(s=>{
+    const arr = store.results[s]||[];
+    if(arr.length===0){
+      return `<div class="progress-card"><h3>${names[s]}</h3><p class="empty-note">Noch keine Versuche — starten Sie eine Übung, um Ihren Fortschritt zu sehen.</p></div>`;
+    }
+    const best = Math.max(...arr.map(r=>r.tdn));
+    const log = arr.slice(-8).reverse().map(r=>`<div>${r.date} · ${r.mode} — ${r.label}: <b style="color:${tdnColor(r.tdn)}">${tdnLabel(r.tdn)}</b></div>`).join("");
+    return `<div class="progress-card">
+      <h3>${names[s]} <span class="tdn-badge ${tdnClass(best)}" style="margin-left:8px;">${tdnLabel(best)}</span></h3>
+      <div class="attempt-log">${log}</div>
+    </div>`;
+  }).join("");
+  mainEl.innerHTML = `
+    <div class="topline"><div><h2>Fortschritt</h2><div class="desc">Ihre bisherigen Versuche, lokal in diesem Browser gespeichert.</div></div>
+      <button class="btn ghost" onclick="if(confirm('Gesamten Fortschritt wirklich löschen?')){store={results:{hoeren:[],lesen:[],schreiben:[],sprechen:[]}};saveStore();renderProgress();}">Fortschritt zurücksetzen</button>
+    </div>
+    <div class="progress-grid">${cards}</div>
+  `;
+}
+
+/* =========================================================================
+   INIT
+   ========================================================================= */
+if('speechSynthesis' in window){ window.speechSynthesis.onvoiceschanged = ()=>{}; }
+render();
+</script>
+</body>
+</html>

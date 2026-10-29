@@ -1,0 +1,290 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>TestDaF Sprachhandlungs-Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap">
+<style>
+:root{
+  --ground:#F2F5F7; --surface:#FFFFFF; --sunken:#E7ECF0; --ink:#17212B; --muted:#56626E;
+  --line:#CBD4DC; --accent:#285A86; --accent-soft:#DCE8F3; --on-accent:#FFFFFF;
+  --ok:#23724A; --ok-soft:#DDF0E5; --bad:#B03A28; --bad-soft:#F7E1DC; --warn:#A5620B;
+  --shadow:0 1px 2px rgba(23,33,43,.06),0 4px 14px rgba(23,33,43,.07);
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#10161C; --surface:#18212A; --sunken:#0C1116; --ink:#E4EAF0; --muted:#98A5B1;
+    --line:#2F3B47; --accent:#7FB0DD; --accent-soft:#1F3347; --on-accent:#0C1620;
+    --ok:#6CC795; --ok-soft:#173226; --bad:#EE8A77; --bad-soft:#3A1E19; --warn:#E6A650;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#10161C; --surface:#18212A; --sunken:#0C1116; --ink:#E4EAF0; --muted:#98A5B1;
+  --line:#2F3B47; --accent:#7FB0DD; --accent-soft:#1F3347; --on-accent:#0C1620;
+  --ok:#6CC795; --ok-soft:#173226; --bad:#EE8A77; --bad-soft:#3A1E19; --warn:#E6A650;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1,h2{font-family:var(--serif);text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:clamp(1.5rem,3.2vw,2rem)}
+h2{font-size:1.3rem}
+.eyebrow{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+header.top p{margin:4px 0 0;color:var(--muted);max-width:70ch}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.nav{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 12px;font-size:.85rem;display:inline-flex;gap:6px;align-items:center}
+.chip .n{font-family:var(--mono);font-size:.78rem;color:var(--muted)}
+.chip[aria-current="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.chip[aria-current="true"] .n{color:var(--on-accent)}
+.chip .best{font-family:var(--mono);font-size:.72rem;padding:0 6px;border-radius:999px;background:var(--ok-soft);color:var(--ok)}
+.chip[aria-current="true"] .best{background:var(--on-accent);color:var(--accent)}
+
+details.tips{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+details.tips summary{cursor:pointer;font-weight:600}
+details.tips ul{margin:10px 0 4px;padding-left:1.2em;display:grid;gap:5px;max-width:84ch}
+
+.exam{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;padding:12px 18px;background:var(--sunken);border-bottom:1px solid var(--line)}
+.bar .what{display:flex;flex-direction:column}
+.timer{font-family:var(--mono);font-size:1.15rem;font-variant-numeric:tabular-nums;padding:4px 10px;border-radius:6px;border:1px solid var(--line);background:var(--surface)}
+.timer.low{color:var(--warn);border-color:var(--warn)}
+.timer.over{color:var(--bad);border-color:var(--bad)}
+.instr{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:2px}
+.instr p{margin:0}
+.instr .warn{color:var(--warn);font-weight:500;margin-top:6px}
+
+.board{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:22px;padding:18px}
+.col{min-width:0;display:flex;flex-direction:column;gap:12px}
+.col-h{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.comment{font-family:var(--serif);font-size:1.05rem;line-height:1.85;margin:0}
+.mark{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:24px;border-radius:6px;border:1.5px solid var(--accent);background:var(--accent-soft);color:var(--accent);font-family:var(--mono);font-size:.82rem;font-weight:500;margin-right:4px;vertical-align:1px;padding:0 4px}
+.mark.used{opacity:.35}
+.mark.sel{background:var(--accent);color:var(--on-accent)}
+.mark.locked{cursor:default}
+
+.stmts{display:flex;flex-direction:column;gap:7px}
+.st{display:grid;grid-template-columns:42px 1fr;gap:10px;align-items:center;border:1px solid var(--line);border-radius:9px;padding:9px 11px;background:var(--surface);text-align:left;color:var(--ink);font-size:.95rem;width:100%}
+.st:hover:not(:disabled){background:var(--accent-soft)}
+.st .slot{border:1.5px dashed var(--line);border-radius:6px;height:30px;display:grid;place-items:center;font-family:var(--mono);font-size:.85rem;color:var(--muted)}
+.st.filled .slot{border-style:solid;border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:600}
+.st.ok{border-color:var(--ok);background:var(--ok-soft)}
+.st.ok .slot{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
+.st.bad{border-color:var(--bad);background:var(--bad-soft)}
+.st.bad .slot{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
+.st.miss{border-color:var(--ok);border-style:dashed}
+.st .solnote{font-size:.78rem;color:var(--ok);font-weight:600;display:block}
+
+.actions{display:flex;flex-wrap:wrap;gap:10px;padding:0 18px 18px;align-items:center}
+.btn{border-radius:8px;padding:9px 16px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-weight:500}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.hint{font-size:.85rem;color:var(--muted)}
+
+.result{border-top:1px solid var(--line);padding:18px;display:flex;flex-direction:column;gap:14px}
+.score{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline}
+.score strong{font-family:var(--serif);font-size:1.7rem}
+.score span{color:var(--muted)}
+ol.expl{margin:0;padding:0;list-style:none;display:grid;gap:12px}
+ol.expl li{display:grid;grid-template-columns:30px 1fr;gap:10px}
+ol.expl .pos{font-family:var(--mono);color:var(--muted)}
+ol.expl .act{font-weight:600}
+ol.expl .mine{color:var(--bad)}
+ol.expl .sent{font-family:var(--serif);color:var(--muted);font-style:italic;margin:2px 0}
+footer.src{font-size:.82rem;color:var(--muted);padding:0 18px 16px}
+footer.src a{color:var(--accent)}
+.note{font-size:.82rem;color:var(--muted);max-width:84ch}
+@media (max-width:880px){ .board{grid-template-columns:1fr} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Digitaler TestDaF · Lesen · Aufgabe 4</div>
+    <h1>Sprachhandlungen zuordnen</h1>
+    <p>Zwölf Kommentare nach Artikeln von spektrum.de und scinexx.de, im Format der offiziellen Demo-Aufgabe: ein kurzer Meinungstext von rund 200 Wörtern, vier markierte Stellen, acht mögliche Aussagen, 6 Minuten. Jede Übung hat ihre <strong>eigene Liste von acht Sprachhandlungen</strong> – wie in der Prüfung wechseln die Verben von Aufgabe zu Aufgabe.</p>
+  </header>
+
+  <nav class="nav" id="nav" aria-label="Übungen"></nav>
+
+  <details class="tips">
+    <summary>Strategie: Woran erkenne ich die Sprachhandlung?</summary>
+    <ul>
+      <li><b>Die Zahl gehört zum Satz danach</b>, nicht davor. Das ist der häufigste Fehler in dieser Aufgabe.</li>
+      <li><b>zweifelt an</b> ≠ <b>kritisiert</b>: Zweifel betrifft die <i>Wahrheit</i> einer Annahme („fraglich“, „ist kaum zu belegen“), Kritik ein <i>Handeln</i> („ein Fehler“, „greift zu kurz“).</li>
+      <li><b>prognostiziert</b> ≠ <b>vermutet</b>: Prognose steht im Futur ohne Abschwächung („wird … einbrechen“), Vermutung hat ein Signal wie <i>wohl, dürfte, vermutlich, könnte</i>.</li>
+      <li><b>begrüßt</b> ≠ <b>empfiehlt</b>: Begrüßen bewertet etwas, das <i>schon geschieht</i> („ist überfällig“, „und das ist gut so“); Empfehlen fordert etwas für die <i>Zukunft</i> („nötig ist“, „es ist wichtig, … zu“).</li>
+      <li><b>warnt vor</b> ≠ <b>bedauert</b>: Warnung nennt eine drohende Folge („Wer …, riskiert, dass“); Bedauern ist eine Gefühlsäußerung über etwas Gegebenes („leider“, „eine bittere Ironie“).</li>
+      <li><b>Achtung Köderwörter:</b> Wörter wie <i>Risiko, Sorge, Nachteile</i> im Satz bedeuten nicht automatisch „warnt“ – oft referiert der Autor nur, was andere denken.</li>
+      <li><b>Acht Aussagen, vier Lücken:</b> Vier Aussagen bleiben übrig. Ordnen Sie zuerst die Stelle zu, bei der Sie sicher sind.</li>
+    </ul>
+  </details>
+
+  <section class="exam" id="exam"></section>
+
+  <p class="note">Hinweis: Die Kommentare sind eigens für diese Übung geschrieben; inhaltlich stützen sie sich auf die unten verlinkten Artikel. Länge, Satzbau, Zahl der Markierungen und die acht alphabetisch geordneten Aussagen folgen der offiziellen Demo-Aufgabe des digitalen TestDaF. Die Aussagenliste ist pro Kommentar neu zusammengestellt.</p>
+</div>
+
+<script>
+const DATA = {"options": ["bedauert etwas.", "begrüßt etwas.", "empfiehlt etwas.", "kritisiert etwas.", "prognostiziert etwas.", "vermutet etwas.", "warnt vor etwas.", "zweifelt an etwas."], "ex": [{"id": "k1", "topic": "Spritpreise", "title": "Kommentar einer Expertin zu den hohen Kraftstoffpreisen", "who": "Die Expertin", "sents": [{"t": "Dass die gestiegenen Kraftstoffpreise viele Haushalte hart treffen, lässt sich nicht bestreiten, und die Politik steht unter Druck, rasch zu handeln."}, {"m": 1, "t": "Ob eine Senkung der Energiesteuer allerdings wirklich bei denen ankommt, die sie am dringendsten brauchen, bleibt nach allem, was wir aus früheren Entlastungen wissen, fraglich."}, {"t": "Wer viel fährt, verbraucht viel, und das sind eher die oberen als die unteren Einkommensgruppen."}, {"m": 2, "t": "Beim Tankrabatt vor vier Jahren blieb ein erheblicher Teil der Entlastung bei den Mineralölkonzernen hängen, und die Verbraucher spürten davon nur einen Bruchteil – ein politischer Fehler, der sich nicht wiederholen darf."}, {"t": "Deutlich treffsicherer wären Direktzahlungen an einkommensschwache Haushalte, weil sie genau dort ankommen, wo das Geld fehlt."}, {"m": 3, "t": "Leider scheitert dieser Weg bisher an einer banalen Hürde: Dem Staat liegen nur von einem kleinen Teil der Steuerpflichtigen die Kontodaten vor."}, {"m": 4, "t": "Vor diesem Hintergrund ist es besonders wichtig, endlich einen funktionierenden Auszahlungsweg aufzubauen, damit Entlastungen künftig innerhalb von Wochen und nicht erst nach Monaten wirken."}, {"t": "Die hohen Preise selbst wird auch die beste Verwaltung nicht senken; sie sind das Ergebnis eines Krieges, nicht einer verfehlten Steuerpolitik."}], "keys": {"1": 7, "2": 3, "3": 0, "4": 2}, "why": {"1": "„bleibt … fraglich“ – bewertet nicht eine Handlung als schlecht, sondern die <b>Geltung einer Annahme</b> als unsicher. Das ist Zweifel, nicht Kritik.", "2": "„ein politischer Fehler, der sich nicht wiederholen darf“ – ein klares negatives Urteil über ein <b>Handeln</b> in der Vergangenheit. Genau das ist Kritik.", "3": "„Leider scheitert dieser Weg …“ – eine Gefühlsäußerung über einen Zustand, den der Sprecher nicht ändern kann. Kein Vorwurf an jemanden, also kein Tadel.", "4": "„ist es besonders wichtig, … aufzubauen, damit …“ – eine Handlungsaufforderung mit Zweckangabe, auch ohne <i>sollte</i> oder Imperativ."}, "src": {"t": "Tankrabatt: Welche Maßnahmen helfen bei hohen Spritpreisen wirklich?", "a": "Katharina Menne", "p": "spektrum.de", "d": "18.09.2026", "u": "https://www.spektrum.de/news/tankrabatt-welche-massnahmen-helfen-bei-hohen-spritpreisen-wirklich/2345308"}}, {"id": "k2", "topic": "Douglasie", "title": "Kommentar eines Experten zum Waldumbau", "who": "Der Experte", "sents": [{"t": "Die Fichte, über Jahrzehnte der Brotbaum der deutschen Forstwirtschaft, stirbt in vielen Regionen großflächig ab, und die Suche nach Ersatz läuft seit Jahren."}, {"m": 1, "t": "Dass die Forstverwaltungen dabei inzwischen auf Mischwälder statt auf eine einzige Ersatzart setzen, ist ein längst überfälliger Schritt in die richtige Richtung."}, {"t": "Besonders viel Aufmerksamkeit bekommt derzeit die Douglasie, die schnell wächst, gutes Holz liefert und Trockenheit besser verträgt als die Fichte."}, {"m": 2, "t": "Wer sie jedoch in lichte Eichenwälder an Steilhängen pflanzt, muss damit rechnen, dass sie sich dort unkontrolliert ausbreitet und die typische Bodenvegetation verdrängt."}, {"t": "Schon geringe Beimischungen verändern die Nährstoffverhältnisse, und empfindliche Arten wie Flechten und Moose reagieren darauf besonders stark."}, {"m": 3, "t": "Der klimaresiliente Wirtschaftswald des Jahres 2060 wird deshalb kein Douglasienwald sein, sondern ein Mischbestand, in dem diese Art einen begrenzten Anteil hat."}, {"m": 4, "t": "In Naturschutzgebieten ist auf sie ganz zu verzichten, im Wirtschaftswald sollte ihr Anteil ein Viertel nicht überschreiten."}, {"t": "Was die Forstwirtschaft mit der Fichte erlebt hat, sollte Warnung genug sein."}], "keys": {"1": 1, "2": 6, "3": 4, "4": 2}, "why": {"1": "„ist ein längst überfälliger Schritt in die richtige Richtung“ – ausdrückliche Zustimmung zu etwas, das <b>bereits geschieht</b>. Das ist Begrüßung, nicht Empfehlung.", "2": "„Wer … pflanzt, muss damit rechnen, dass …“ – eine Folge wird als Gefahr vor Augen geführt. Das ist eine Warnung.", "3": "„Der … Wirtschaftswald des Jahres 2060 wird … sein“ – Futur mit Jahresangabe und ohne Unsicherheitssignal: eine Prognose, keine Vermutung.", "4": "„ist … zu verzichten“ und „sollte … nicht überschreiten“ – zwei Handlungsanweisungen für die Zukunft. Das ist eine Empfehlung."}, "src": {"t": "Bäume mit Zukunft: Die Douglasie, ein Hoffnungsträger mit Grenzen", "a": "Gunther Willinger", "p": "spektrum.de", "d": "19.09.2026", "u": "https://www.spektrum.de/news/serie-baeume-mit-zukunft-teil-1-douglasie/2319040"}}, {"id": "k3", "topic": "Plastik und Seevögel", "title": "Kommentar einer Expertin zu Plastikmüll im Meer", "who": "Die Expertin", "sents": [{"t": "Eine Langzeitstudie auf der australischen Insel Lord Howe zeigt, dass die Überlebenschance eines jungen Sturmtauchers mit der Menge an Kunststoff in seinem Magen sinkt."}, {"m": 1, "t": "Dass Bestandsanalysen bis heute fast ausschließlich zählen, wie viele Küken das Nest lebend verlassen, greift angesichts dieser Zahlen entschieden zu kurz."}, {"t": "Denn der entscheidende Teil der Sterblichkeit tritt erst danach ein, während der Jahre auf See, und er taucht in keiner Statistik auf."}, {"m": 2, "t": "Die Brutkolonien wirken heute noch stabil, doch in wenigen Jahren werden die Bestände einbrechen."}, {"m": 3, "t": "Der Anteil belasteter Küken dürfte dabei sogar über den erhobenen 20 Prozent liegen, denn kleine Partikel entgehen der Untersuchung vermutlich häufiger als große."}, {"t": "Das australische Team hat dieses Problem selbst offen benannt."}, {"m": 4, "t": "Bleibt die plastikbedingte Sterblichkeit weiterhin aus den Modellen ausgeklammert, drohen Schutzmaßnahmen erst zu greifen, wenn die Populationen nicht mehr zu retten sind."}, {"t": "Die Daten liegen vor; es fehlt nur die Bereitschaft, sie zu verwenden."}], "keys": {"1": 3, "2": 4, "3": 5, "4": 6}, "why": {"1": "„greift … entschieden zu kurz“ – ein negatives Urteil über die <b>Praxis</b> der Bestandsanalyse. Das ist Kritik, kein Zweifel an einer Annahme.", "2": "„doch in wenigen Jahren werden die Bestände einbrechen“ – Futur ohne Bedingung und ohne Abschwächung: eine Prognose.", "3": "„dürfte … liegen“ und „vermutlich“ – Unsicherheitssignale. Damit ist es eine Vermutung, keine Prognose.", "4": "„Bleibt … ausgeklammert, drohen Schutzmaßnahmen erst zu greifen, wenn …“ – <i>drohen</i> stellt eine schlimme Folge in Aussicht: eine Warnung."}, "src": {"t": "Artensterben: Wie viel Plastikmüll im Magen verkraftet ein Seevogel?", "a": "Daniel Lingenhöhl", "p": "spektrum.de", "d": "18.09.2026", "u": "https://www.spektrum.de/news/artensterben-wie-viel-plastikmuell-im-magen-verkraftet-ein-seevogel/2345326"}}, {"id": "k4", "topic": "Wilde Honigbienen", "title": "Kommentar eines Experten zu wildlebenden Honigbienen", "who": "Der Experte", "sents": [{"t": "Ein Teil der Honigbienenvölker lebt ohne jede Betreuung in Baumhöhlen und Mauerspalten, und erstmals wird diese Wildpopulation in der EU als gefährdet geführt."}, {"m": 1, "t": "Dass die Rote Liste die freilebenden Völker getrennt von den Beständen der Imkereien bewertet, ist fachlich richtig und war lange überfällig."}, {"t": "Denn Schwärme aus Bienenstöcken besetzen jedes Jahr neue Nistplätze und verdecken damit, wie es den wilden Völkern tatsächlich geht."}, {"m": 2, "t": "Dass sich diese Völker ohne den ständigen Nachschub aus der Imkerei halten könnten, ist nach den vorliegenden Modellrechnungen kaum anzunehmen."}, {"t": "Für Deutschland und die Schweiz ergibt die Modellrechnung ohne Zuwanderung ein vollständiges Verschwinden binnen eines Jahrzehnts."}, {"m": 3, "t": "Nötig sind deshalb vor allem zwei Dinge: ein systematisches Monitoring über Ländergrenzen hinweg sowie der Erhalt alter Höhlenbäume und eines vielfältigen Blütenangebots."}, {"m": 4, "t": "Vorsicht ist allerdings geboten, wenn jemand diese Zahlen auf ganz Europa überträgt: In Südostengland zeigt dieselbe Rechnung einen deutlichen Zuwachs."}, {"t": "Was den wilden Bienen hilft, käme ohnehin vielen weiteren Arten strukturreicher Lebensräume zugute."}], "keys": {"1": 1, "2": 7, "3": 2, "4": 6}, "why": {"1": "„ist fachlich richtig und war lange überfällig“ – Zustimmung zu einer <b>bereits getroffenen</b> Entscheidung: Begrüßung.", "2": "„ist … kaum anzunehmen“ – die Geltung einer Annahme wird bestritten: Zweifel, kein Tadel an einem Verhalten.", "3": "„Nötig sind deshalb vor allem zwei Dinge …“ – eine Forderung für die Zukunft: Empfehlung.", "4": "„Vorsicht ist allerdings geboten, wenn …“ – vor einem Fehlschluss wird ausdrücklich gewarnt."}, "src": {"t": "Wilde Honigbienen stehen in der EU erstmals auf der Roten Liste", "a": "Kathrin Klatt", "p": "scinexx.de", "d": "18.09.2026", "u": "https://www.scinexx.de/news/biowissen/wilde-honigbienen-stehen-in-der-eu-erstmals-auf-der-roten-liste/"}}, {"id": "k5", "topic": "Asteroidenabwehr", "title": "Kommentar einer Expertin zur Asteroidenabwehr", "who": "Die Expertin", "sents": [{"t": "Kleine Asteroiden lassen sich bei ausreichender Vorwarnzeit durch einen gezielten Einschlag ablenken; für große Objekte diskutiert die Fachwelt seit Jahren den Einsatz von Kernwaffen."}, {"m": 1, "t": "Ob ein kinetischer Einschlag bei einem Körper von 160 Metern überhaupt genügend Wirkung entfaltet, ist unter Fachleuten bis heute umstritten."}, {"m": 2, "t": "Dass das neue Modell zur Energieübertragung durch Röntgenstrahlung in den Tests bis auf weniger als ein Prozent mit früheren Rechnungen übereinstimmt, ist ein erfreulicher Fortschritt für ein Feld, das lange mit groben Näherungen arbeiten musste."}, {"t": "In der Simulation wurde der Körper zu rund 98 Prozent zerlegt, und fast das gesamte Material flog schneller auseinander, als die eigene Schwerkraft es halten konnte."}, {"t": "Überraschend war dabei, dass eine Zündung in 25 Metern Höhe mehr bewirkte als eine in nur 10 Metern, weil sich die Strahlung über eine größere Fläche verteilt."}, {"m": 3, "t": "Dass die Simulationen bereits nach wenigen hundert Millisekunden enden, ist für eine Frage von dieser Tragweite entschieden zu wenig."}, {"m": 4, "t": "Bevor aus diesen Rechnungen eine Abwehrstrategie wird, müssen deshalb auch Aufbau, Porosität und Rotation des Zielobjekts berücksichtigt werden."}, {"t": "Bis dahin bleibt die Kernwaffe das, was sie in diesem Zusammenhang immer war: das letzte Mittel, nicht das erste."}], "keys": {"1": 7, "2": 1, "3": 3, "4": 2}, "why": {"1": "„Ob … überhaupt genügend Wirkung entfaltet, ist … umstritten“ – die Geltung einer Annahme ist offen: Zweifel.", "2": "„ist ein erfreulicher Fortschritt“ – positive Bewertung eines <b>erreichten</b> Ergebnisses: Begrüßung, nicht Empfehlung.", "3": "„ist … entschieden zu wenig“ – ein negatives Urteil über das <b>Vorgehen</b> anderer: Kritik.", "4": "„müssen deshalb auch … berücksichtigt werden“ – Forderung nach einem bestimmten Vorgehen: Empfehlung."}, "src": {"t": "Könnte eine Atombombe einen 160-Meter-Asteroiden zerreißen?", "a": "Kathrin Klatt", "p": "scinexx.de", "d": "18.09.2026", "u": "https://www.scinexx.de/news/kosmos/koennte-eine-atombombe-einen-160-meter-asteroiden-zerreissen/"}}, {"id": "k6", "topic": "Invasive Meeresarten", "title": "Kommentar eines Experten zu invasiven Arten im Meer", "who": "Der Experte", "sents": [{"t": "Eine neue Auswertung von 67 Untersuchungen kommt zu dem Schluss, dass der Klimawandel eingeschleppten Meeresarten die Ausbreitung erleichtert."}, {"m": 1, "t": "Dass 54 dieser Untersuchungen aus dem gemäßigten Nordatlantik stammen und fast alle davon nur die Erwärmung betrachten, ist eine Einseitigkeit, die man einer Metaanalyse mit weltweitem Anspruch anlasten muss."}, {"t": "Über die Tropen, die Südhalbkugel und die Tiefsee wissen wir daher fast nichts."}, {"m": 2, "t": "Leider sind ausgerechnet die Regionen ohne Daten diejenigen, in denen sich das Meer am schnellsten verändert – daran wird sich so bald nichts ändern."}, {"m": 3, "t": "Der eigentliche Mechanismus liegt wohl weniger in der Temperatur selbst als in den Extremereignissen: Hitzewellen und Stürme reißen Lücken in die heimischen Lebensgemeinschaften, und schnell wachsende Arten füllen sie."}, {"t": "Dafür spricht, dass die Effekte in kurzfristigen Experimenten am deutlichsten ausfielen."}, {"m": 4, "t": "Wer die Behandlung von Ballastwasser und die Überwachung mit Umwelt-DNA weiter aufschiebt, muss damit rechnen, dass die Bekämpfung später ein Vielfaches kostet."}, {"t": "Vorbeugen ist in diesem Feld nicht nur billiger, sondern oft die einzige wirksame Option."}], "keys": {"1": 3, "2": 0, "3": 5, "4": 6}, "why": {"1": "„eine Einseitigkeit, die man … anlasten muss“ – ein negatives Urteil über die Arbeit anderer: Kritik.", "2": "„Leider sind ausgerechnet …“ – eine Gefühlsäußerung über einen Zustand, für den niemand direkt verantwortlich ist: Bedauern, nicht Kritik.", "3": "„liegt <i>wohl</i> weniger in …“ – das Abtönungswort <i>wohl</i> macht daraus eine Vermutung, keine Feststellung.", "4": "„Wer … aufschiebt, muss damit rechnen, dass …“ – die Folge wird als Gefahr vor Augen geführt: Warnung."}, "src": {"t": "Der Klimawandel erleichtert invasiven Meeresarten die Ausbreitung", "a": "Kathrin Klatt", "p": "scinexx.de", "d": "18.09.2026", "u": "https://www.scinexx.de/news/biowissen/der-klimawandel-erleichtert-invasiven-meeresarten-die-ausbreitung/"}}, {"id": "k7", "topic": "Eingeschleppte Stechmücken", "title": "Kommentar einer Expertin zur Ausbreitung von Stechmücken", "who": "Die Expertin", "options": ["bezweifelt etwas.", "erklärt etwas.", "fordert etwas.", "hebt etwas hervor.", "räumt etwas ein.", "veranschaulicht etwas.", "warnt vor etwas.", "widerspricht etwas."], "sents": [{"t": "Von den 184 bekannten Überträgerarten unter den Stechmücken sind 45 in fremde Regionen verschleppt worden, 28 von ihnen haben sich dort dauerhaft festgesetzt."}, {"m": 1, "t": "Dass sich einzelne Einschleppungen bei dem heutigen Warenvolumen niemals vollständig verhindern lassen, will ich gar nicht bestreiten."}, {"m": 2, "t": "Der Grund für diese rasche Zunahme der Einschleppungen liegt denn auch weniger in der Erwärmung als im Verkehr: Erst Container, Güterzüge und Frachtflugzeuge bringen Eier und Larven über die Ozeane."}, {"t": "Verschleppt wird in Altreifen, in Bambusstangen, in Zeltplanen, in Maschinenteilen – überall dort, wo sich ein wenig Regenwasser hält."}, {"t": "Die Erwärmung entscheidet erst danach, ob eine Art die erste Überwinterung übersteht."}, {"m": 3, "t": "Wer aus der Ausbreitung der Tigermücke bereits auf bevorstehende Dengue-Epidemien in Mitteleuropa schließt, geht einen Schritt zu weit: Ein vorhandener Überträger schafft nur eine Möglichkeit, noch keinen Ausbruch."}, {"m": 4, "t": "Die Kontrolle gehört deshalb an den Anfang der Kette, in die Häfen und auf die Umschlagplätze, und nicht erst an die Regentonne im Garten."}, {"t": "Ist eine Art einmal etabliert, wird man sie nach aller Erfahrung nicht wieder los."}], "keys": {"1": 4, "2": 1, "3": 7, "4": 2}, "why": {"1": "„… will ich gar nicht bestreiten“ – der Sprecher gibt einen Punkt der Gegenseite zu, bevor er seinen eigenen macht. Das ist ein <b>Zugeständnis</b>, keine Warnung.", "2": "„Der Grund … liegt weniger in …, als …“ – hier wird eine <b>Ursache benannt</b>. Die Beispiele im nächsten Satz veranschaulichen; dieser Satz erklärt.", "3": "„… geht einen Schritt zu weit: … schafft eine Möglichkeit, noch keinen Ausbruch“ – eine fremde <b>Schlussfolgerung wird zurückgewiesen</b>. Kein Zweifel an einer offenen Frage, sondern Widerspruch gegen eine Behauptung.", "4": "„Die Kontrolle gehört deshalb an den Anfang der Kette“ – eine <b>Handlungsforderung</b>, auch ohne <i>sollte</i> oder <i>muss</i>."}, "src": {"t": "Wie Stechmücken die Welt erobern", "a": "Nadja Podbregar", "p": "scinexx.de", "d": "24.10.2025", "u": "https://www.scinexx.de/news/biowissen/wie-stechmuecken-die-welt-erobern/"}}, {"id": "k8", "topic": "Flüsse und Regen", "title": "Kommentar eines Experten zu Abflussmodellen", "who": "Der Experte", "options": ["betont etwas.", "erklärt etwas.", "gibt etwas zu bedenken.", "korrigiert etwas.", "prognostiziert etwas.", "schlägt etwas vor.", "veranschaulicht etwas.", "warnt vor etwas."], "sents": [{"t": "Mehr als zwei Millionen Regenereignisse aus über 80.000 Einzugsgebieten in 97 Ländern hat ein Team um Ali Ameli von der University of British Columbia ausgewertet."}, {"m": 1, "t": "Das verbreitete Bild vom Einzugsgebiet als Rohr, in das oben Regen fällt und aus dem unten Wasser herausläuft, ist demnach nicht länger haltbar."}, {"m": 2, "t": "Ein Einzugsgebiet gleicht einem Schwamm: Je nach Vorgeschichte nimmt er viel oder wenig auf, bevor überhaupt etwas abfließt."}, {"t": "Entscheidend ist nicht die Menge des Regens, sondern seine zeitliche Verteilung, dazu Trockenheit, Geländeform, Geologie und Landnutzung."}, {"t": "In der Wachstumsperiode steigt der Anteil der komplexen Gebiete um 63 Prozent, in Europa erreicht er dann 94 Prozent."}, {"m": 3, "t": "Eines sollte man dabei nicht übersehen: Die Einteilung beschreibt Zusammenhänge, Ursachen weist sie nicht nach."}, {"m": 4, "t": "Naheliegend wäre deshalb, die Messnetze zuerst dort auszubauen, wo bislang kaum ein Pegel steht – in Afrika und in weiten Teilen Asiens."}, {"t": "Wer weiter mit dem Rohr rechnet, wird sich über seine Hochwasserprognosen nicht wundern dürfen."}], "keys": {"1": 3, "2": 6, "3": 2, "4": 5}, "why": {"1": "„Das verbreitete Bild … ist nicht länger haltbar“ – eine <b>falsche Vorstellung wird berichtigt</b>. Das ist mehr als Zweifel: Der Sprecher erklärt sie für überholt.", "2": "„gleicht eher einem Schwamm“ – ein <b>Bild</b>, das den Sachverhalt anschaulich macht. Es liefert keine neue Behauptung, sondern erläutert die vorige.", "3": "„Eines sollte man dabei nicht übersehen: …“ – der Sprecher <b>lenkt den Blick auf einen Vorbehalt</b>, ohne das Ergebnis selbst zu bestreiten.", "4": "„Naheliegend wäre deshalb, … auszubauen“ – ein <b>Vorschlag</b> im Konjunktiv; er fordert nicht, er stellt etwas zur Diskussion."}, "src": {"t": "Warum reagieren Flüsse auf ähnlichen Regen so unterschiedlich?", "a": "Clara Lyu", "p": "scinexx.de", "d": "17.09.2026", "u": "https://www.scinexx.de/news/geowissen/warum-reagieren-fluesse-auf-aehnlichen-regen-so-unterschiedlich/"}}, {"id": "k9", "topic": "Beben am Testgelände", "title": "Kommentar einer Expertin zu den Erdbeben in Nordkorea", "who": "Die Expertin", "options": ["bestätigt etwas.", "fordert etwas.", "hält etwas für möglich.", "räumt etwas ein.", "stellt etwas richtig.", "warnt vor etwas.", "weist etwas zurück.", "zeigt sich über etwas überrascht."], "sents": [{"t": "Zwischen 2006 und 2017 zündete Nordkorea sechs Kernsprengsätze unter dem Berg Mantap; üblicherweise klingen die Nachbeben solcher Explosionen binnen Wochen ab."}, {"m": 1, "t": "Dass die Erdstöße dort auch acht Jahre nach dem letzten Test nicht nur anhalten, sondern häufiger werden, hätte vorher wohl niemand erwartet."}, {"t": "Ein Team um Xingli Fan hat in 17 Jahren seismischer Aufzeichnungen 1.399 lokale Beben aufgespürt, 955 davon so genau, dass sich zwei annähernd parallele Störungszonen abzeichnen."}, {"m": 2, "t": "Denkbar ist, dass die Explosionen das oberflächennahe Gestein geschädigt und den Spannungszustand so verschoben haben, dass ohnehin versagensnahe Störungen allmählich nachgeben."}, {"m": 3, "t": "Der genaue Ablauf im Gestein bleibt freilich eine Deutung aus Messdaten und Modellrechnung, kein beobachteter Vorgang."}, {"t": "Für die Überwachung von Testverboten hat der Befund dennoch Gewicht: Späte Beben lassen sich von natürlicher Tektonik nur schwer unterscheiden."}, {"m": 4, "t": "Der Betrieb der Messstationen und die Archivierung ihrer Daten dürfen deshalb nicht nach wenigen Jahren enden."}, {"t": "Ob sich die Beobachtung auf andere Testgelände übertragen lässt, hängt von deren Geologie ab."}], "keys": {"1": 7, "2": 2, "3": 3, "4": 1}, "why": {"1": "„… hätte vorher wohl niemand erwartet“ – der Sprecher markiert den Befund als <b>unerwartet</b>. Er bestätigt damit nichts, sondern staunt.", "2": "„Denkbar ist, dass …“ – eine <b>Möglichkeit</b> wird erwogen, ohne Festlegung. Kein Nachweis und keine Warnung.", "3": "„bleibt freilich eine Deutung …, kein beobachteter Vorgang“ – der Sprecher <b>gesteht eine Schwäche der eigenen Position zu</b>, bevor er sie im nächsten Satz („dennoch Gewicht“) verteidigt.", "4": "„dürfen deshalb nicht … eingestellt werden“ – eine <b>Forderung</b> in der Form eines Verbots."}, "src": {"t": "Atomwaffentests in Nordkorea haben wohl Hunderte Erdbeben ausgelöst", "a": "Robert Klatt", "p": "scinexx.de", "d": "19.09.2026", "u": "https://www.scinexx.de/news/geowissen/atomwaffentests-in-nordkorea-haben-wohl-hunderte-erdbeben-ausgeloest/"}}, {"id": "k10", "topic": "Wasserstoff aus Meerwasser", "title": "Kommentar eines Experten zur Meerwasser-Elektrolyse", "who": "Der Experte", "options": ["begrüßt etwas.", "bemängelt etwas.", "erklärt etwas.", "hebt etwas hervor.", "kündigt etwas an.", "schränkt etwas ein.", "stellt etwas richtig.", "verspricht etwas."], "sents": [{"t": "Wasserstoff aus Meerwasser scheitert bisher an zwei Dingen: Nebenreaktionen greifen die Elektroden an, und eine vorgeschaltete Entsalzung kostet zusätzliche Anlagen und Energie."}, {"m": 1, "t": "Dass ein Team am Dalianer Institut für chemische Physik nun ausgerechnet die Abwärme der Elektrolyse für die Entsalzung nutzt, statt sie wie bisher ungenutzt abzuführen, ist ein überfälliger Schritt."}, {"t": "Ein Vakuum senkt den Siedepunkt des Meerwassers so weit, dass die niedrige Temperatur der Abwärme zum Verdampfen ausreicht; das Destillat speist anschließend die Elektrolyse."}, {"m": 2, "t": "Von einer direkten Spaltung von Salzwasser, wie sie in manchen Meldungen zu lesen war, kann dabei allerdings keine Rede sein: Salz und Wasser werden nach wie vor vorher getrennt."}, {"m": 3, "t": "Bemerkenswert ist vor allem, dass das Verfahren zwei Engpässe zugleich angeht – die ungenutzte Niedertemperaturwärme und die Empfindlichkeit der Elektroden."}, {"t": "Die 250-Kilowatt-Anlage lieferte 48 Normkubikmeter Wasserstoff und 31,6 Kilogramm Frischwasser je Stunde, bei 14,4 Prozent höherer Systemeffizienz als die herkömmliche Route."}, {"m": 4, "t": "Belegt ist das freilich nur für hundert Tage Betrieb und für eine einzige Anlage."}, {"t": "Was im industriellen Dauerbetrieb geschieht, weiß bislang niemand; auch die zurückbleibende Salzlauge muss irgendwohin."}], "keys": {"1": 0, "2": 6, "3": 3, "4": 5}, "why": {"1": "„… ist ein überfälliger Schritt“ – eine <b>zustimmende Bewertung</b> dessen, was bereits geschehen ist.", "2": "„wie sie in manchen Meldungen zu lesen war … kann keine Rede sein“ – eine <b>falsche Darstellung wird berichtigt</b>. Der Sprecher bemängelt nicht das Verfahren, sondern die Berichterstattung.", "3": "„Bemerkenswert ist vor allem, dass …“ – ein Punkt wird als besonders wichtig <b>herausgestellt</b>; bewertet wird er nicht noch einmal.", "4": "„Belegt ist das freilich nur für …“ – die eigene Aussage wird in ihrer <b>Reichweite begrenzt</b>, nicht bezweifelt und nicht getadelt."}, "src": {"t": "Pilotanlage gewinnt Wasserstoff und Frischwasser aus Meerwasser", "a": "Kathrin Klatt", "p": "scinexx.de", "d": "19.09.2026", "u": "https://www.scinexx.de/news/technik/pilotanlage-gewinnt-wasserstoff-und-frischwasser-aus-meerwasser/"}}, {"id": "k11", "topic": "Proteinarme Ernährung", "title": "Kommentar einer Expertin zur Eiweißbeschränkung", "who": "Die Expertin", "options": ["begrüßt etwas.", "erläutert etwas.", "fordert etwas.", "hält etwas für verfrüht.", "rät von etwas ab.", "vermutet etwas.", "warnt vor etwas.", "wendet etwas ein."], "sents": [{"t": "Tiere, die wenig Eiweiß bekommen, verbrauchen mehr Energie, regulieren ihren Blutzucker besser und leben in mehreren Modellorganismen länger."}, {"m": 1, "t": "Zustande kommt das, weil Sensoren in den Zellen den Mangel an Aminosäuren melden und das Hormon FGF21 diese Meldung ins Gehirn trägt, wo Appetit, Energieverbrauch und Stoffwechsel neu eingestellt werden."}, {"m": 2, "t": "Gegen die verbreitete Lesart, der Nutzen entstehe in den einzelnen Zellen, spricht allerdings, dass ohne dieses Zusammenspiel der Organe gar nichts davon eintritt."}, {"t": "In Mäusen war FGF21 für mehrere dieser Wirkungen sogar zwingend erforderlich."}, {"m": 3, "t": "Wer daraus heute schon eine Ernährungsregel für den Menschen ableiten möchte, greift dem Beweis vor: Die Befunde zur Lebensspanne stammen aus Maus und Fliege."}, {"t": "Hinzu kommt, dass die Reaktion je nach Geschlecht, Alter und Stoffwechsellage sehr verschieden ausfällt."}, {"m": 4, "t": "Im höheren Alter sollte man auf eigene Faust besser nicht weniger Eiweiß essen, denn dort schwindet die Muskelmasse ohnehin."}, {"t": "Was die Arbeit liefert, ist eine prüfbare Hypothese, kein Speiseplan."}], "keys": {"1": 1, "2": 7, "3": 3, "4": 4}, "why": {"1": "„Zustande kommt das, weil …“ – der <b>Mechanismus wird dargelegt</b>. Es ist keine Vermutung: Abtönungswörter wie <i>wohl</i> oder <i>dürfte</i> fehlen.", "2": "„Gegen die verbreitete Lesart … spricht allerdings, dass …“ – gegen eine fremde Deutung wird ein <b>Gegenargument</b> gestellt.", "3": "„greift dem Beweis vor“ – nicht die Sache selbst wird bestritten, sondern der <b>Zeitpunkt des Schlusses</b>: Der Beleg am Menschen fehlt noch.", "4": "„sollte man … besser nicht“ – eine <b>Empfehlung, etwas zu unterlassen</b>. Gewarnt wird nicht vor einer Gefahr, es wird von einem Verhalten abgeraten."}, "src": {"t": "Proteinarme Ernährung könnte der Schlüssel zu einem langen Leben sein", "a": "Clara Lyu", "p": "scinexx.de", "d": "14.09.2026", "u": "https://www.scinexx.de/news/medizin/proteinarme-ernaehrung-koennte-der-schluessel-zu-einem-langen-leben-sein/"}}, {"id": "k12", "topic": "Kreatin im mittleren Alter", "title": "Kommentar eines Experten zu einer Kreatin-Studie", "who": "Der Experte", "options": ["bemängelt etwas.", "bestätigt etwas.", "empfiehlt etwas.", "fordert etwas.", "legt etwas offen.", "relativiert etwas.", "warnt vor etwas.", "widerspricht etwas."], "sents": [{"t": "Zwölf Wochen lang nahmen 64 überwiegend unsportliche Erwachsene zwischen 45 und 65 Jahren täglich 10 Gramm Kreatinmonohydrat oder ein Scheinpräparat ein."}, {"m": 1, "t": "Was für junge Sportler längst belegt ist, findet sich nun auch in dieser Altersgruppe wieder: Selbst ohne strukturiertes Training wuchs die fettfreie Masse im Mittel um 1,1 Kilogramm, und Kraft wie Muskelausdauer nahmen zu."}, {"t": "Kamen Training und ein Kaloriendefizit hinzu, standen 1,27 Kilogramm unter Kreatin nur 0,14 Kilogramm unter Placebo gegenüber."}, {"m": 2, "t": "Ärgerlich ist allerdings, dass die Teilnehmer selbst wählen durften, ob sie in die Trainingsgruppe gehen; verblindet war allein die Zuteilung zu Kreatin oder Scheinpräparat."}, {"m": 3, "t": "Zum Bild gehört außerdem, dass der Hersteller die Präparate stellte und der Studienleiter dessen wissenschaftlichem Beirat vorsitzt."}, {"m": 4, "t": "Die etwas besseren Werte in einzelnen Gedächtnistests sind weniger wert, als sie klingen: Bei Aufmerksamkeit und Arbeitsgedächtnis zeigte sich gar nichts, und die Autoren führen diesen Teil selbst nur als Erkundung an."}, {"t": "Auf die Ausdauerleistung wirkte das Präparat gar nicht."}, {"t": "Ob sich der Zuwachs über zwölf Wochen hinaus hält, muss eine größere Studie zeigen."}], "keys": {"1": 1, "2": 0, "3": 4, "4": 5}, "why": {"1": "„Was … längst belegt ist, findet sich nun auch … wieder“ – ein <b>bekannter Befund wird erneut bestätigt</b>, diesmal für eine andere Altersgruppe.", "2": "„Ärgerlich ist allerdings, dass …“ – ein <b>Mangel am Vorgehen</b> wird gerügt. Nicht Bedauern über einen Zustand, sondern Tadel an einer Entscheidung der Forschenden.", "3": "„Zum Bild gehört außerdem, dass …“ – ein möglicher <b>Interessenkonflikt wird benannt</b>, ohne ihn zu bewerten. Ein Tadel steckt nicht darin.", "4": "„… sind weniger wert, als sie klingen“ – der Befund wird nicht bestritten, sondern in seinem <b>Gewicht zurückgenommen</b>."}, "src": {"t": "Kreatin erhöht im höheren Alter die Kraft auch ohne Training", "a": "Robert Klatt", "p": "scinexx.de", "d": "20.09.2026", "u": "https://www.scinexx.de/news/medizin/kreatin-erhoeht-im-hoeheren-alter-die-kraft-auch-ohne-training/"}}]};
+const EX = DATA.ex;
+const optsOf = ex => ex.options || DATA.options;
+const TIME = 360;
+let best = {};
+try { best = JSON.parse(localStorage.getItem("tdaf4-best") || "{}") || {}; } catch(e) { best = {}; }
+const state = EX.map(() => ({place:{}, checked:false, left:TIME, sel:null}));
+let cur = 0;
+try { const c = parseInt(localStorage.getItem("tdaf4-cur"),10); if (c>=0 && c<EX.length) cur = c; } catch(e){}
+
+const $nav = document.getElementById("nav"), $exam = document.getElementById("exam");
+const fmt = s => { const neg = s<0; s = Math.abs(s); return (neg?"-":"") + Math.floor(s/60) + ":" + String(s%60).padStart(2,"0"); };
+const markOf = (st, oi) => { for (const m in st.place) if (st.place[m]===oi) return +m; return null; };
+
+function renderNav(){
+  $nav.innerHTML = "";
+  EX.forEach((ex,i) => {
+    const b = document.createElement("button");
+    b.className = "chip"; b.type = "button";
+    b.setAttribute("aria-current", i===cur ? "true" : "false");
+    b.innerHTML = `<span class="n">${i+1}</span>${ex.topic}` + (best[i]!=null ? `<span class="best">${best[i]}/4</span>` : "");
+    b.onclick = () => { cur = i; try{localStorage.setItem("tdaf4-cur", i);}catch(e){} render(); window.scrollTo({top:0}); };
+    $nav.appendChild(b);
+  });
+}
+
+function textHTML(ex, st){
+  return ex.sents.map(s => {
+    if (!s.m) return s.t;
+    const used = st.place[s.m] !== undefined;
+    const cls = "mark" + (used ? " used" : "") + (st.sel===s.m ? " sel" : "") + (st.checked ? " locked" : "");
+    return `<button type="button" class="${cls}" data-m="${s.m}" ${st.checked?"disabled":""} aria-label="Textstelle ${s.m}">${s.m}</button>${s.t}`;
+  }).join(" ");
+}
+
+function stmtsHTML(ex, st){
+  return optsOf(ex).map((o,i) => {
+    const m = markOf(st, i);
+    const isKey = Object.keys(ex.keys).find(k => ex.keys[k]===i);
+    let cls = "st" + (m!==null ? " filled" : "");
+    let note = "";
+    if (st.checked){
+      if (isKey && m === +isKey) cls += " ok";
+      else if (m !== null) cls += " bad";
+      else if (isKey) { cls += " miss"; note = `<span class="solnote">hierher gehört ${isKey}</span>`; }
+    }
+    return `<button type="button" class="${cls}" data-o="${i}" ${st.checked?"disabled":""}>
+      <span class="slot">${m!==null ? m : "–"}</span><span>${ex.who} ${o}${note}</span></button>`;
+  }).join("");
+}
+
+function render(){
+  renderNav();
+  const ex = EX[cur], st = state[cur];
+  const placed = Object.keys(st.place).length;
+  $exam.innerHTML = `
+    <div class="bar">
+      <div class="what"><span class="eyebrow">Übung ${cur+1} von ${EX.length}</span><h2>${ex.title}</h2></div>
+      <div class="timer" id="timer"></div>
+    </div>
+    <div class="instr">
+      <p>Lesen Sie den Text.</p>
+      <p>Ordnen Sie die Textstellen (1–4) den Aussagen rechts zu.</p>
+      <p>Für jede Textstelle gibt es genau eine richtige Lösung.</p>
+      <p>Sie haben 6 Minuten Zeit.</p>
+      <p class="warn">Die Zahlen beziehen sich immer auf den nachfolgenden Satz.</p>
+    </div>
+    <div class="board">
+      <div class="col">
+        <div class="col-h">Text</div>
+        <p class="comment">${textHTML(ex, st)}</p>
+      </div>
+      <div class="col">
+        <div class="col-h">Aussagen · ${placed} von 4 zugeordnet</div>
+        <div class="stmts">${stmtsHTML(ex, st)}</div>
+        <div class="hint">${st.checked ? "" : (st.sel ? `Textstelle ${st.sel} ist ausgewählt – tippen Sie jetzt auf die passende Aussage.` : "Tippen Sie eine Zahl im Text an und danach die passende Aussage.")}</div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn primary" id="check" type="button" ${st.checked?"disabled":""}>Auswerten</button>
+      <button class="btn" id="reset" type="button">Neu beginnen</button>
+      ${cur < EX.length-1 ? `<button class="btn" id="next" type="button">Nächste Übung →</button>` : ""}
+    </div>
+    <div id="result"></div>
+    <footer class="src">Inhaltliche Grundlage: „<a href="${ex.src.u}" target="_blank" rel="noopener">${ex.src.t}</a>“ von ${ex.src.a}, ${ex.src.p}, ${ex.src.d} (eigener Kommentartext).</footer>`;
+  document.getElementById("check").onclick = check;
+  document.getElementById("reset").onclick = () => { state[cur] = {place:{}, checked:false, left:TIME, sel:null}; render(); };
+  const nx = document.getElementById("next"); if (nx) nx.onclick = () => { cur++; try{localStorage.setItem("tdaf4-cur", cur);}catch(e){} render(); window.scrollTo({top:0}); };
+  if (st.checked) renderResult();
+  updateTimer();
+}
+
+$exam.addEventListener("click", e => {
+  const st = state[cur];
+  if (st.checked) return;
+  const mk = e.target.closest(".mark");
+  if (mk){
+    const m = +mk.dataset.m;
+    if (st.place[m] !== undefined){ delete st.place[m]; st.sel = m; }
+    else st.sel = (st.sel === m ? null : m);
+    render(); return;
+  }
+  const s = e.target.closest(".st");
+  if (s){
+    const oi = +s.dataset.o;
+    const occupant = markOf(st, oi);
+    if (st.sel === null){ if (occupant !== null){ delete st.place[occupant]; render(); } return; }
+    if (occupant !== null) delete st.place[occupant];
+    st.place[st.sel] = oi; st.sel = null; render();
+  }
+});
+
+function check(){
+  const ex = EX[cur], st = state[cur];
+  st.checked = true; st.sel = null;
+  st.score = [1,2,3,4].filter(m => st.place[m] === ex.keys[String(m)]).length;
+  st.used = TIME - st.left;
+  if (best[cur]==null || st.score > best[cur]) { best[cur] = st.score; try{ localStorage.setItem("tdaf4-best", JSON.stringify(best)); }catch(e){} }
+  render();
+  document.getElementById("result").scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"nearest"});
+}
+
+function renderResult(){
+  const ex = EX[cur], st = state[cur];
+  const O = optsOf(ex);
+  const items = [1,2,3,4].map(m => {
+    const right = ex.keys[String(m)], mine = st.place[m];
+    const sent = ex.sents.find(s => s.m === m).t;
+    const short = sent.split(" ").slice(0,9).join(" ");
+    return `<li><span class="pos">${m}</span><div>
+      <div><span class="act">${ex.who} ${O[right]}</span>${mine===right ? "" : ` <span class="mine">· Ihre Zuordnung: ${mine!==undefined ? ex.who + " " + O[mine] : "keine"}</span>`}</div>
+      <div class="sent">„${short} …“</div>
+      <div>${ex.why[String(m)]}</div></div></li>`;
+  }).join("");
+  const unused = O.map((o,i)=>i).filter(i => !Object.values(ex.keys).includes(i)).map(i => O[i].replace(/\.$/,"")).join(" · ");
+  document.getElementById("result").innerHTML = `
+    <div class="result">
+      <div class="score"><strong>${st.score} / 4</strong><span>${st.score===4?"Alles richtig.":st.score>=2?"Sehen Sie sich die Begründungen an.":"Arbeiten Sie die vier Stellen Satz für Satz durch."}</span><span>Zeit: ${fmt(st.used)}${st.used>TIME?" (über dem Limit)":" von 6:00"}</span></div>
+      <ol class="expl">${items}</ol>
+      <div class="hint">Nicht gebraucht wurden: ${unused}.</div>
+    </div>`;
+}
+
+function updateTimer(){
+  const t = document.getElementById("timer"); if (!t) return;
+  const st = state[cur];
+  t.textContent = st.left >= 0 ? fmt(st.left) : "Zeit abgelaufen " + fmt(st.left);
+  t.classList.toggle("low", st.left <= 60 && st.left >= 0);
+  t.classList.toggle("over", st.left < 0);
+}
+setInterval(() => { const st = state[cur]; if (!st.checked && !document.hidden) { st.left--; updateTimer(); } }, 1000);
+
+render();
+</script>
+
+</body></html>

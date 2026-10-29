@@ -1,0 +1,529 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>TestDaF Textabschnitte-Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+<style>
+:root{
+  --ground:#F2F5F7; --surface:#FFFFFF; --sunken:#E7ECF0; --ink:#17212B; --muted:#56626E;
+  --line:#CBD4DC; --accent:#285A86; --accent-soft:#DCE8F3; --on-accent:#FFFFFF;
+  --ok:#23724A; --ok-soft:#DDF0E5; --bad:#B03A28; --bad-soft:#F7E1DC; --warn:#A5620B;
+  --shadow:0 1px 2px rgba(23,33,43,.06),0 4px 14px rgba(23,33,43,.07);
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#10161C; --surface:#18212A; --sunken:#0C1116; --ink:#E4EAF0; --muted:#98A5B1;
+    --line:#2F3B47; --accent:#7FB0DD; --accent-soft:#1F3347; --on-accent:#0C1620;
+    --ok:#6CC795; --ok-soft:#173226; --bad:#EE8A77; --bad-soft:#3A1E19; --warn:#E6A650;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#10161C; --surface:#18212A; --sunken:#0C1116; --ink:#E4EAF0; --muted:#98A5B1;
+  --line:#2F3B47; --accent:#7FB0DD; --accent-soft:#1F3347; --on-accent:#0C1620;
+  --ok:#6CC795; --ok-soft:#173226; --bad:#EE8A77; --bad-soft:#3A1E19; --warn:#E6A650;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1,h2{font-family:var(--serif);text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:clamp(1.5rem,3.2vw,2rem)}
+h2{font-size:1.35rem}
+.eyebrow{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+header.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:12px}
+header.top p{margin:4px 0 0;color:var(--muted);max-width:62ch}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.nav{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 12px;font-size:.85rem;display:inline-flex;gap:6px;align-items:center}
+.chip .n{font-family:var(--mono);font-size:.78rem;color:var(--muted)}
+.chip[aria-current="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.chip[aria-current="true"] .n{color:var(--on-accent)}
+.chip .best{font-family:var(--mono);font-size:.72rem;padding:0 6px;border-radius:999px;background:var(--ok-soft);color:var(--ok)}
+.chip[aria-current="true"] .best{background:var(--on-accent);color:var(--accent)}
+
+details.tips{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+details.tips summary{cursor:pointer;font-weight:600}
+details.tips ul{margin:10px 0 4px;padding-left:1.2em;display:grid;gap:4px;max-width:80ch}
+
+.exam{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;padding:12px 18px;background:var(--sunken);border-bottom:1px solid var(--line)}
+.bar .what{display:flex;flex-direction:column}
+.timer{font-family:var(--mono);font-size:1.15rem;font-variant-numeric:tabular-nums;padding:4px 10px;border-radius:6px;border:1px solid var(--line);background:var(--surface)}
+.timer.low{color:var(--warn);border-color:var(--warn)}
+.timer.over{color:var(--bad);border-color:var(--bad)}
+.instr{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:2px}
+.instr p{margin:0}
+.instr .hint{color:var(--muted);font-size:.85rem;margin-top:6px}
+
+.board{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:18px}
+.col{display:flex;flex-direction:column;gap:10px;min-width:0}
+.col-h{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.slot{display:grid;grid-template-columns:32px 1fr;gap:10px;align-items:stretch;min-height:78px}
+.slot .num{font-family:var(--mono);font-weight:500;display:flex;align-items:flex-start;justify-content:center;padding-top:12px;color:var(--muted)}
+.slot .drop{border:1.5px dashed var(--line);border-radius:8px;min-height:78px;display:flex;align-items:stretch;transition:background .15s,border-color .15s}
+.slot .drop.empty{cursor:pointer}
+.slot .drop.empty::after{content:"Abschnitt hierher ziehen";margin:auto;color:var(--muted);font-size:.82rem}
+.slot .drop.target,.pool.target{border-color:var(--accent);background:var(--accent-soft)}
+.slot.ok .drop{border:2px solid var(--ok);background:var(--ok-soft)}
+.slot.bad .drop{border:2px solid var(--bad);background:var(--bad-soft)}
+.slot.ok .num{color:var(--ok)} .slot.bad .num{color:var(--bad)}
+.pool{display:flex;flex-direction:column;gap:10px;min-height:120px;border:1.5px dashed transparent;border-radius:10px;padding:2px}
+.pool .empty-note{color:var(--muted);font-size:.85rem;margin:auto;text-align:center;padding:20px}
+
+.card{position:relative;display:grid;grid-template-columns:30px 1fr;gap:10px;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px 10px 8px;text-align:left;color:var(--ink);user-select:none;-webkit-user-select:none}
+.pool .card{box-shadow:var(--shadow)}
+.slot .card{border:none;background:transparent;box-shadow:none}
+.card .grip{touch-action:none;cursor:grab;display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:1px}
+.card .letter{font-family:var(--mono);font-size:.8rem;width:24px;height:24px;border-radius:5px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-weight:500}
+.card .dots{width:10px;height:14px;background-image:radial-gradient(var(--muted) 1.2px,transparent 1.3px);background-size:5px 5px;opacity:.7}
+.card p{margin:0;font-size:.95rem}
+.card.selected{outline:2px solid var(--accent);outline-offset:1px;background:var(--accent-soft)}
+.card.lifted{opacity:.35}
+.card:not(.locked){cursor:pointer}
+@media (pointer:fine){.card:not(.locked){cursor:grab}}
+.ghost{position:fixed;z-index:50;pointer-events:none;box-shadow:0 10px 30px rgba(0,0,0,.25);transform:rotate(-1deg);opacity:.95}
+
+.actions{display:flex;flex-wrap:wrap;gap:10px;padding:0 18px 18px}
+.btn{border-radius:8px;padding:9px 16px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-weight:500}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+.result{border-top:1px solid var(--line);padding:18px;display:flex;flex-direction:column;gap:14px}
+.score{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline}
+.score strong{font-family:var(--serif);font-size:1.7rem}
+.score span{color:var(--muted)}
+.key{font-family:var(--mono);letter-spacing:.05em}
+ol.expl{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+ol.expl li{display:grid;grid-template-columns:32px 1fr;gap:10px}
+ol.expl .pos{font-family:var(--mono);color:var(--muted);padding-top:1px}
+ol.expl .start{font-style:italic;color:var(--muted)}
+ol.expl .sig{margin-top:2px}
+ol.expl mark{background:var(--accent-soft);color:var(--ink);padding:0 3px;border-radius:3px}
+
+footer.src{font-size:.82rem;color:var(--muted);padding:0 18px 16px}
+footer.src a{color:var(--accent)}
+.note{font-size:.82rem;color:var(--muted);max-width:80ch}
+
+@media (max-width:760px){
+  .board{grid-template-columns:1fr}
+  .col.pool-col{order:-1}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">Digitaler TestDaF · Lesen · Aufgabe 2</div>
+      <h1>Textabschnitte ordnen</h1>
+      <p>Zwölf Übungstexte nach Artikeln von wissenschaft.de und scinexx.de – im Format der Prüfung: fünf Abschnitte, eine richtige Reihenfolge, 5 Minuten.</p>
+    </div>
+  </header>
+
+  <nav class="nav" id="nav" aria-label="Übungen"></nav>
+
+  <details class="tips">
+    <summary>Strategie: Woran erkenne ich die Reihenfolge?</summary>
+    <ul>
+      <li><b>Einleitung zuerst:</b> Der erste Abschnitt verweist auf nichts zurück. Er nennt ein allgemeines Thema oder Problem.</li>
+      <li><b>Rückverweise suchen:</b> <i>dieser, diese Frage, dabei, dafür, deshalb, solche</i> brauchen immer einen Abschnitt davor.</li>
+      <li><b>Bestimmter Artikel nach unbestimmtem:</b> „<i>ein</i> Forschungsteam“ steht vor „<i>die</i> Forschenden“.</li>
+      <li><b>Konnektoren:</b> <i>zunächst → anschließend → danach</i>; <i>auch, zudem, außerdem</i> ergänzen etwas bereits Gesagtes; <i>jedoch, dagegen</i> setzen einen Kontrast voraus.</li>
+      <li><b>Typischer Aufbau eines Forschungsberichts:</b> Problem → Forschungsfrage → Methode → Ergebnis → Erklärung/Ausblick.</li>
+      <li><b>Kontrolle:</b> Lesen Sie am Ende alle fünf Abschnitte in Ihrer Reihenfolge noch einmal ohne Pause durch.</li>
+    </ul>
+  </details>
+
+  <section class="exam" id="exam" aria-live="polite"></section>
+
+  <p class="note">Hinweis: Die Texte sind gekürzt und sprachlich bearbeitet – so wie auch Prüfungstexte im TestDaF adaptiert werden. In der echten Prüfung werden bei dieser Aufgabe 4 Items gewertet; hier wird jede der 5 Positionen geprüft. Ziehen mit der Maus, am Handy am Griff <span aria-hidden="true">⠿</span> ziehen – oder einfach Abschnitt antippen und dann Position antippen.</p>
+</div>
+
+<script>
+const EX = [
+ {topic:"Musik und Stress", src:{t:"Wie Musik Stress lindert", a:"Elena Bernard", d:"11.09.2026", u:"https://wissenschaft.de/artikel/wie-musik-stress-lindert"},
+  display:[3,0,4,2,1],
+  s:[
+   ["Musik weckt Gefühle, bringt uns in Bewegung und aktiviert das Belohnungssystem im Gehirn. Viele Menschen hören deshalb gezielt Musik, um sich zu entspannen.",
+    "Einleitung: allgemeines Thema, <mark>kein Rückverweis</mark> auf etwas Vorheriges."],
+   ["Unklar war jedoch bisher, ob Musik dabei tatsächlich besonders wirkt oder ob jedes ruhige Geräusch denselben Effekt hätte. Dieser Frage ist ein Forschungsteam der Chinesischen Akademie der Wissenschaften nachgegangen.",
+    "<mark>dabei</mark> bezieht sich auf das Entspannen mit Musik; <mark>ein Forschungsteam</mark> wird hier zum ersten Mal genannt."],
+   ["Die Forschenden versetzten ihre Versuchspersonen zunächst durch Kopfrechnen unter Zeitdruck in Stress. Anschließend hörte eine Gruppe Entspannungsmusik, die andere Naturgeräusche wie Meeresrauschen.",
+    "<mark>Die Forschenden</mark> (bestimmter Artikel) setzt das Team aus Abschnitt 2 voraus. Methode folgt auf Forschungsfrage."],
+   ["Das Ergebnis war eindeutig: In der Musikgruppe normalisierten sich Herzfrequenz, Cortisolspiegel und Stimmung deutlich schneller als in der Vergleichsgruppe.",
+    "<mark>Das Ergebnis</mark> und <mark>Musikgruppe / Vergleichsgruppe</mark> setzen den Versuchsaufbau voraus."],
+   ["Aufnahmen im Hirnscanner liefern dafür eine Erklärung: Der Wechsel von Spannung und Auflösung in der Musik verändert die Verbindung zwischen Hörrinde und stressverarbeitenden Hirnregionen.",
+    "<mark>dafür eine Erklärung</mark> – erklärt wird das Ergebnis aus Abschnitt 4."]
+  ]},
+ {topic:"Feinstaub und Augen", src:{t:"Luftverschmutzung lässt die Sehkraft schwinden", a:"Nadja Podbregar", d:"15.09.2026", u:"https://wissenschaft.de/artikel/luftverschmutzung-laesst-die-sehkraft-schwinden"},
+  display:[2,4,0,3,1],
+  s:[
+   ["Dass Feinstaub Lunge und Herz schädigt, ist seit Langem bekannt. Wie sich die winzigen Partikel auf die Augen auswirken, wurde dagegen bisher kaum untersucht.",
+    "Einleitung: Bekanntes (<i>seit Langem bekannt</i>) und eine offene Frage – typischer Anfang eines Forschungsberichts."],
+   ["Um diese Wissenslücke zu schließen, hat ein Team aus Riad 41 Studien mit Daten von Millionen Menschen ausgewertet. Dabei verglichen die Forschenden die Schadstoffbelastung am Wohnort mit der Häufigkeit verschiedener Augenkrankheiten.",
+    "<mark>diese Wissenslücke</mark> fasst „kaum untersucht“ aus Abschnitt 1 zusammen."],
+   ["Besonders deutlich zeigte sich ein Zusammenhang beim Glaukom, dem Grünen Star: Wer in stark belasteten Gebieten lebte, hatte ein bis zu 70 Prozent höheres Risiko.",
+    "Erstes Ergebnis zu den <i>verschiedenen Augenkrankheiten</i> aus Abschnitt 2."],
+   ["Auch für den Grauen Star stieg das Risiko mit der Luftverschmutzung. Bei der altersbedingten Makuladegeneration waren die Ergebnisse hingegen nicht eindeutig.",
+    "<mark>Auch</mark> für den Grauen Star – setzt voraus, dass schon eine andere Krankheit (Grüner Star) genannt wurde."],
+   ["Vermutlich lösen die Partikel Entzündungen und oxidativen Stress aus, die Sehnerv und Linse über Jahre schädigen. Die Forschenden fordern daher strengere Grenzwerte für die Luftqualität.",
+    "Erklärung und Schlussfolgerung: <mark>daher</mark> strengere Grenzwerte – nach allen Ergebnissen."]
+  ]},
+ {topic:"Elefanten und Impulskontrolle", src:{t:"Elefanten können spontane Impulse unterdrücken", a:"Elena Bernard", d:"11.09.2026", u:"https://wissenschaft.de/artikel/elefanten-koennen-spontane-impulse-unterdruecken"},
+  display:[4,1,3,0,2],
+  s:[
+   ["Elefanten leben in komplexen Familienverbänden und können sogar Werkzeuge benutzen. Ob sie auch spontane Impulse unterdrücken können, war jedoch kaum erforscht.",
+    "Einleitung: bekannte Fähigkeiten der Tiere und eine offene Frage."],
+   ["Um diese Fähigkeit zu untersuchen, trainierten Forschende 16 Asiatische Elefanten in Thailand zunächst mit einer undurchsichtigen Box, in die sie von unten hineingreifen mussten.",
+    "<mark>diese Fähigkeit</mark> = Impulse unterdrücken (Abschnitt 1); <mark>zunächst</mark> leitet den ersten Schritt ein."],
+   ["Danach erhielten die Tiere eine durchsichtige Box: Der Apfel darin war nun sichtbar, erreichbar war er aber weiterhin nur über die Öffnung unten. Diese Aufgabe meisterten die Elefanten problemlos.",
+    "<mark>Danach</mark> folgt auf <i>zunächst</i>; <mark>durchsichtig</mark> steht im Kontrast zu <i>undurchsichtig</i>; <mark>weiterhin</mark> setzt die Öffnung unten voraus."],
+   ["Schwieriger wurde es, als die Forschenden die Box drehten, sodass die Öffnung plötzlich an der Seite lag. Vor allem ältere Tiere suchten mehrmals an der gewohnten Stelle, bevor sie sich umstellten.",
+    "<mark>Schwieriger</mark> vergleicht mit der leichten Aufgabe („problemlos“) aus Abschnitt 3."],
+   ["Solche Erkenntnisse könnten auch praktisch nützlich sein: Wer versteht, wie Elefanten mit Hindernissen umgehen, kann Felder besser vor den Tieren schützen.",
+    "<mark>Solche Erkenntnisse</mark> fasst die Ergebnisse zusammen – Ausblick am Schluss."]
+  ]},
+ {topic:"KI und Sprachvielfalt", src:{t:"Wie künstliche Intelligenz unsere Sprache verarmt", a:"Nadja Podbregar", d:"07.09.2026", u:"https://wissenschaft.de/artikel/wie-kuenstliche-intelligenz-unsere-sprache-verarmt"},
+  display:[1,3,0,4,2],
+  s:[
+   ["Chatbots wie ChatGPT helfen inzwischen vielen Menschen beim Schreiben. Doch was geschieht mit unserer persönlichen Ausdrucksweise, wenn immer mehr Texte von einer KI verfasst oder überarbeitet werden?",
+    "Einleitung: Alltagsphänomen und die zentrale Frage."],
+   ["Um das herauszufinden, analysierte ein Team der University of Southern California über 880.000 englischsprachige Texte aus der Zeit vor und nach der Einführung von ChatGPT.",
+    "<mark>Um das herauszufinden</mark> – <i>das</i> ist die Frage aus Abschnitt 1."],
+   ["Das Ergebnis: Seit 2022 hat die sprachliche Vielfalt in allen untersuchten Textsorten abgenommen. Die Texte wurden zwar nicht einfacher, ähnelten einander aber immer stärker.",
+    "<mark>Das Ergebnis</mark> und <mark>die untersuchten Textsorten</mark> setzen die Analyse aus Abschnitt 2 voraus."],
+   ["Ein ergänzendes Experiment bestätigte diesen Trend. Als KI-Modelle 1.000 menschliche Texte umformulierten, blieb der Inhalt weitgehend erhalten, die sprachliche Komplexität sank jedoch um bis zu 50 Prozent.",
+    "<mark>ergänzend</mark> und <mark>diesen Trend</mark> verweisen auf das erste Ergebnis (Abschnitt 3)."],
+   ["Angesichts beider Befunde warnen die Forschenden vor einer Folge, die über die Sprache hinausgeht: Da Sprache und Denken eng verknüpft sind, könnte auch die Vielfalt unseres Denkens verloren gehen.",
+    "<mark>beider Befunde</mark> – beide Ergebnisse (Abschnitte 3 und 4) müssen schon genannt sein."]
+  ]},
+ {topic:"Methan aus Gletschern", src:{t:"Schmelzende Gletscher setzen uraltes Methan frei", a:"Elena Bernard", d:"10.09.2026", u:"https://wissenschaft.de/artikel/schmelzende-gletscher-setzen-uraltes-methan-frei"},
+  display:[3,2,4,1,0],
+  s:[
+   ["Wenn Permafrostböden tauen und Gletscher schmelzen, können lange gespeicherte Treibhausgase entweichen. Welche Rolle das Schmelzwasser von Gletschern dabei spielt, war bislang allerdings kaum bekannt.",
+    "Einleitung: allgemeines Problem und Wissenslücke."],
+   ["Forschende der Arktischen Universität Norwegens nahmen deshalb 148 Wasserproben aus 19 Flüssen auf Spitzbergen, die von Gletschern gespeist werden.",
+    "<mark>deshalb</mark> – weil die Rolle des Schmelzwassers unbekannt war (Abschnitt 1)."],
+   ["Sämtliche Proben enthielten deutlich mehr Methan, als aufgrund der Konzentration in der Atmosphäre zu erwarten war – im Extremfall das 425-Fache.",
+    "<mark>Sämtliche Proben</mark> (bestimmt) setzt die 148 Wasserproben voraus."],
+   ["Isotopenanalysen verrieten zudem die Herkunft des Gases: Es stammt nicht von Mikroben, sondern aus Schiefergestein, das über Jahrmillionen Erdgas gebildet hat.",
+    "<mark>zudem</mark> ergänzt ein Ergebnis; <mark>des Gases</mark> = das Methan aus Abschnitt 3."],
+   ["Aus diesem Gestein löst das Schmelzwasser das Gas, wenn es durch Spalten bis zum Grund des Gletschers fließt. Besonders leicht gelingt das dort, wo das Eis am Gletscherbett angetaut ist.",
+    "<mark>Aus diesem Gestein</mark> – das Schiefergestein wird erst in Abschnitt 4 genannt."]
+  ]},
+ {topic:"Typen des Aufschiebens", src:{t:"Prokrastination: Welcher Aufschiebe-Typ bin ich?", a:"Nadja Podbregar", d:"14.09.2026", u:"https://wissenschaft.de/artikel/prokrastination-welcher-aufschiebe-typ-bin-ich"},
+  display:[2,0,3,4,1],
+  s:[
+   ["Fast jeder schiebt unangenehme Aufgaben manchmal auf. Die Folgen können erheblich sein: verpasste Fristen, schlechtere Noten oder doppelte Arbeit.",
+    "Einleitung: Alltagsphänomen, keine Rückverweise."],
+   ["Viele glauben, das Problem lasse sich mit mehr Motivation oder besserem Zeitmanagement lösen. Der Psychologe Itamar Shatz von der University of Cambridge hält das jedoch für einen Irrtum.",
+    "<mark>das Problem</mark> = das Aufschieben aus Abschnitt 1; der Experte wird hier mit vollem Namen eingeführt."],
+   ["Seiner Ansicht nach kämpfen beim Aufschieben zwei Prinzipien gegeneinander: der Wunsch, Unangenehmes zu vermeiden, und die Neigung, sich auf das Unmittelbare zu konzentrieren. Treffen beide zusammen, siegt meist das kurzfristig Angenehmere.",
+    "<mark>Seiner Ansicht nach</mark> – <i>seiner</i> braucht eine zuvor genannte Person (Shatz)."],
+   ["Neben diesem Grundmechanismus unterscheidet Shatz auf Grundlage von rund hundert Studien neun Typen von Aufschiebern, etwa den Perfektionisten, den Träumer oder den Rebellen.",
+    "<mark>Neben diesem Grundmechanismus</mark> verweist auf die zwei Prinzipien aus Abschnitt 3."],
+   ["Für jeden dieser Typen empfiehlt er eigene Strategien. Perfektionisten etwa sollten lernen, sich mit einem „gut genug“ zufriedenzugeben.",
+    "<mark>dieser Typen</mark> – die neun Typen aus Abschnitt 4; <i>Perfektionisten</i> wurden dort schon erwähnt."]
+  ]},
+ {topic:"Das Gedächtnis des Fettgewebes", src:{t:"Wie Immunzellen im Fettgewebe das Abnehmen erschweren", a:"Elena Bernard", d:"10.09.2026", u:"https://wissenschaft.de/artikel/wie-immunzellen-im-fettgewebe-das-abnehmen-erschweren"},
+  display:[4,2,0,1,3],
+  s:[
+   ["Wer stark übergewichtig ist, hat es oft schwer, sein Gewicht nach einer Diät zu halten. Forschende vermuten, dass das Fettgewebe eine Art Gedächtnis für das frühere Übergewicht besitzt.",
+    "Einleitung: bekanntes Problem (Jojo-Effekt) und eine Vermutung."],
+   ["Eine wichtige Rolle spielen dabei offenbar Makrophagen. Diese Fresszellen entfernen im Fettgewebe absterbende Zellen und geben den Botenstoff Inosin ab, der die Fettverbrennung anregt.",
+    "<mark>dabei</mark> = beim „Gedächtnis“ des Fettgewebes; <mark>Makrophagen</mark> werden hier eingeführt und erklärt."],
+   ["Ein japanisches Team machte Mäuse zunächst mit fettreichem Futter übergewichtig und setzte sie anschließend auf Diät. Vor und nach der Gewichtsabnahme untersuchten die Forschenden die Genaktivität der Makrophagen.",
+    "<mark>der Makrophagen</mark> (bestimmt, ohne Erklärung) setzt Abschnitt 2 voraus. Methode nach Hintergrund."],
+   ["Bei den übergewichtigen Tieren war ein Protein namens CWC22 kaum aktiv. Die Folge: Die Fresszellen arbeiteten schlechter und setzten weniger Inosin frei.",
+    "<mark>den übergewichtigen Tieren</mark> = die Mäuse aus Abschnitt 3; <mark>Die Folge</mark> leitet das Ergebnis weiter."],
+   ["Diese Veränderung blieb bei vielen Genen auch nach der Diät bestehen. Stellten die Forschenden die normale Funktion jedoch wieder her, kam der Fettabbau wieder in Gang.",
+    "<mark>Diese Veränderung</mark> fasst das Ergebnis aus Abschnitt 4 zusammen."]
+  ]},
+ {topic:"Geld und Kindergesundheit", src:{t:"Extra-Geld für Mütter könnte Kindergesundheit fördern", a:"Nadja Podbregar", d:"14.09.2026", u:"https://wissenschaft.de/artikel/extra-geld-fuer-muetter-koennte-kindergesundheit-foerdern"},
+  display:[1,4,2,0,3],
+  s:[
+   ["Kinder aus armen Familien sind häufiger chronisch krank und haben eine geringere Lebenserwartung. Zudem finden sich in ihrem Erbgut Spuren, die auf ein beschleunigtes biologisches Altern hindeuten.",
+    "Einleitung: bekannte Tatsachen; <i>Zudem</i> verbindet hier nur die beiden Sätze im selben Abschnitt."],
+   ["Bislang war allerdings unklar, ob Armut diese Veränderungen tatsächlich verursacht – oder ob es sich nur um einen statistischen Zusammenhang handelt.",
+    "<mark>diese Veränderungen</mark> = die Spuren im Erbgut aus Abschnitt 1; <mark>allerdings</mark> schränkt ein."],
+   ["Um das zu klären, werteten Forschende Daten einer US-Studie aus: 400 einkommensschwache Mütter erhielten ab der Geburt ihres Kindes jeden Monat 333 Dollar, eine Vergleichsgruppe nur 20 Dollar.",
+    "<mark>Um das zu klären</mark> – die offene Frage aus Abschnitt 2."],
+   ["Im Alter von vier Jahren waren die Kinder der ersten Gruppe epigenetisch weniger gealtert als die der Vergleichsgruppe. Bei den Müttern selbst zeigte sich dagegen kein solcher Effekt.",
+    "<mark>der ersten Gruppe</mark> und <mark>der Vergleichsgruppe</mark> setzen den Aufbau aus Abschnitt 3 voraus."],
+   ["Auch wenn der Effekt klein ist, halten die Forschenden ihn für bedeutsam: Da sich beschleunigtes Altern im Laufe des Lebens aufsummiert, könnten Förderprogramme für Kinder langfristig viel bewirken.",
+    "<mark>der Effekt</mark> (bestimmt) bezieht sich auf das Ergebnis in Abschnitt 4 – Bewertung und Ausblick."]
+  ]},
+ {topic:"Allergien vorbeugen?", src:{t:"Kann die Ernährung der Mutter Ei- und Erdnussallergien beim Baby verhindern?", a:"Clara Lyu", p:"scinexx.de", d:"18.09.2026", u:"https://www.scinexx.de/news/medizin/kann-die-ernaehrung-der-mutter-ei-und-erdnussallergien-beim-baby-verhindern/"},
+  display:[3,1,4,0,2],
+  s:[
+   ["Manche Kinder reagieren schon auf ihre erste Portion Ei oder Erdnuss allergisch – also auf ein Lebensmittel, das sie noch nie zuvor gegessen haben.",
+    "Einleitung: ein überraschendes Phänomen, <mark>ohne Rückverweis</mark> auf etwas Vorheriges."],
+   ["Das legt den Verdacht nahe, dass die Prägung des Immunsystems früher beginnt, nämlich im Mutterleib oder über die Muttermilch.",
+    "<mark>Das legt den Verdacht nahe</mark> – <i>das</i> ist die Beobachtung aus Abschnitt 1."],
+   ["Ob sich daraus ein Schutz ableiten lässt, hat eine australische Studie mit 2.137 Schwangeren geprüft. Die eine Hälfte sollte wöchentlich mindestens sechs Eier und 60 Erdnüsse essen, die andere höchstens halb so viele.",
+    "<mark>Ob sich daraus ein Schutz ableiten lässt</mark> bezieht sich auf die Vermutung aus Abschnitt 2. Erst danach kann die Methode kommen."],
+   ["Nach einem Jahr zeigte sich kein Unterschied: In der ersten Gruppe hatten 7,8 Prozent der Kinder eine Allergie, in der zweiten 8,4 Prozent.",
+    "<mark>In der ersten Gruppe</mark> und <mark>in der zweiten</mark> setzen die beiden Gruppen aus Abschnitt 3 voraus."],
+   ["Für die Praxis heißt das: Ein vorsorgliches „Mehr essen“ in der Schwangerschaft schützt nicht. An den Empfehlungen zur Beikost ändert der Befund allerdings nichts.",
+    "<mark>Für die Praxis heißt das</mark> zieht die Folgerung aus dem Ergebnis – das kann nur am Schluss stehen."]
+  ]},
+ {topic:"Höhlen auf Gran Canaria", src:{t:"Insektenreste enthüllen indigene Bestattungspraktiken auf Gran Canaria", a:"Robert Klatt", p:"scinexx.de", d:"18.09.2026", u:"https://www.scinexx.de/news/archaeologie/insektenreste-enthuellen-indigene-bestattungspraktiken-auf-gran-canaria/"},
+  display:[2,0,3,4,1],
+  s:[
+   ["Die indigenen Bewohner Gran Canarias legten künstliche Höhlen an und nutzten sie sowohl als Vorratsspeicher als auch als Grabstätte.",
+    "Einleitung: allgemeiner Hintergrund, noch ohne Problem und ohne Rückverweis."],
+   ["Weil die Skelette meist gestört sind, blieb bisher offen, wie schnell die Toten in diese Räume kamen und wozu eine Höhle vorher gedient hatte.",
+    "<mark>in diese Räume</mark> verweist auf die Höhlen aus Abschnitt 1; hier steht die offene Frage."],
+   ["Ein spanisches Team suchte die Antwort deshalb nicht bei den Knochen, sondern bei den Insekten: Es untersuchte 43 Sedimentproben aus einer Grabhöhle.",
+    "<mark>die Antwort</mark> und <mark>deshalb</mark> setzen die offene Frage aus Abschnitt 2 voraus."],
+   ["Mehr als 8.000 Insektenreste kamen zusammen, darunter über tausend Puppenhüllen von Fliegen, die sich nur an frischen Körpern entwickeln.",
+    "Das Ergebnis der Proben aus Abschnitt 3 – ohne die Probenahme hängt diese Zahl in der Luft."],
+   ["Ein Fünftel der Funde stammt dagegen von Vorratsschädlingen wie dem flugunfähigen Kornkäfer, und zwar vor allem aus der Schicht unter den Bodenplanken. Die Höhle war demnach zuerst ein Getreidespeicher und wurde erst später zur Grabstätte.",
+    "<mark>dagegen</mark> stellt den zweiten Befund dem ersten gegenüber; <mark>demnach</mark> zieht den Schluss."]
+  ]},
+ {topic:"Nanopartikel aus Eisen", src:{t:"Ultraschall verwandelt Eisen in magnetische Nanopartikel", a:"Clara Lyu", p:"scinexx.de", d:"18.09.2026", u:"https://www.scinexx.de/news/technik/ultraschall-verwandelt-eisen-in-magnetische-nanopartikel/"},
+  display:[4,2,0,1,3],
+  s:[
+   ["Magnetische Eisenoxid-Partikel im Nanometerbereich sind gefragt: in Katalysatoren, in Trennverfahren und in der Medizin.",
+    "Einleitung: wofür man den Stoff braucht. Kein Rückverweis."],
+   ["Hergestellt werden sie bisher meist aus gelösten Eisensalzen, wofür zusätzliche Chemikalien nötig sind.",
+    "<mark>Hergestellt werden sie</mark> – das Pronomen <i>sie</i> braucht die Partikel aus Abschnitt 1."],
+   ["Ein japanisches Team hat deshalb einen einfacheren Weg getestet: Es verteilte ein Gramm Eisenpulver in Wasser und setzte die Mischung Ultraschall aus.",
+    "<mark>deshalb</mark> und <mark>einen einfacheren Weg</mark> setzen das aufwendige Verfahren aus Abschnitt 2 voraus."],
+   ["Am besten funktionierte das bei 43 Kilohertz und 40 Grad Celsius. Nach 24 Stunden waren gut 68 Prozent des Eisens umgewandelt, die Partikel maßen im Mittel 32 Nanometer.",
+    "<mark>Am besten funktionierte das</mark> – <i>das</i> ist der Versuch aus Abschnitt 3."],
+   ["Dass dabei der Schall den Ausschlag gibt und nicht die Wärme, zeigt ein Kontrollversuch: Wurde die Mischung bei denselben 40 Grad nur gerührt, blieb das Oxid als grobe Schicht auf der Oberfläche haften.",
+    "<mark>denselben 40 Grad</mark> – die Temperatur wird erst in Abschnitt 4 genannt, deshalb kann der Kontrollversuch nur danach stehen."]
+  ]},
+ {topic:"Aufforstung in China", src:{t:"Chinas Aufforstung hat den Wasserkreislauf verschoben", a:"Clara Lyu", p:"scinexx.de", d:"05.09.2026", u:"https://www.scinexx.de/news/geowissen/chinas-aufforstung-hat-den-wasserkreislauf-verschoben/"},
+  display:[1,3,0,4,2],
+  s:[
+   ["China hat in den vergangenen zwei Jahrzehnten in großem Stil aufgeforstet und Flächen renaturiert.",
+    "Einleitung: die Ausgangstatsache, ohne Rückverweis."],
+   ["Welche Folgen das für den Wasserhaushalt haben würde, war allerdings offen, denn mehr Wald bedeutet auch mehr Verdunstung.",
+    "<mark>das</mark> ist die Aufforstung aus Abschnitt 1; hier steht die offene Frage."],
+   ["Ein Team der China Agricultural University verband deshalb Satellitendaten mit einem Modell, das verdunstetes Wasser durch die Atmosphäre verfolgt.",
+    "<mark>deshalb</mark> schließt an die offene Frage an – Methode nach Fragestellung."],
+   ["Das Ergebnis: Verdunstung und Niederschlag nahmen beide zu, die Verdunstung jedoch stärker. Unter dem Strich sank die verfügbare Wassermenge um 0,46 Millimeter pro Jahr.",
+    "<mark>Das Ergebnis</mark> setzt die Untersuchung aus Abschnitt 3 voraus."],
+   ["Besonders deutlich wird das Ungleichgewicht im trockenen Nordwesten: Von dort gelangt Feuchtigkeit bis auf das Tibetische Hochland, wo der Niederschlag sogar zunimmt – zurück kommt weniger, als die Region abgibt.",
+    "<mark>das Ungleichgewicht</mark> fasst das Ergebnis aus Abschnitt 4 zusammen und vertieft es regional."]
+  ]}
+];
+
+const LET = ["A","B","C","D","E"], TIME = 300;
+let best = {};
+try { best = JSON.parse(localStorage.getItem("tdaf2-best") || "{}") || {}; } catch(e) { best = {}; }
+const state = EX.map(() => ({slots:[null,null,null,null,null], checked:false, left:TIME, started:false}));
+let cur = 0;
+try { const c = parseInt(localStorage.getItem("tdaf2-cur"),10); if (c>=0 && c<EX.length) cur = c; } catch(e){}
+let selected = null;
+
+const $nav = document.getElementById("nav"), $exam = document.getElementById("exam");
+const sectionOf = (ex, card) => ex.display[card];
+const solutionCard = (ex, pos) => ex.display.indexOf(pos);
+const fmt = s => { const neg = s<0; s = Math.abs(s); return (neg?"-":"") + String(Math.floor(s/60)).padStart(1,"0") + ":" + String(s%60).padStart(2,"0"); };
+
+function renderNav(){
+  $nav.innerHTML = "";
+  EX.forEach((ex,i) => {
+    const b = document.createElement("button");
+    b.className = "chip"; b.type = "button"; b.id = "chip-"+i;
+    b.setAttribute("aria-current", i===cur ? "true" : "false");
+    b.innerHTML = `<span class="n">${i+1}</span>${ex.topic}` + (best[i]!=null ? `<span class="best">${best[i]}/5</span>` : "");
+    b.onclick = () => { cur = i; selected = null; try{localStorage.setItem("tdaf2-cur", i);}catch(e){} render(); };
+    $nav.appendChild(b);
+  });
+}
+
+function cardEl(ex, st, card){
+  const d = document.createElement("div");
+  d.className = "card" + (st.checked ? " locked" : "") + (selected===card ? " selected" : "");
+  d.dataset.card = card;
+  d.tabIndex = st.checked ? -1 : 0;
+  d.setAttribute("role","button");
+  d.setAttribute("aria-label", "Abschnitt " + LET[card]);
+  d.innerHTML = `<div class="grip" aria-hidden="true"><span class="letter">${LET[card]}</span><span class="dots"></span></div><p>${ex.s[sectionOf(ex,card)][0]}</p>`;
+  return d;
+}
+
+function render(){
+  renderNav();
+  const ex = EX[cur], st = state[cur];
+  st.started = true;
+  const placed = new Set(st.slots.filter(v => v!==null));
+  let html = `
+    <div class="bar">
+      <div class="what"><span class="eyebrow">Übung ${cur+1} von ${EX.length}</span><h2>${ex.topic}</h2></div>
+      <div class="timer" id="timer" aria-label="Verbleibende Zeit">${fmt(st.left)}</div>
+    </div>
+    <div class="instr">
+      <p>Lesen Sie die Textabschnitte rechts.</p>
+      <p>Bringen Sie die Textabschnitte in die richtige Reihenfolge.</p>
+      <p>Ziehen Sie dafür die Textteile von rechts nach links.</p>
+      <p>Es gibt genau eine richtige Reihenfolge.</p>
+      <p>Sie haben 5 Minuten Zeit.</p>
+    </div>
+    <div class="board">
+      <div class="col"><div class="col-h">Reihenfolge</div><div id="slots" style="display:flex;flex-direction:column;gap:10px"></div></div>
+      <div class="col pool-col"><div class="col-h">Textabschnitte</div><div class="pool" id="pool"></div></div>
+    </div>
+    <div class="actions">
+      <button class="btn primary" id="check" type="button" ${st.checked?"disabled":""}>Auswerten</button>
+      <button class="btn" id="reset" type="button">Neu beginnen</button>
+      ${cur < EX.length-1 ? `<button class="btn" id="next" type="button">Nächste Übung →</button>` : ""}
+    </div>
+    <div id="result"></div>
+    <footer class="src">Textgrundlage: „<a href="${ex.src.u}" target="_blank" rel="noopener">${ex.src.t}</a>“ von ${ex.src.a}, ${ex.src.p || "wissenschaft.de"}, ${ex.src.d} (gekürzt und bearbeitet).</footer>`;
+  $exam.innerHTML = html;
+
+  const $slots = document.getElementById("slots"), $pool = document.getElementById("pool");
+  st.slots.forEach((card, j) => {
+    const s = document.createElement("div");
+    s.className = "slot";
+    if (st.checked) s.classList.add(card === solutionCard(ex,j) ? "ok" : "bad");
+    s.innerHTML = `<div class="num">${j+1}</div>`;
+    const drop = document.createElement("div");
+    drop.className = "drop" + (card===null ? " empty" : "");
+    drop.dataset.slot = j;
+    if (card!==null) drop.appendChild(cardEl(ex, st, card));
+    s.appendChild(drop);
+    $slots.appendChild(s);
+  });
+  const free = [0,1,2,3,4].filter(c => !placed.has(c));
+  free.forEach(c => $pool.appendChild(cardEl(ex, st, c)));
+  if (!free.length) $pool.innerHTML = `<div class="empty-note">Alle Abschnitte sind eingeordnet.<br>Prüfen Sie die Reihenfolge und klicken Sie auf „Auswerten“.</div>`;
+
+  document.getElementById("check").onclick = check;
+  document.getElementById("reset").onclick = () => { state[cur] = {slots:[null,null,null,null,null], checked:false, left:TIME, started:true}; selected=null; render(); };
+  const nx = document.getElementById("next"); if (nx) nx.onclick = () => { cur++; selected=null; try{localStorage.setItem("tdaf2-cur", cur);}catch(e){} render(); window.scrollTo({top:0}); };
+  if (st.checked) renderResult();
+  updateTimer();
+  if (selected !== null){ const f = $exam.querySelector(`.card[data-card="${selected}"]`); if (f) f.focus({preventScroll:true}); }
+}
+
+function place(card, j){
+  const st = state[cur];
+  const from = st.slots.indexOf(card), occ = st.slots[j];
+  if (from === j) return;
+  if (from >= 0) st.slots[from] = occ; // swap or move
+  st.slots[j] = card;
+}
+function toPool(card){ const st = state[cur]; const f = st.slots.indexOf(card); if (f>=0) st.slots[f] = null; }
+
+function check(){
+  const ex = EX[cur], st = state[cur];
+  st.checked = true; selected = null;
+  const score = st.slots.filter((c,j) => c === solutionCard(ex,j)).length;
+  if (best[cur]==null || score > best[cur]) { best[cur] = score; try{ localStorage.setItem("tdaf2-best", JSON.stringify(best)); }catch(e){} }
+  st.score = score; st.used = TIME - st.left;
+  render();
+  document.getElementById("result").scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"});
+}
+
+function renderResult(){
+  const ex = EX[cur], st = state[cur];
+  const key = [0,1,2,3,4].map(j => LET[solutionCard(ex,j)]).join(" – ");
+  const used = st.used;
+  const timeTxt = used <= TIME ? `Zeit: ${fmt(used)} von 5:00` : `Zeit: ${fmt(used)} – ${fmt(used-TIME)} über dem Limit`;
+  const msg = st.score===5 ? "Alles richtig." : st.score>=3 ? "Fast – sehen Sie sich die markierten Positionen an." : "Lesen Sie die Signalwörter unten und versuchen Sie es noch einmal.";
+  const items = ex.s.map((sec, j) => {
+    const words = sec[0].split(" ").slice(0,6).join(" ");
+    return `<li><span class="pos">${j+1}·${LET[solutionCard(ex,j)]}</span><div><div class="start">„${words} …“</div><div class="sig">${sec[1]}</div></div></li>`;
+  }).join("");
+  document.getElementById("result").innerHTML = `
+    <div class="result">
+      <div class="score"><strong>${st.score} / 5</strong><span>${msg}</span><span>${timeTxt}</span></div>
+      <div>Richtige Reihenfolge: <span class="key">${key}</span></div>
+      <ol class="expl">${items}</ol>
+    </div>`;
+}
+
+function updateTimer(){
+  const t = document.getElementById("timer"); if (!t) return;
+  const st = state[cur];
+  t.textContent = st.left >= 0 ? fmt(st.left) : "Zeit abgelaufen " + fmt(st.left);
+  t.classList.toggle("low", st.left <= 60 && st.left >= 0);
+  t.classList.toggle("over", st.left < 0);
+}
+setInterval(() => { const st = state[cur]; if (!st.checked && st.started && !document.hidden) { st.left--; updateTimer(); } }, 1000);
+
+/* ---------- interaction: tap-to-place + pointer drag ---------- */
+let drag = null, justDragged = false;
+function clearTargets(){ document.querySelectorAll(".target").forEach(e => e.classList.remove("target")); }
+function targetAt(x,y){
+  const el = document.elementFromPoint(x,y); if (!el) return null;
+  return el.closest(".drop") || el.closest(".pool") || null;
+}
+$exam.addEventListener("pointerdown", e => {
+  const card = e.target.closest(".card"); if (!card || state[cur].checked) return;
+  if (e.button !== 0) return;
+  const onGrip = !!e.target.closest(".grip");
+  if (e.pointerType !== "mouse" && !onGrip) return; // touch: drag only from grip, else tap
+  drag = {card:+card.dataset.card, el:card, x:e.clientX, y:e.clientY, id:e.pointerId, moving:false, ghost:null};
+  if (e.pointerType !== "mouse") e.preventDefault();
+});
+window.addEventListener("pointermove", e => {
+  if (!drag || e.pointerId !== drag.id) return;
+  const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+  if (!drag.moving && Math.hypot(dx,dy) > 6){
+    drag.moving = true;
+    const r = drag.el.getBoundingClientRect();
+    const g = drag.el.cloneNode(true);
+    g.classList.add("ghost"); g.classList.remove("selected");
+    g.style.width = r.width + "px"; g.style.left = r.left + "px"; g.style.top = r.top + "px";
+    g.style.background = getComputedStyle(document.documentElement).getPropertyValue("--surface");
+    g.style.border = "1px solid " + getComputedStyle(document.documentElement).getPropertyValue("--accent");
+    drag.offX = e.clientX - r.left; drag.offY = e.clientY - r.top;
+    document.body.appendChild(g); drag.ghost = g;
+    drag.el.classList.add("lifted");
+  }
+  if (drag.moving){
+    e.preventDefault();
+    drag.ghost.style.left = (e.clientX - drag.offX) + "px";
+    drag.ghost.style.top = (e.clientY - drag.offY) + "px";
+    clearTargets();
+    const t = targetAt(e.clientX, e.clientY); if (t) t.classList.add("target");
+  }
+}, {passive:false});
+window.addEventListener("pointerup", e => {
+  if (!drag || e.pointerId !== drag.id) return;
+  const d = drag; drag = null;
+  if (d.moving){
+    d.ghost.remove(); clearTargets();
+    const t = targetAt(e.clientX, e.clientY);
+    if (t && t.classList.contains("drop")) place(d.card, +t.dataset.slot);
+    else if (t && t.classList.contains("pool")) toPool(d.card);
+    selected = null; render();
+    justDragged = true; setTimeout(() => { justDragged = false; }, 0);
+  }
+});
+window.addEventListener("pointercancel", () => { if (drag){ if (drag.ghost) drag.ghost.remove(); drag = null; clearTargets(); render(); } });
+
+$exam.addEventListener("click", e => {
+  if (state[cur].checked || justDragged) return;
+  const card = e.target.closest(".card");
+  const drop = e.target.closest(".drop");
+  const pool = e.target.closest(".pool");
+  if (card && selected === null){ selected = +card.dataset.card; render(); return; }
+  if (card && selected === +card.dataset.card){ selected = null; render(); return; }
+  if (selected !== null){
+    if (drop){ place(selected, +drop.dataset.slot); selected = null; render(); return; }
+    if (pool){ if (card){ selected = +card.dataset.card; } else { toPool(selected); selected = null; } render(); return; }
+  }
+});
+$exam.addEventListener("keydown", e => {
+  if ((e.key === "Enter" || e.key === " ") && e.target.classList.contains("card")){ e.preventDefault(); e.target.click(); }
+  if (selected !== null && /^[1-5]$/.test(e.key)){ place(selected, +e.key - 1); selected = null; render(); }
+});
+
+render();
+</script>
+
+</body></html>

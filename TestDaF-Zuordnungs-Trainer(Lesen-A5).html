@@ -1,0 +1,344 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>TestDaF Zuordnungs-Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap">
+<style>
+:root{
+  --ground:#F2F5F7; --surface:#FFFFFF; --sunken:#E7ECF0; --ink:#17212B; --muted:#56626E;
+  --line:#CBD4DC; --accent:#285A86; --accent-soft:#DCE8F3; --on-accent:#FFFFFF;
+  --ok:#23724A; --ok-soft:#DDF0E5; --bad:#B03A28; --bad-soft:#F7E1DC; --warn:#A5620B;
+  --shadow:0 1px 2px rgba(23,33,43,.06),0 4px 14px rgba(23,33,43,.07);
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#10161C; --surface:#18212A; --sunken:#0C1116; --ink:#E4EAF0; --muted:#98A5B1;
+    --line:#2F3B47; --accent:#7FB0DD; --accent-soft:#1F3347; --on-accent:#0C1620;
+    --ok:#6CC795; --ok-soft:#173226; --bad:#EE8A77; --bad-soft:#3A1E19; --warn:#E6A650;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#10161C; --surface:#18212A; --sunken:#0C1116; --ink:#E4EAF0; --muted:#98A5B1;
+  --line:#2F3B47; --accent:#7FB0DD; --accent-soft:#1F3347; --on-accent:#0C1620;
+  --ok:#6CC795; --ok-soft:#173226; --bad:#EE8A77; --bad-soft:#3A1E19; --warn:#E6A650;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1,h2{font-family:var(--serif);text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:clamp(1.5rem,3.2vw,2rem)}
+h2{font-size:1.35rem}
+.eyebrow{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+header.top p{margin:4px 0 0;color:var(--muted);max-width:70ch}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.nav{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 12px;font-size:.85rem;display:inline-flex;gap:6px;align-items:center}
+.chip .n{font-family:var(--mono);font-size:.78rem;color:var(--muted)}
+.chip[aria-current="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.chip[aria-current="true"] .n{color:var(--on-accent)}
+.chip .best{font-family:var(--mono);font-size:.72rem;padding:0 6px;border-radius:999px;background:var(--ok-soft);color:var(--ok)}
+.chip[aria-current="true"] .best{background:var(--on-accent);color:var(--accent)}
+
+details.tips{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+details.tips summary{cursor:pointer;font-weight:600}
+details.tips ul{margin:10px 0 4px;padding-left:1.2em;display:grid;gap:4px;max-width:82ch}
+
+.exam{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+.bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;padding:12px 18px;background:var(--sunken);border-bottom:1px solid var(--line);border-radius:12px 12px 0 0}
+.bar .what{display:flex;flex-direction:column}
+.timer{font-family:var(--mono);font-size:1.15rem;font-variant-numeric:tabular-nums;padding:4px 10px;border-radius:6px;border:1px solid var(--line);background:var(--surface)}
+.timer.low{color:var(--warn);border-color:var(--warn)}
+.timer.over{color:var(--bad);border-color:var(--bad)}
+.instr{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:2px}
+.instr p{margin:0}
+.instr .warn{color:var(--warn);font-weight:500;margin-top:6px}
+
+.board{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:22px;padding:18px}
+.col{min-width:0;display:flex;flex-direction:column;gap:12px}
+.col-h{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.article{font-family:var(--serif);font-size:1.05rem;line-height:1.75;display:flex;flex-direction:column;gap:12px}
+.article h3{font-family:var(--serif);font-size:1.25rem;margin:0}
+.article p{margin:0}
+
+.row{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;background:var(--surface)}
+.row.done{border-color:var(--accent)}
+.row.ok{border-color:var(--ok);background:var(--ok-soft)}
+.row.bad{border-color:var(--bad);background:var(--bad-soft)}
+.row .say{display:flex;gap:8px}
+.row .rn{font-family:var(--mono);font-size:.8rem;color:var(--muted);padding-top:2px}
+.cats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-left:26px}
+.cat{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:7px;padding:6px 4px;font-size:.85rem;text-align:center;line-height:1.25}
+.cat:hover{background:var(--accent-soft)}
+.cat[aria-checked="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:500}
+.cat.key{border-color:var(--ok);color:var(--ok);font-weight:600;background:var(--surface)}
+.cat[aria-checked="true"].key{background:var(--ok);border-color:var(--ok);color:#fff}
+.cat.wrong{border-color:var(--bad);background:var(--bad);color:#fff;text-decoration:line-through}
+.row .why{margin-left:26px;font-size:.9rem;border-top:1px dashed var(--line);padding-top:8px}
+.row .tag{display:inline-block;font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:0 6px;margin-left:6px;vertical-align:1px}
+
+.actions{display:flex;flex-wrap:wrap;gap:10px;padding:0 18px 18px}
+.btn{border-radius:8px;padding:9px 16px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-weight:500}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.scorebar{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline;padding:0 18px 18px}
+.scorebar strong{font-family:var(--serif);font-size:1.7rem}
+.scorebar span{color:var(--muted)}
+footer.src{font-size:.82rem;color:var(--muted);padding:0 18px 16px}
+footer.src a{color:var(--accent)}
+.note{font-size:.82rem;color:var(--muted);max-width:82ch}
+@media (max-width:860px){ .board{grid-template-columns:1fr} .cats{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Digitaler TestDaF · Lesen · Aufgabe 5</div>
+    <h1>Aussagen zuordnen</h1>
+    <p id="intro">Sechs Übungen nach Artikeln von spektrum.de und scinexx.de, im Format der offiziellen Demo-Aufgabe: ein kurzer Vergleichstext von rund 300 Wörtern, 7 Aussagen, vier Kategorien, 9 Minuten.</p>
+  </header>
+  <nav class="nav" id="nav" aria-label="Übungen"></nav>
+  <details class="tips">
+    <summary>Strategie: Wie ordne ich sicher zu?</summary>
+    <ul>
+      <li><b>Erst den Text lesen, dann die Aussagen.</b> Die Aussagen folgen nicht dem Textverlauf, und die nötige Information kann an mehreren Stellen stehen.</li>
+      <li><b>Achtung bei Vergleichen:</b> Steht im Text „A ist häufiger als B“, dann ist die Aussage „hier ist es selten“ der <i>anderen</i> Seite zuzuordnen. Diese Umkehrung ist die häufigste Falle.</li>
+      <li><b>Synonyme und Oberbegriffe erkennen:</b> <i>urban → Stadt</i>, <i>Angststörung und Schizophrenie → psychische Störungen</i>, <i>Allergie → Überreaktion der Abwehr</i>.</li>
+      <li><b>„beide“</b> wählen Sie, wenn die Aussage für beide Seiten gilt – oft steht das nicht in einem Satz, sondern ergibt sich aus zwei Stellen.</li>
+      <li><b>„passt nicht“</b> ist richtig, wenn der Text dazu nichts sagt. Vorsicht: Solche Aussagen enthalten fast immer Wörter aus dem Text. Suchen Sie nicht nach Wörtern, sondern nach der Aussage.</li>
+      <li><b>Nicht raten, sondern prüfen:</b> Zu jeder Zuordnung sollten Sie die Textstelle nennen können – oder sicher sein, dass es keine gibt.</li>
+      <li><b>Zeit:</b> 9 Minuten, also etwa 2 Minuten Lesen und gut 1 Minute pro Aussage.</li>
+    </ul>
+  </details>
+  <section class="exam" id="exam"></section>
+  <p class="note">Hinweis: Die Texte sind neu geschrieben und stützen sich auf den Inhalt der verlinkten Artikel, so wie Prüfungstexte im TestDaF gekürzt und bearbeitet werden. Die Aussagen stehen wie in der Prüfung in alphabetischer Reihenfolge; pro Aussage ist genau eine Kategorie richtig. Nach dem Auswerten sehen Sie zu jeder Aussage die Begründung mit der Textstelle.</p>
+</div>
+
+<script>
+const EX = [
+ {topic:"Herzbericht", cats:["Frauen","Männer","beide","passt nicht"],
+  src:{t:"Deutscher Herzbericht: Weniger Todesfälle durch Herzinfarkte", a:"dpa", p:"spektrum.de", d:"16.09.2026", u:"https://www.spektrum.de/news/herzbericht-weniger-todesfaelle-durch-herzinfarkte/2344926"},
+  title:"Herzkrankheiten in Deutschland",
+  lead:"Entscheiden Sie für jede Aussage, ob sie zu den Frauen, zu den Männern, zu beiden oder gar nicht passt.",
+  paras:[
+   "Herz-Kreislauf-Erkrankungen sind in Deutschland weiterhin die häufigste Todesursache. Der Deutsche Herzbericht wertet dazu jedes Jahr die amtlichen Zahlen aus, zuletzt für 2024. Er meldet einen Rückgang: An der koronaren Herzkrankheit, bei der die Herzkranzgefäße verkalken, starben 113.473 Menschen, ein Jahr zuvor waren es noch 119.795. Auch die Zahl der tödlichen Herzinfarkte ging zurück, von 43.839 auf 41.258.",
+   "Der Kardiologe Thomas Voigtländer führt diese Entwicklung auf bessere Diagnosen, neue Stents und Bypässe, wirksamere Medikamente und eine schnellere Rettungskette zurück. Zugleich mahnt er mehr Vorbeugung an, denn die Schädigung der Herzkranzgefäße beginne lange vor dem ersten Symptom. Als wichtigste Risikofaktoren nennt der Bericht – für Frauen wie für Männer – Bluthochdruck, Störungen des Fettstoffwechsels, Diabetes, starkes Übergewicht und Rauchen. Eine Ausnahme vom allgemeinen Rückgang bilden angeborene Herzfehler: Hier stieg die Zahl der Todesfälle gegenüber 2023 leicht an.",
+   "Ein Unterschied bleibt allerdings bestehen. Nach einem akuten Herzinfarkt sind die Aussichten sehr ungleich verteilt: 2024 starben 14,4 Prozent der betroffenen Frauen im Krankenhaus, aber nur 10,1 Prozent der Männer. Diese Lücke besteht seit 2019. Der Bericht nennt zwei mögliche Gründe: Patientinnen leiden häufiger zusätzlich an anderen Krankheiten, und ihr Infarkt wird vermutlich später erkannt. Voigtländer fordert deshalb, die Todesursachen während des Klinikaufenthalts genauer zu untersuchen.",
+   "Mit dem Alter gewinnen Herz-Kreislauf-Erkrankungen als Todesursache an Gewicht: Ab 70 Jahren nimmt ihr Anteil an allen Todesursachen deutlich zu, und weil die Bevölkerung altert, dürfte er weiter steigen. 2024 gab es mehr als 1,65 Millionen Krankenhausaufenthalte wegen Herzproblemen; bei Herzschwäche steigen die Einweisungen ab 65 Jahren steil an. Sorgen bereiten den Fachleuten zudem Klinikschließungen und eine ungleich verteilte Versorgung. Zertifizierte Brustschmerz-Ambulanzen gelten als ein Mittel, die Akutversorgung zu sichern. Bei Herzschwäche könnte außerdem die empfohlene Grippeimpfung manche Einweisung verhindern."
+  ],
+  items:[
+   {s:"Ab 70 Jahren nimmt die Bedeutung dieser Krankheiten als Todesursache zu.", a:2, tag:"gilt für alle", w:"Absatz 4 spricht über das Alter, ohne zwischen Frauen und Männern zu unterscheiden – die Aussage gilt für beide Gruppen."},
+   {s:"Bei dieser Gruppe wird ein Infarkt vermutlich später erkannt.", a:0, tag:"Textstelle", w:"Absatz 3 nennt als Grund für die schlechteren Aussichten der Frauen, dass ihr Infarkt „vermutlich später erkannt“ wird."},
+   {s:"Bluthochdruck und Rauchen gelten als wichtigste Risikofaktoren.", a:2, tag:"gilt für alle", w:"Absatz 2 nennt die Risikofaktoren ausdrücklich „für Frauen wie für Männer“."},
+   {s:"Hier liegt die Sterblichkeit im Krankenhaus bei 10,1 Prozent.", a:1, tag:"Zahlen zuordnen", w:"Der Wert 10,1 Prozent steht in Absatz 3 für die Männer; 14,4 Prozent gelten für die Frauen."},
+   {s:"In dieser Gruppe wird häufiger geraucht.", a:3, tag:"passt nicht", w:"Rauchen kommt im Text vor – aber nur als Risikofaktor (Absatz 2). Dass eine der beiden Gruppen häufiger raucht, steht nirgends. Typischer Wort-Köder."},
+   {s:"Nach einem Infarkt sterben mehr als 14 von 100 Betroffenen im Krankenhaus.", a:0, tag:"Zahlen zuordnen", w:"14,4 Prozent – dieser Wert gilt laut Absatz 3 für die Frauen."},
+   {s:"Weitere Erkrankungen kommen hier häufiger dazu.", a:0, tag:"Umschreibung", w:"„Patientinnen leiden häufiger zusätzlich an anderen Krankheiten“ (Absatz 3) – gemeint sind Begleiterkrankungen bei den Frauen."}
+  ]},
+ {topic:"Geburt und Psyche", cats:["Mit Mitbestimmung","Ohne Mitbestimmung","beide","passt nicht"],
+  src:{t:"Geburtstrauma: Das Gefühl der Kontrolle ist entscheidend", a:"Liesa Bauer", p:"spektrum.de", d:"14.09.2026", u:"https://www.spektrum.de/news/geburtstrauma-erlebte-kontrolle-bei-der-geburt-schuetzt-die-psyche/2344245"},
+  title:"Wie Frauen ihre Geburt erleben",
+  lead:"Entscheiden Sie für jede Aussage, ob sie zu einer Geburt mit Mitbestimmung, zu einer Geburt ohne Mitbestimmung, zu beiden oder gar nicht passt.",
+  paras:[
+   "Nach einer Entbindung entwickelt ein Teil der Mütter psychische Beschwerden: Depressionen, Angstzustände oder eine posttraumatische Belastungsstörung. Welche Umstände dabei eine Rolle spielen, hat ein Team um Sergio Martínez-Vázquez von der Universität Jaén untersucht. Befragt wurden 300 Frauen, die in den sechs Monaten zuvor ein Kind bekommen hatten. Erhoben wurde nicht nur ihr seelischer Zustand, sondern auch, ob die Schwangerschaft geplant war, wie die Geburt verlief, ob es Komplikationen gab, ob ein Geburtsplan vorlag und eingehalten wurde und ob früh gestillt werden konnte und direkter Hautkontakt möglich war. Die Angaben stammen aus Fragebögen, die die Frauen im Rückblick ausfüllten.",
+   "Ein Faktor trat deutlich hervor: das Gefühl, selbst über das Geschehen mitzubestimmen. Frauen, die sich während der Entbindung unterstützt fühlten und deren Wünsche in die Entscheidungen einbezogen wurden, entwickelten seltener eine posttraumatische Belastungsstörung. Ähnlich günstig wirkte es, wenn die Frauen bereits ein Kind geboren hatten oder wenn das Stillen früh beginnen konnte.",
+   "Umgekehrt zeigte sich das größte Risiko dort, wo ein vorher besprochener Geburtsplan im Verlauf übergangen wurde. Dieser Punkt erwies sich als der stärkste einzelne Risikofaktor für eine Traumafolgestörung nach der Geburt – stärker als jeder medizinische Umstand, den die Forschenden erfasst haben.",
+   "Nachdem das Team andere Einflüsse herausgerechnet hatte, spielte es für die psychische Gesundheit keine Rolle, ob das Kind per Kaiserschnitt oder vaginal zur Welt kam, ob es direkten Hautkontakt gab und ob die Schwangerschaft geplant war – und zwar in allen Gruppen, gleich wie die Frauen die Geburt erlebt hatten. Andere Beschwerden hingen an anderen Umständen: Eine schwere Belastung im Jahr vor der Geburt begünstigte eine Depression, Komplikationen in der Schwangerschaft gingen mit späteren Ängsten einher. Musste das Neugeborene auf die Intensivstation, war das Suizidrisiko der Mutter erhöht. Entscheidend ist also weniger die Art der Geburt als ihr Erleben. Die Forschenden empfehlen deshalb, Gebärende in Entscheidungen einzubeziehen und ihre Wünsche ernst zu nehmen."
+  ],
+  items:[
+   {s:"Der vorher besprochene Geburtsplan wurde im Verlauf übergangen.", a:1, tag:"Textstelle", w:"Absatz 3 beschreibt genau diese Situation: Der Plan wird übergangen, die Frau kann nicht mehr mitbestimmen."},
+      {s:"Die Frauen fühlten sich während der Entbindung unterstützt.", a:0, tag:"Textstelle", w:"„Frauen, die sich während der Entbindung unterstützt fühlten und deren Wünsche in die Entscheidungen einbezogen wurden“ (Absatz 2)."},
+   {s:"Diesen Zustand empfehlen die Forschenden ausdrücklich.", a:0, tag:"Schlussfolgerung", w:"Absatz 4 empfiehlt, Gebärende in Entscheidungen einzubeziehen und ihre Wünsche ernst zu nehmen – empfohlen wird also die Geburt mit Mitbestimmung."},
+   {s:"Ein geplanter Kaiserschnitt schützt hier vor späteren Ängsten.", a:3, tag:"passt nicht", w:"Kaiserschnitt und Ängste kommen beide im Text vor, aber nicht in diesem Zusammenhang: Der Geburtsmodus hatte keinen Einfluss (Absatz 4), und Ängste hingen mit Komplikationen in der Schwangerschaft zusammen."},
+   {s:"Eine posttraumatische Belastungsstörung tritt hier seltener auf.", a:0, tag:"Umkehrung", w:"Absatz 2: Wer mitbestimmen konnte, entwickelte seltener eine solche Störung. Das größte Risiko liegt auf der anderen Seite (Absatz 3)."},
+   {s:"Hier ist das Risiko für eine Traumafolgestörung am größten.", a:1, tag:"Umkehrung", w:"Absatz 3 nennt das Übergehen des Geburtsplans den stärksten einzelnen Risikofaktor."},
+   {s:"Ob das Kind per Kaiserschnitt kam, ist für die Psyche ohne Bedeutung.", a:2, tag:"gilt für alle", w:"Absatz 4 sagt das ausdrücklich „unabhängig davon, wie die Frauen die Geburt erlebt hatten“ – also für beide Seiten."}
+  ]},
+ {topic:"Gesten beim Lernen", cats:["Nur Sprache","Sprache und Gesten","beide","passt nicht"],
+  src:{t:"Beim Lernen verbinden Gesten das Elterngehirn mit dem Kindergehirn", a:"Katja Gaschler", p:"spektrum.de", d:"15.09.2026", u:"https://www.spektrum.de/news/beim-lernen-verbinden-gesten-das-elterngehirn-mit-dem-kindergehirn/2344627"},
+  title:"Wenn die Hände mit erklären",
+  lead:"Entscheiden Sie für jede Aussage, ob sie zum Erklären nur mit Sprache, zum Erklären mit Sprache und Gesten, zu beiden oder gar nicht passt.",
+  paras:[
+   "Dass Handbewegungen beim Erklären helfen, gilt in der Lernforschung als gesichert. Woran das liegt, war dagegen offen. Ece Demir-Lira und ihre Doktorandin Ying Li von der University of Iowa sind der Frage mit 42 Eltern-Kind-Paaren nachgegangen. Die Kinder waren zwischen vier und sieben Jahre alt. Gemeinsam sollten sie nach Vorlagen Figuren aus sieben geometrischen Teilen legen, etwa einen Vogel, ein Haus oder eine Katze.",
+   "Während die Paare arbeiteten, trugen beide Beteiligten je eine Haube, die schwaches Infrarotlicht durch die Kopfhaut in die äußeren Schichten des Gehirns schickte. Kleine Detektoren maßen, wie viel Licht zurückkam, und machten so besonders stark durchblutete, also aktive Bereiche sichtbar. Das Verfahren heißt funktionelle Nahinfrarotspektroskopie; weil zwei Gehirne gleichzeitig gemessen werden, spricht man von Hyperscanning. So lässt sich in Echtzeit verfolgen, wie stark die Hirnaktivität zweier Menschen während einer gemeinsamen Tätigkeit im Gleichklang läuft.",
+   "Zu Beginn der Aufgabe stellte sich bei allen Paaren eine solche Kopplung ein. Danach unterschieden sich die Paare: Wo die Erwachsenen ihre Anweisungen ausschließlich in Worte fassten, wurde der Gleichklang im Verlauf schwächer. Wo sie ihre Worte mit passenden Handbewegungen begleiteten, blieb er dagegen bestehen – auch in weiter vorn gelegenen Regionen, die die Aufmerksamkeit steuern.",
+   "Die Forscherinnen erklären das damit, dass eine Geste den Bezug eines Wortes eindeutig macht. Gerade bei räumlichen Aufgaben ist der Unterschied groß: Die Anweisung, ein Teil so zu drehen, dass die lange Kante nach unten zeigt, lässt sich mit einer begleitenden Handbewegung viel leichter umsetzen. Offenbar bleiben Erwachsener und Kind so länger gemeinsam bei der Sache, und genau das könnte gemeinsames Lernen wirksamer machen. Ähnliche Vorteile hat die Forschung sogar für schwierige mathematische Themen beschrieben – ein Hinweis darauf, wie eng Denken und Bewegung zusammenhängen."
+  ],
+  items:[
+   {s:"Auch vordere Hirnregionen blieben dauerhaft gekoppelt.", a:1, tag:"Textstelle", w:"Absatz 3: Bei den Paaren mit Handbewegungen blieb der Gleichklang bestehen, „auch in weiter vorn gelegenen Regionen“."},
+   {s:"Der Bezug der Wörter wird eindeutiger.", a:1, tag:"Umschreibung", w:"Absatz 4: Eine Geste macht den Bezug eines Wortes eindeutig."},
+   {s:"Die Erwachsenen und die Kinder lösten die Aufgabe schneller.", a:3, tag:"passt nicht", w:"Der Text sagt, dass die Paare länger gemeinsam bei der Sache bleiben und dass Lernen dadurch wirksamer werden <i>könnte</i>. Über die Zeit bis zur Lösung oder über Erfolgsquoten steht nichts da."},
+   {s:"Die Kopplung der Gehirne wurde im Verlauf schwächer.", a:0, tag:"Umkehrung", w:"Das gilt nur für das Erklären ohne Gesten (Absatz 3); mit Gesten blieb die Kopplung erhalten."},
+   {s:"Für räumliche Anweisungen fehlte hier eine zusätzliche Hilfe.", a:0, tag:"Schlussfolgerung", w:"Absatz 4: Gerade bei räumlichen Anweisungen hilft die begleitende Handbewegung. Wo nur gesprochen wurde, fehlte diese Hilfe."},
+   {s:"Hier blieben Erwachsener und Kind länger gemeinsam bei der Sache.", a:1, tag:"Umschreibung", w:"Absatz 4: Weil die Geste den Bezug eindeutig macht, bleiben beide offenbar länger gemeinsam konzentriert."},
+   {s:"Zu Beginn liefen die Hirnaktivitäten im Gleichklang.", a:2, tag:"gilt für alle", w:"Absatz 3, erster Satz: „Zu Beginn der Aufgabe stellte sich bei allen Paaren eine solche Kopplung ein.“"}
+  ]},
+ {topic:"Bienen ohne Imker", cats:["Wildvölker","Imkereivölker","beide","passt nicht"],
+  src:{t:"Wilde Honigbienen stehen in der EU erstmals auf der Roten Liste", a:"Kathrin Klatt", p:"scinexx.de", d:"18.09.2026", u:"https://www.scinexx.de/news/biowissen/wilde-honigbienen-stehen-in-der-eu-erstmals-auf-der-roten-liste/"},
+  title:"Bienen ohne Imker",
+  lead:"Entscheiden Sie für jede Aussage, ob sie zu den wildlebenden Völkern, zu den Völkern der Imkereien, zu beiden oder gar nicht passt.",
+  paras:[
+   "Nicht alle Honigbienen leben in Kästen. Ein Teil der Völker nistet ohne jede Betreuung in Baumhöhlen, Felsspalten und Gebäuden; nach bisherigen Schätzungen ist das mindestens ein Sechstel der europäischen Population. Wie es diesen freilebenden Völkern geht, lässt sich allerdings schwer sagen. Denn jedes Jahr fliegen aus den Kästen der Imkereien Schwärme aus und besetzen freie Nistplätze. Ein Rückgang bleibt dadurch unsichtbar.",
+   "Ein Team um Benjamin Rutschmann hat deshalb Überlebensdaten von 700 bekannten Nistplätzen aus sieben Ländern ausgewertet und berechnet, wie sich die freilebenden Bestände ohne diesen Nachschub entwickeln würden. In sechs der sieben Länder ergibt sich ein negativer Trend, im Mittel minus 56 Prozent pro Jahrzehnt. Für Deutschland und die Schweiz führt die Rechnung zum vollständigen Verschwinden binnen zehn Jahren, für Spanien zu minus 78 Prozent, für Südostengland dagegen zu einem deutlichen Zuwachs.",
+   "Wichtig ist, was diese Zahlen nicht sind: Sie beschreiben keine gezählten Bestände, sondern ein Modell ohne Zuwanderung. Tatsächlich ist ein großer Teil der Nistplätze weiterhin besetzt, eben durch ausgeflogene Schwärme. Als Ursachen des Rückgangs kommen der Verlust alter Höhlenbäume, Nahrungsmangel, Krankheitserreger, die Varroa-Milbe und Pflanzenschutzmittel infrage; untersucht wurden sie in dieser Arbeit nicht.",
+   "Biologisch handelt es sich um ein und dieselbe Art, die Westliche Honigbiene. Für die Rote Liste zählt dennoch allein die wildlebende Population, und diese gilt in der EU inzwischen als gefährdet. Die Fachleute fordern ein systematisches Monitoring über Ländergrenzen hinweg sowie mehr alte Höhlenbäume und blütenreiche Flächen – davon würden auch viele andere Arten profitieren."
+  ],
+  items:[
+   {s:"Aus ihnen fliegen jedes Jahr Schwärme aus.", a:1, tag:"Textstelle", w:"„Jedes Jahr fliegen aus den Kästen der Imkereien Schwärme aus und besetzen freie Nistplätze“ (Absatz 1)."},
+   {s:"Die Varroa-Milbe wurde als Hauptursache nachgewiesen.", a:3, tag:"passt nicht", w:"Die Varroa-Milbe steht im Text – aber nur in einer Liste möglicher Ursachen, die „untersucht wurden sie in dieser Arbeit nicht“ (Absatz 3). Ein Nachweis fehlt also."},
+   {s:"Für die Rote Liste wird allein diese Gruppe bewertet.", a:0, tag:"Textstelle", w:"„Für die Rote Liste zählt dennoch allein die wildlebende Population“ (Absatz 4)."},
+   {s:"Ihre Entwicklung ohne Zuwanderung wurde modelliert.", a:0, tag:"Textstelle", w:"Berechnet wurde, wie sich die <i>freilebenden</i> Bestände ohne den Nachschub aus den Imkereien entwickeln würden (Absatz 2)."},
+   {s:"In Deutschland würden sie ohne Zuwanderung verschwinden.", a:0, tag:"Zahlen deuten", w:"„Für Deutschland und die Schweiz führt die Rechnung zum vollständigen Verschwinden binnen zehn Jahren“ (Absatz 2) – gemeint sind die wildlebenden Völker."},
+   {s:"Sie gehören zur Westlichen Honigbiene.", a:2, tag:"gilt für alle", w:"„Biologisch handelt es sich um ein und dieselbe Art, die Westliche Honigbiene“ (Absatz 4) – das gilt für beide Gruppen."},
+   {s:"Sie werden von Menschen in Kästen gehalten.", a:1, tag:"Umkehrung", w:"Der erste Satz stellt beide Gruppen gegenüber: „Nicht alle Honigbienen leben in Kästen.“ Die Kästen gehören zu den Imkereien."}
+  ]},
+ {topic:"Plastik im Magen", cats:["Küken ohne Plastik","Küken mit Plastik","beide","passt nicht"],
+  src:{t:"Artensterben: Wie viel Plastikmüll im Magen verkraftet ein Seevogel?", a:"Daniel Lingenhöhl", p:"spektrum.de", d:"18.09.2026", u:"https://www.spektrum.de/news/artensterben-wie-viel-plastikmuell-im-magen-verkraftet-ein-seevogel/2345326"},
+  title:"Plastik im Magen",
+  lead:"Entscheiden Sie für jede Aussage, ob sie zu den Küken ohne Plastik im Magen, zu den Küken mit Plastik im Magen, zu beiden oder gar nicht passt.",
+  paras:[
+   "Kunststoffabfälle haben die entlegensten Meeresregionen erreicht, und viele Tiere verwechseln sie mit Nahrung. Viele Altvögel verfüttern die Partikel sogar an ihre Küken, die diese nicht wieder loswerden. Auf der australischen Insel Lord Howe untersuchen Fachleute deshalb seit 2010 die Jungvögel des Blassfuß-Sturmtauchers. Sie beringen jedes Küken, wiegen es und schätzen die Menge an Kunststoff im Magen. Manche Mägen knirschen schon beim Abtasten; bei einigen Tieren wird der Magen ausgepumpt.",
+   "Nach dem Ausfliegen verbringen die Vögel mehrere Jahre auf See. Später kehren sie zu ihrem Brutplatz zurück, und weil sie beringt sind, lassen sie sich dort wiederfinden. So lässt sich abschätzen, wie viele nach sechs, sieben oder acht Jahren noch leben – und ob die Kunststoffmenge im Magen damit zusammenhängt. Wer nie wieder auftaucht, gilt als gestorben; das ist ein hartes, in der Seevogelforschung aber übliches Kriterium.",
+   "Das Ergebnis ist deutlich. Von den Jungtieren, in deren Mägen sich nichts fand, kehrte knapp ein Drittel zurück. Bei zwei Gramm Kunststoff halbierte sich dieser Anteil; Jungvögel mit fünf Gramm im Magen wurden fast nie wieder gesichtet. Hochgerechnet trägt bis zu ein Fünftel aller Küken eines Jahrgangs mindestens ein Gramm im Magen.",
+   "Die Forschenden kritisieren, dass Bestandstrends bisher meist daran gemessen werden, wie viele Küken das Nest lebend verlassen. Die zusätzliche Sterblichkeit auf See bleibt dabei unsichtbar. Einschränkend gilt allerdings: Auch ohne Kunststoff übersteht nur ein Teil der Jungvögel die Jahre auf See, und Stürme oder Nahrungsmangel können Tausende Tiere gleichzeitig töten."
+  ],
+  items:[
+   {s:"Bei fünf Gramm im Magen wurde fast keiner wieder gesichtet.", a:1, tag:"Zahlen deuten", w:"„Jungvögel mit fünf Gramm im Magen wurden fast nie wieder gesichtet“ (Absatz 3)."},
+   {s:"Bei ihnen fand sich im Magen kein Kunststoff.", a:0, tag:"Textstelle", w:"„Von den Jungtieren, in deren Magen sich nichts fand …“ (Absatz 3)."},
+   {s:"Bis zu ein Fünftel eines Jahrgangs trägt mindestens ein Gramm im Magen.", a:1, tag:"Zahlen deuten", w:"So steht es in Absatz 3 – gemeint sind also die belasteten Küken."},
+   {s:"Ihre Rückkehrquote liegt bei knapp einem Drittel.", a:0, tag:"Zahlen deuten", w:"Knapp ein Drittel kehrte zurück – dieser Wert gilt für die unbelasteten Jungtiere (Absatz 3)."},
+   {s:"Ihre Überlebenschance sinkt mit der Menge im Magen.", a:1, tag:"Umschreibung", w:"Zwei Gramm halbieren die Rückkehrquote, fünf Gramm lassen sie fast auf null sinken (Absatz 3)."},
+   {s:"Sie werden von ihren Eltern gezielt mit Fisch gefüttert.", a:3, tag:"passt nicht", w:"Gefüttert wird im Text erwähnt, aber nur indirekt („verwechseln sie mit Nahrung“). Über gezielte Fütterung mit Fisch steht nichts da."},
+   {s:"Sie werden vor dem Ausfliegen beringt und gewogen.", a:2, tag:"gilt für alle", w:"„Sie beringen jedes Küken, wiegen es und schätzen die Menge an Kunststoff im Magen“ (Absatz 1) – das gilt für alle Jungvögel."},
+  ]},
+ {topic:"Asteroid sprengen", cats:["Zündung in 10 Metern","Zündung in 25 Metern","beide","passt nicht"],
+  src:{t:"Könnte eine Atombombe einen 160-Meter-Asteroiden zerreißen?", a:"Kathrin Klatt", p:"scinexx.de", d:"18.09.2026", u:"https://www.scinexx.de/news/kosmos/koennte-eine-atombombe-einen-160-meter-asteroiden-zerreissen/"},
+  title:"Wie nah darf die Bombe zünden?",
+  lead:"Entscheiden Sie für jede Aussage, ob sie zur Zündung in 10 Metern Höhe, zur Zündung in 25 Metern Höhe, zu beiden oder gar nicht passt.",
+  paras:[
+   "Kleine Asteroiden lassen sich bei genügend Vorwarnzeit durch einen gezielten Einschlag ablenken; schon eine winzige Änderung der Geschwindigkeit führt über Jahre zu einer Bahn, die an der Erde vorbeiführt. Für große Objekte oder kurze Vorwarnzeiten wird die Kernwaffe als letztes Mittel diskutiert. Im Vakuum wirkt dabei keine Druckwelle, sondern vor allem Röntgenstrahlung: Sie verdampft eine dünne Schicht an der Oberfläche, und der Rückstoß schickt einen Stoß durch das Innere.",
+   "Ein Team des Lawrence Livermore National Laboratory hat diesen Vorgang simuliert. Modelliert wurde ein 160 Meter großer, felsiger Körper mit unregelmäßiger Form, die sich am Asteroiden Bennu orientiert, dazu eine Waffe von einer Megatonne. Verändert wurde vor allem die Höhe, in der sie zündete.",
+   "Nach 68 Millisekunden zeigte sich ein überraschender Unterschied: Bei einer Zündung in 25 Metern Höhe waren 92,6 Prozent des Materials beschädigt, bei einer Zündung in 10 Metern Höhe erst 78,1 Prozent. Der Grund liegt in der Geometrie: Aus größerem Abstand verteilt sich die Strahlung über eine größere Fläche. Die höhere Zündung schnitt im direkten Vergleich also besser ab.",
+   "Nach 145 Millisekunden war der Körper bei der Zündung in 10 Metern Höhe zu 98,2 Prozent zerlegt; 97 Prozent des Materials flogen dabei schneller auseinander, als es die eigene Schwerkraft zusammenhalten konnte. Offen bleibt trotzdem das Entscheidende: Die Rechnungen enden nach Sekundenbruchteilen. Wie groß die Bruchstücke am Ende sind und ob sie sich durch ihre eigene Anziehung wieder zusammenlagern, lässt sich daraus nicht ablesen."
+  ],
+  items:[
+   {s:"Die Bruchstücke wurden bis zum Ende ihrer Bahn verfolgt.", a:3, tag:"passt nicht", w:"Genau das steht nicht im Text – im Gegenteil: „Die Rechnungen enden nach Sekundenbruchteilen“ (Absatz 4)."},
+   {s:"Die Strahlung trifft hier eine größere Fläche.", a:1, tag:"Textstelle", w:"„aus größerem Abstand verteilt sich die Strahlung über eine größere Fläche“ (Absatz 3) – das gilt für die Zündung in 25 Metern."},
+   {s:"Hier flogen 97 Prozent des Materials schnell genug auseinander.", a:0, tag:"Zahlen deuten", w:"Absatz 4 nennt diesen Wert ausdrücklich für die Zündung in 10 Metern Höhe."},
+   {s:"Hier waren nach 68 Millisekunden erst gut drei Viertel beschädigt.", a:0, tag:"Zahlen deuten", w:"78,1 Prozent – das ist gut drei Viertel und gilt für die Zündung in 10 Metern (Absatz 3)."},
+   {s:"Hier waren nach 68 Millisekunden über 90 Prozent beschädigt.", a:1, tag:"Zahlen deuten", w:"92,6 Prozent, gemessen bei der Zündung in 25 Metern (Absatz 3)."},
+   {s:"Im direkten Vergleich schnitt diese Variante schlechter ab.", a:0, tag:"Umkehrung", w:"„Die höhere Zündung schnitt im direkten Vergleich also besser ab“ (Absatz 3) – schlechter war damit die Zündung in 10 Metern."},
+   {s:"Simuliert wurde eine Waffe von einer Megatonne.", a:2, tag:"gilt für alle", w:"„dazu eine Waffe von einer Megatonne“ (Absatz 2) – verändert wurde nur der Abstand, nicht die Waffe."}
+  ]}
+];
+
+const TIME = 540;
+let best = {};
+try { best = JSON.parse(localStorage.getItem("tdaf5-best") || "{}") || {}; } catch(e) { best = {}; }
+const state = EX.map(ex => ({pick: ex.items.map(() => null), checked:false, left:TIME}));
+let cur = 0;
+try { const c = parseInt(localStorage.getItem("tdaf5-cur"),10); if (c>=0 && c<EX.length) cur = c; } catch(e){}
+
+const $nav = document.getElementById("nav"), $exam = document.getElementById("exam");
+const fmt = s => { s = Math.abs(s); return Math.floor(s/60) + ":" + String(s%60).padStart(2,"0"); };
+
+function renderNav(){
+  $nav.innerHTML = "";
+  EX.forEach((ex,i) => {
+    const b = document.createElement("button");
+    b.className = "chip"; b.type = "button";
+    b.setAttribute("aria-current", i===cur ? "true" : "false");
+    b.innerHTML = `<span class="n">${i+1}</span>${ex.topic}` + (best[i]!=null ? `<span class="best">${best[i]}/7</span>` : "");
+    b.onclick = () => { cur = i; try{localStorage.setItem("tdaf5-cur", i);}catch(e){} render(); window.scrollTo({top:0}); };
+    $nav.appendChild(b);
+  });
+}
+
+function render(){
+  renderNav();
+  const ex = EX[cur], st = state[cur];
+  const paras = ex.paras.map(p => `<p>${p}</p>`).join("");
+  const rows = ex.items.map((it,k) => {
+    const pick = st.pick[k];
+    const cls = "row" + (st.checked ? (pick===it.a ? " ok" : " bad") : (pick!==null ? " done" : ""));
+    const cats = ex.cats.map((c,i) => {
+      let cc = "cat";
+      if (st.checked){ if (i===it.a) cc += " key"; else if (i===pick) cc += " wrong"; }
+      return `<button type="button" class="${cc}" role="radio" aria-checked="${pick===i?"true":"false"}" data-i="${k}" data-c="${i}" ${st.checked?"disabled":""}>${c}</button>`;
+    }).join("");
+    const why = st.checked ? `<div class="why"><b>${ex.cats[it.a]}</b><span class="tag">${it.tag}</span><br>${it.w}</div>` : "";
+    return `<div class="${cls}">
+      <div class="say"><span class="rn">${k+1}</span><span>${it.s}</span></div>
+      <div class="cats" role="radiogroup" aria-label="Aussage ${k+1}">${cats}</div>${why}</div>`;
+  }).join("");
+  const answered = st.pick.filter(p => p!==null).length;
+  $exam.innerHTML = `
+    <div class="bar">
+      <div class="what"><span class="eyebrow">Übung ${cur+1} von ${EX.length}</span><h2>${ex.topic}</h2></div>
+      <div class="timer" id="timer"></div>
+    </div>
+    <div class="instr">
+      <p>Lesen Sie den Text.</p>
+      <p>Ordnen Sie die Aussagen 1–7 zu:</p>
+      <p>${ex.lead}</p>
+      <p>Es kann auch sein, dass einzelne Aussagen gar nicht passen.</p>
+      <p>Für jede Aussage gibt es genau eine richtige Lösung.</p>
+      <p class="warn">Die Aussagen folgen nicht dem Textverlauf. Relevante Informationen können an verschiedenen Stellen im Text stehen.</p>
+    </div>
+    <div class="board">
+      <div class="col">
+        <div class="col-h">Text</div>
+        <div class="article"><h3>${ex.title}</h3>${paras}</div>
+      </div>
+      <div class="col">
+        <div class="col-h">Aussagen · ${answered} von 7 zugeordnet</div>
+        ${rows}
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn primary" id="check" type="button" ${st.checked?"disabled":""}>Auswerten</button>
+      <button class="btn" id="reset" type="button">Neu beginnen</button>
+      ${cur < EX.length-1 ? `<button class="btn" id="next" type="button">Nächste Übung →</button>` : ""}
+    </div>
+    ${st.checked ? `<div class="scorebar"><strong>${st.score} / 7</strong><span>${st.score>=6?"Sehr gut.":st.score>=4?"Lesen Sie die Begründungen zu den roten Aussagen.":"Gehen Sie die Begründungen Aussage für Aussage durch."}</span><span>Zeit: ${fmt(st.used)}${st.used>TIME?" (über dem Limit)":" von 9:00"}</span></div>` : ""}
+    <footer class="src">Textgrundlage: „<a href="${ex.src.u}" target="_blank" rel="noopener">${ex.src.t}</a>“ von ${ex.src.a}, ${ex.src.p}, ${ex.src.d} (neu geschrieben und gekürzt).</footer>`;
+  document.getElementById("check").onclick = check;
+  document.getElementById("reset").onclick = () => { state[cur] = {pick: ex.items.map(() => null), checked:false, left:TIME}; render(); };
+  const nx = document.getElementById("next"); if (nx) nx.onclick = () => { cur++; try{localStorage.setItem("tdaf5-cur", cur);}catch(e){} render(); window.scrollTo({top:0}); };
+  updateTimer();
+}
+
+$exam.addEventListener("click", e => {
+  const cat = e.target.closest(".cat");
+  const st = state[cur];
+  if (cat && !st.checked){ st.pick[+cat.dataset.i] = +cat.dataset.c; render(); }
+});
+
+function check(){
+  const ex = EX[cur], st = state[cur];
+  st.checked = true;
+  st.score = st.pick.filter((p,k) => p === ex.items[k].a).length;
+  st.used = TIME - st.left;
+  if (best[cur]==null || st.score > best[cur]) { best[cur] = st.score; try{ localStorage.setItem("tdaf5-best", JSON.stringify(best)); }catch(e){} }
+  render();
+}
+
+function updateTimer(){
+  const t = document.getElementById("timer"); if (!t) return;
+  const st = state[cur];
+  t.textContent = st.left >= 0 ? fmt(st.left) : "Zeit abgelaufen +" + fmt(st.left);
+  t.classList.toggle("low", st.left <= 90 && st.left >= 0);
+  t.classList.toggle("over", st.left < 0);
+}
+setInterval(() => { const st = state[cur]; if (!st.checked && !document.hidden) { st.left--; updateTimer(); } }, 1000);
+
+render();
+</script>
+
+</body></html>

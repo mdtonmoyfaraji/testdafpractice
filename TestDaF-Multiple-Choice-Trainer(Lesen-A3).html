@@ -1,0 +1,451 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>TestDaF Multiple-Choice-Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap">
+<style>
+:root{
+  --ground:#F2F5F7; --surface:#FFFFFF; --sunken:#E7ECF0; --ink:#17212B; --muted:#56626E;
+  --line:#CBD4DC; --accent:#285A86; --accent-soft:#DCE8F3; --on-accent:#FFFFFF;
+  --ok:#23724A; --ok-soft:#DDF0E5; --bad:#B03A28; --bad-soft:#F7E1DC; --warn:#A5620B;
+  --shadow:0 1px 2px rgba(23,33,43,.06),0 4px 14px rgba(23,33,43,.07);
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#10161C; --surface:#18212A; --sunken:#0C1116; --ink:#E4EAF0; --muted:#98A5B1;
+    --line:#2F3B47; --accent:#7FB0DD; --accent-soft:#1F3347; --on-accent:#0C1620;
+    --ok:#6CC795; --ok-soft:#173226; --bad:#EE8A77; --bad-soft:#3A1E19; --warn:#E6A650;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#10161C; --surface:#18212A; --sunken:#0C1116; --ink:#E4EAF0; --muted:#98A5B1;
+  --line:#2F3B47; --accent:#7FB0DD; --accent-soft:#1F3347; --on-accent:#0C1620;
+  --ok:#6CC795; --ok-soft:#173226; --bad:#EE8A77; --bad-soft:#3A1E19; --warn:#E6A650;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:1140px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1,h2{font-family:var(--serif);text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:clamp(1.5rem,3.2vw,2rem)}
+h2{font-size:1.35rem}
+.eyebrow{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+header.top p{margin:4px 0 0;color:var(--muted);max-width:68ch}
+header.top a{color:var(--accent)}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.nav{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 12px;font-size:.85rem;display:inline-flex;gap:6px;align-items:center}
+.chip .n{font-family:var(--mono);font-size:.78rem;color:var(--muted)}
+.chip[aria-current="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.chip[aria-current="true"] .n{color:var(--on-accent)}
+.chip .best{font-family:var(--mono);font-size:.72rem;padding:0 6px;border-radius:999px;background:var(--ok-soft);color:var(--ok)}
+.chip[aria-current="true"] .best{background:var(--on-accent);color:var(--accent)}
+
+details.tips{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+details.tips summary{cursor:pointer;font-weight:600}
+details.tips ul{margin:10px 0 4px;padding-left:1.2em;display:grid;gap:4px;max-width:80ch}
+
+.exam{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+.bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;padding:12px 18px;background:var(--sunken);border-bottom:1px solid var(--line);border-radius:12px 12px 0 0}
+.bar .what{display:flex;flex-direction:column}
+.timer{font-family:var(--mono);font-size:1.15rem;font-variant-numeric:tabular-nums;padding:4px 10px;border-radius:6px;border:1px solid var(--line);background:var(--surface)}
+.timer.low{color:var(--warn);border-color:var(--warn)}
+.timer.over{color:var(--bad);border-color:var(--bad)}
+.instr{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:2px}
+.instr p{margin:0}
+
+.board{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:22px;padding:18px}
+.col{min-width:0;display:flex;flex-direction:column;gap:12px}
+.col-h{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.article{font-family:var(--serif);font-size:1.04rem;line-height:1.7;display:flex;flex-direction:column;gap:12px}
+.article h3{font-family:var(--serif);font-size:1.25rem;margin:0}
+.para{display:grid;grid-template-columns:28px 1fr;gap:8px}
+.para .pn{font-family:var(--mono);font-size:.8rem;color:var(--accent);background:var(--accent-soft);border-radius:4px;height:20px;display:grid;place-items:center;margin-top:5px}
+.para p{margin:0}
+.para.hl p{background:var(--accent-soft);border-radius:4px;box-shadow:0 0 0 4px var(--accent-soft)}
+
+.q{border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;background:var(--surface)}
+.q.done{border-color:var(--accent)}
+.q.ok{border-color:var(--ok);background:var(--ok-soft)}
+.q.bad{border-color:var(--bad);background:var(--bad-soft)}
+.q .stem{font-weight:500;display:flex;gap:8px}
+.q .qn{font-family:var(--mono);font-size:.8rem;color:var(--muted);padding-top:2px}
+.opts{display:flex;flex-direction:column;gap:4px;margin-left:26px}
+.opt{display:flex;gap:8px;align-items:flex-start;border:1px solid transparent;border-radius:6px;padding:5px 8px;background:transparent;color:var(--ink);text-align:left;font-size:.95rem}
+.opt:hover{background:var(--accent-soft)}
+.opt .box{width:16px;height:16px;border:1.5px solid var(--line);border-radius:50%;flex:0 0 auto;margin-top:4px}
+.opt[aria-checked="true"]{background:var(--accent-soft);border-color:var(--accent)}
+.opt[aria-checked="true"] .box{border-color:var(--accent);background:radial-gradient(var(--accent) 45%,transparent 48%)}
+.opt.key{color:var(--ok);font-weight:600}
+.opt.key .box{border-color:var(--ok)}
+.opt.miss{color:var(--bad);text-decoration:line-through}
+.q .why{margin-left:26px;font-size:.9rem;border-top:1px dashed var(--line);padding-top:8px}
+.q .why b{color:var(--ink)}
+.q .tag{display:inline-block;font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:0 6px;margin-left:6px;vertical-align:1px}
+
+.actions{display:flex;flex-wrap:wrap;gap:10px;padding:0 18px 18px}
+.btn{border-radius:8px;padding:9px 16px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-weight:500}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.scorebar{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline;padding:0 18px 18px}
+.scorebar strong{font-family:var(--serif);font-size:1.7rem}
+.scorebar span{color:var(--muted)}
+footer.src{font-size:.82rem;color:var(--muted);padding:0 18px 16px}
+footer.src a{color:var(--accent)}
+.note{font-size:.82rem;color:var(--muted);max-width:80ch}
+@media (max-width:820px){ .board{grid-template-columns:1fr} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Digitaler TestDaF · Lesen · Aufgabe 3</div>
+    <h1>Multiple-Choice</h1>
+    <p id="intro">Sechs Übungstexte nach Artikeln von scinexx.de, im Format der offiziellen Demo-Aufgabe: ein Text in 6 Absätzen (etwa 550 Wörter), 7 Fragen, 15 Minuten.</p>
+  </header>
+  <nav class="nav" id="nav" aria-label="Übungen"></nav>
+  <details class="tips">
+    <summary>Strategie: Wie beantworte ich die sieben Fragen?</summary>
+    <ul>
+      <li><b>Reihenfolge nutzen:</b> Die Fragen 1–6 folgen dem Text und nennen den Absatz. Frage 7 betrifft den ganzen Text.</li>
+      <li><b>Erst den Absatz, dann die Optionen lesen.</b> Wer mit den Optionen anfängt, sucht nur noch bekannte Wörter.</li>
+      <li><b>Die Lösung steht fast nie mit den Wörtern des Textes da.</b> Rechnen Sie mit Umschreibungen: <i>unnötig → überflüssig</i>, <i>reicht völlig aus → wird empfohlen</i>.</li>
+      <li><b>Vier typische Fallen:</b> (1) richtig, aber in einem anderen Absatz; (2) allgemein richtig, aber nicht die Aussage des Absatzes; (3) ein echtes Detail mit einem verdrehten Wort; (4) Ursache und Wirkung vertauscht.</li>
+      <li><b>Absolute Wörter prüfen:</b> <i>alle, immer, nie, beweist, vorgeschrieben</i> sind oft zu stark für den Text.</li>
+      <li><b>Frage zum Hauptanliegen:</b> Achten Sie auf das Verb (<i>informieren</i> ist neutral, <i>aufklären</i> und <i>warnen</i> sind kritisch) und darauf, worum es im ganzen Text geht, nicht nur im ersten Absatz.</li>
+      <li><b>Zeit:</b> 15 Minuten, also etwa 5 Minuten Lesen und 1,5 Minuten pro Frage.</li>
+    </ul>
+  </details>
+  <section class="exam" id="exam"></section>
+  <p class="note" id="foot">Hinweis: Die Texte sind neu geschrieben und stützen sich auf den Inhalt der verlinkten Artikel, so wie Prüfungstexte im TestDaF gekürzt und bearbeitet werden. Wie in der Prüfung sind die Optionen nicht mit a)–d) bezeichnet und pro Frage ist nur eine Antwort möglich; nach dem Auswerten sehen Sie zu jeder Frage die Begründung.</p>
+</div>
+
+<script>
+/* EX: gefüllt mit den Übungen. Struktur:
+   {topic, src:{t,a,d,u}, title, paras:[6 Absätze], q:[{stem, o:[4], a:index, ref:Absatznummer|0, tag, w:Erklärung}]} */
+const EX = [
+ {topic:"Die Kosten der Demenz",
+  src:{t:"Unbezahlte Pflege macht den größten Teil der Demenzkosten aus", a:"Kathrin Klatt", p:"scinexx.de", d:"16.09.2026", u:"https://www.scinexx.de/news/gesellschaft/unbezahlte-pflege-macht-den-groessten-teil-der-demenzkosten-aus/"},
+  title:"Was Demenz eine Gesellschaft kostet",
+  paras:[
+   "Mit dem Fortschreiten einer Demenz wächst der Bedarf an Hilfe: Betroffene brauchen Unterstützung im Alltag, medizinische Behandlung und schließlich Langzeitpflege. Ein großer Teil dieser Arbeit wird jedoch zu Hause geleistet, von Partnern, Kindern und Freunden. Weil niemand diese Stunden bezahlt, erscheinen sie in keiner Abrechnung von Kliniken, Pflegediensten oder Versicherungen. Die wirtschaftliche Last der Krankheit ist damit deutlich größer, als es die offiziellen Zahlen vermuten lassen. Wer wissen will, was Demenz eine Gesellschaft kostet, muss diese unsichtbare Arbeit mitrechnen.",
+   "Genau daran scheitern Vergleiche zwischen Ländern bisher. Die vorliegenden Kostenstudien gehen methodisch sehr unterschiedlich vor: Manche setzen für eine Stunde Pflege durch Angehörige den Lohn einer Fachkraft an, andere einen deutlich niedrigeren Wert oder gar keinen. Dazu kommt, dass die Studien verschiedene Versorgungsbereiche erfassen und sich auf unterschiedlich schwer erkrankte Gruppen beziehen. Selbst für ähnlich wohlhabende Länder liegen die Schätzungen deshalb weit auseinander. Ein Forschungsteam wollte daher wissen, wie hoch die Kosten ausfallen, wenn man alle verfügbaren Daten in einen einheitlichen Rahmen bringt.",
+   "Die Arbeitsgruppe um Richard Dodel von der Universität Duisburg-Essen führte dafür 45 europäische Kostenstudien in einer gemeinsamen Auswertung zusammen. Sie verband die Ergebnisse mit Daten darüber, wie viele Menschen in den einzelnen Ländern an Demenz erkrankt sind, und rechnete alle Beträge auf das Preisniveau des Jahres 2019 um; zusätzlich glich sie Unterschiede in der Kaufkraft aus. Auf diese Weise entstand eine Schätzung für 30 europäische Länder, in denen 2019 rund 8,8 Millionen Menschen mit einer Demenz lebten.",
+   "Das Ergebnis: Zusammen kostete die Versorgung dieser Menschen 221,4 Milliarden Euro pro Jahr, im Mittel 25.218 Euro pro Betroffenem. Den größeren Anteil daran trägt nicht das Gesundheitswesen, sondern die Familie: 128,1 Milliarden Euro oder 57,9 Prozent entfallen auf die unbezahlte Pflege durch Angehörige und Nahestehende. Medizinische Behandlung und professionelle Pflege machen 93,2 Milliarden Euro aus, also 42,1 Prozent. Ein dritter Posten, die Verluste durch entgangene Erwerbsarbeit, fällt mit 59 Millionen Euro dagegen kaum ins Gewicht, weil die meisten Betroffenen bereits im Rentenalter sind.",
+   "Zwischen den Ländern sind die Unterschiede groß. Die höchsten Gesamtkosten trägt Deutschland mit 51,8 Milliarden Euro, vor Italien mit 32,8 und dem Vereinigten Königreich mit 26,1 Milliarden Euro; auf diese drei Länder sowie Frankreich und Spanien entfallen zusammen 68,1 Prozent der geschätzten Summe. Pro Betroffenem reicht die Spanne von 10.136 Euro in Ungarn bis 45.474 Euro in den Niederlanden – auch die Versorgungssysteme sind also sehr verschieden. In Belgien entstehen fast 60 Prozent der Kosten außerhalb der professionellen Versorgung. Der Neurologe Sebastiaan Engelborghs sagt dazu, der Beitrag der Partner und Kinder verdiene nicht nur Anerkennung, sondern auch strukturelle Unterstützung.",
+   "Die Forschenden selbst sprechen von bestmöglichen Näherungen. Ihre Schätzung beruht nicht auf abgerechneten Ausgaben, sondern auf Studien, deren Kostenangaben teilweise aus den Jahren vor 2019 stammen; für Länder mit mittlerem oder niedrigem Einkommen reichten die Daten gar nicht aus. Auch der auffällig kleine Posten für entgangene Erwerbsarbeit stützt sich nur auf wenige Quellen. Offen ist zudem, wie sich neue Medikamente auswirken, die den Verlauf einer Alzheimer-Erkrankung im Frühstadium verlangsamen: Ob sie die Gesamtkosten senken oder die teure Spätphase nur verschieben, weiß niemand. Angesichts dieser offenen Fragen fordert Dodel mehr Forschung zu den fortgeschrittenen Stadien – und zu den Familien, die den größten Teil der Arbeit übernehmen."
+  ],
+  q:[
+   {stem:"Welche der folgenden Aussagen fasst am besten den Inhalt aus Absatz 1 zusammen?", ref:1, tag:"Absatz zusammenfassen", a:3,
+    o:["Der Bedarf an Pflegekräften wächst schneller als das Angebot.","Die Behandlung von Demenz wird für Kliniken immer teurer.","Die Zahl der Demenzkranken steigt in Europa deutlich an.","Ein großer Teil der Pflegearbeit bleibt statistisch unsichtbar."],
+    w:"Der Absatz führt vom wachsenden Hilfebedarf zu der Feststellung, dass die Arbeit der Familien in keiner Abrechnung erscheint – das ist seine Kernaussage. Der wachsende Bedarf an Pflegekräften steht nicht im Text; steigende Fallzahlen kommen erst in Absatz 6 vor (richtig, aber falscher Absatz); teurere Klinikbehandlung ist allgemein plausibel, aber nicht der Punkt dieses Absatzes."},
+   {stem:"Laut Absatz 2 sind die bisherigen Schätzungen schwer zu vergleichen, weil …", ref:2, tag:"Detail", a:1,
+    o:["die Krankheitsverläufe in den Ländern unterschiedlich sind.","die Studien die Arbeit der Angehörigen unterschiedlich bewerten.","die Zahl der Betroffenen in vielen Ländern unbekannt ist.","viele Studien nur einzelne Regionen eines Landes betrachten."],
+    w:"Im Text steht, dass eine Pflegestunde je nach Studie mit dem Lohn einer Fachkraft, mit einem niedrigeren Wert oder mit gar nichts angesetzt wird. Die Zahl der Betroffenen war bekannt – sie wird in Absatz 3 sogar genutzt (ein echtes Detail, aber mit einem verdrehten Wort). Unterschiedliche Krankheitsverläufe und einzelne Regionen kommen im Text nicht vor."},
+   {stem:"In Absatz 3 wird gesagt, dass die Forschenden …", ref:3, tag:"Detail", a:0,
+    o:["alle Beträge auf ein gemeinsames Preisniveau umgerechnet haben.","die Angaben der Pflegekassen direkt ausgewertet haben.","die Kosten in 45 europäischen Ländern neu erhoben haben.","die Pflegezeit der Angehörigen in Interviews gemessen haben."],
+    w:"Genannt werden das Preisniveau von 2019 und der Ausgleich der Kaufkraft. Es waren 45 <i>Studien</i>, nicht 45 Länder, und sie wurden zusammengeführt, nicht neu erhoben. Grundlage waren vorhandene Studien und Erkrankungszahlen, nicht Daten der Pflegekassen und nicht Interviews."},
+   {stem:"Laut Absatz 4 zeigt die Studie, dass die Versorgung von Demenzkranken …", ref:4, tag:"Zahlen deuten", a:2,
+    o:["die Gesundheitssysteme stärker belastet als die Familien.","mehr Geld kostet als die Behandlung anderer Krankheiten.","überwiegend von Angehörigen getragen wird.","zu hohen Verlusten an Arbeitszeit führt."],
+    w:"57,9 Prozent der Kosten entstehen durch unbezahlte Pflege, 42,1 Prozent durch medizinische Behandlung und professionelle Pflege – also mehr als die Hälfte in den Familien. Option 1 vertauscht dieses Verhältnis. Die Verluste an Erwerbsarbeit sind mit 59 Millionen Euro auffällig klein, nicht hoch. Ein Vergleich mit anderen Krankheiten kommt im Text nicht vor."},
+   {stem:"Welche der folgenden Überschriften passt inhaltlich am besten zu Absatz 5?", ref:5, tag:"Hauptpunkt", a:3,
+    o:["Hohe Kosten vor allem in kleinen Ländern","Pflegende Familien fordern mehr Geld","Reiche Länder geben weniger für Pflege aus","Sehr große Unterschiede zwischen den Ländern"],
+    w:"Der Absatz reiht Gesamtsummen und Beträge pro Betroffenem auf – von 10.136 bis 45.474 Euro. Die höchsten Summen tragen große Länder, nicht kleine. Nicht die Familien fordern Unterstützung, sondern ein Neurologe fordert sie für die Familien (ein Detail mit verdrehtem Subjekt). Dass reiche Länder weniger ausgeben, widerspricht den Zahlen."},
+   {stem:"In Absatz 6 werden die eigenen Ergebnisse von den Forschenden …", ref:6, tag:"Sprachhandlung", a:1,
+    o:["angezweifelt.","eingeschränkt.","verteidigt.","widerrufen."],
+    w:"Sie nennen ihre Zahlen „bestmögliche Näherungen“ und führen auf, was die Daten nicht leisten – das ist eine Einschränkung, keine Rücknahme. <i>Angezweifelt</i> und <i>widerrufen</i> sind zu stark, <i>verteidigt</i> wäre eine Reaktion auf Kritik, die hier gar nicht vorkommt."},
+   {stem:"Hauptanliegen des Textes ist es, …", ref:0, tag:"Hauptanliegen", a:2,
+    o:["die Öffentlichkeit vor einem Zusammenbruch der Pflegesysteme zu warnen.","für eine bessere Bezahlung von Pflegekräften zu werben.","über die Bedeutung unbezahlter Pflegearbeit aufzuklären.","über die medizinische Versorgung von Demenzkranken in Europa zu informieren."],
+    w:"Der Text beginnt mit der unsichtbaren Arbeit der Familien, belegt ihren Umfang mit Zahlen und endet mit der Forderung nach Unterstützung für sie. Über die medizinische Versorgung informiert er zwar auch, aber das ist zu neutral und zu weit vom Kern entfernt (die klassische Falle bei dieser Frage). Von einem Zusammenbruch der Systeme ist nirgends die Rede, und um die Bezahlung professioneller Pflegekräfte geht es gar nicht."}
+  ]},
+ {topic:"Dünger weltweit",
+  src:{t:"Braucht die Landwirtschaft regional mehr oder weniger Dünger?", a:"Clara Lyu", p:"scinexx.de", d:"16.09.2026", u:"https://www.scinexx.de/news/biowissen/braucht-die-landwirtschaft-regional-mehr-oder-weniger-duenger/"},
+  title:"Wie viel Dünger braucht ein Feld?",
+  paras:[
+   "Ohne Mineraldünger wäre die Ernährung von acht Milliarden Menschen kaum denkbar: Stickstoff, Phosphor und Kalium haben die Erträge der Landwirtschaft im 20. Jahrhundert vervielfacht. Ob eine Düngergabe nützt oder schadet, hängt allerdings von der Menge, der Nährstoffart und dem Ort ab. Zu wenig Dünger begrenzt die Ernte; zu viel belastet die Böden, gelangt mit dem Regen in Flüsse und Seen und erhöht die Emission von Treibhausgasen. Pauschale Forderungen – mehr Dünger für die Welternährung oder weniger Dünger für die Umwelt – gehen deshalb an der Sache vorbei.",
+   "Wer genauer werden will, stößt bisher auf eine Lücke in den Daten. Die üblichen Statistiken nennen nur den Gesamtverbrauch eines Landes oder beziehen sich auf einen einzelnen Zeitpunkt. Wie viel Stickstoff der Reis in Vietnam oder der Mais in Kenia über Jahrzehnte erhalten hat, ließ sich daraus nicht ablesen. Für den Agrarforscher Deepak Ray von der University of Minnesota ist das ein Problem, denn er versteht die Düngerfrage als Verteilungsfrage: mehr Nährstoffe dorthin, wo sie die Erträge sichern, weniger dorthin, wo zu viel ausgebracht wird. Dafür muss man zuerst wissen, wer wo was einsetzt.",
+   "Ray und sein Team haben deshalb eine weltweite Zeitreihe für die Jahre 1980 bis 2022 erstellt. Sie verbanden rund 800.000 gemeldete Einzelwerte mit Angaben zu Ernteflächen und zum nationalen Verbrauch. Wo Angaben fehlten, half ein dreistufiges Rechenverfahren: Beobachtete Werte blieben unverändert, fehlende wurden aus langfristigen Mustern geschätzt und die Ergebnisse anschließend so angepasst, dass sie zu den gemeldeten Gesamtmengen passen. Erfasst sind 156 Kulturpflanzen sowie Weiden und Wälder; für zehn besonders wichtige Kulturen entstanden zusätzlich feinere Reihen für 25 wichtige Anbauländer.",
+   "Die Bilanz von vier Jahrzehnten fällt zweigeteilt aus. Der Gesamtverbrauch stieg deutlich: bei Stickstoff um 68 Prozent, bei Phosphor um 52 und bei Kalium um 69 Prozent. Die Mengen pro Hektar wuchsen dagegen viel langsamer, nämlich um 29, 18 und 25 Prozent. In den letzten zehn bis fünfzehn Jahren ging der Mehrverbrauch bei Stickstoff und Phosphor vor allem darauf zurück, dass mehr Land bewirtschaftet wurde.",
+   "Noch aufschlussreicher ist der Blick auf die Regionen, denn dort laufen die Entwicklungen auseinander. In West- und Nordeuropa sowie in Ostasien sind die ohnehin hohen Stickstoff- und Phosphorgaben zuletzt gesunken. In Ländern, die lange kaum gedüngt haben, etwa Äthiopien und Vietnam, stiegen sie an. Viele Felder südlich der Sahara bleiben weiter unterversorgt; dort könnten zusätzliche Nährstoffe die Ernten deutlich verbessern. Zwischen den Regionen mit den höchsten und den niedrigsten Stickstoffgaben beträgt der Unterschied mehr als das Zehnfache. Achim Dobermann vom Weltverband der Düngerindustrie fasst es so zusammen: Es gibt nicht die eine globale Düngerherausforderung; manche Regionen müssen effizienter werden, andere brauchen überhaupt erst Zugang zu Nährstoffen.",
+   "Dass sich die Gaben in Regionen mit sehr hohem und sehr niedrigem Einsatz langsam einander annähern, sollte man allerdings nicht als Fortschritt in Richtung Nachhaltigkeit deuten, warnen die Autoren. In den Verläufen erkennen sie drei typische Phasen: zunächst ein Wachstum von sehr niedrigem Niveau, dann eine intensive Nutzung mit sinkender Effizienz und Überschüssen, schließlich Effizienzgewinne durch Regeln, Anreize und genauere Verfahren. Ein Naturgesetz sei das nicht, betonen sie, sondern eine Deutung. Auch der Datensatz selbst hat Grenzen: Er beruht in großen Teilen auf berechneten statt gemessenen Werten, und der Vergleich mit unabhängigen Erhebungen fiel bei Phosphor schwächer aus als bei Stickstoff und Kalium. Als Grundlage für regionale Strategien halten die Forschenden ihn dennoch für geeignet. Dasselbe Nachhaltigkeitsziel bedeutet dann je nach Region etwas anderes: weniger düngen, ausgeglichener düngen oder überhaupt erst düngen."
+  ],
+  q:[
+   {stem:"Welche der folgenden Aussagen fasst am besten den Inhalt aus Absatz 1 zusammen?", ref:1, tag:"Absatz zusammenfassen", a:1,
+    o:["Der Verbrauch von Dünger ist in den letzten Jahrzehnten stark gestiegen.","Die Wirkung von Dünger hängt von den Umständen ab.","Die Zahl der überdüngten Flächen nimmt weltweit zu.","Mineraldünger schadet Böden und Gewässern dauerhaft."],
+    w:"Der Absatz nennt Nutzen <i>und</i> Schaden und führt beides auf Menge, Nährstoffart und Ort zurück – deshalb seien pauschale Forderungen falsch. Der gestiegene Verbrauch ist richtig, steht aber erst in Absatz 4 (falscher Absatz). Option 4 ist zu absolut und lässt den Nutzen weg; die Zunahme überdüngter Flächen steht so nicht im Text."},
+   {stem:"Laut Absatz 2 fehlte der Forschung bisher …", ref:2, tag:"Detail", a:2,
+    o:["ein Überblick über die Preise von Düngemitteln.","eine Erklärung für die Überdüngung in Europa.","eine Übersicht über einzelne Kulturpflanzen über längere Zeit.","genaue Angaben über den Verbrauch einzelner Länder."],
+    w:"Im Text fehlt gerade die Verbindung von Kulturpflanze und Zeitverlauf: Wie viel Stickstoff der Reis in Vietnam über Jahrzehnte bekam, war nicht ablesbar. Die nationalen Gesamtmengen gab es dagegen sehr wohl – Option 4 verdreht ein echtes Detail. Preise und eine Erklärung der europäischen Überdüngung kommen nicht vor."},
+   {stem:"In Absatz 3 wird gesagt, dass die Forschenden …", ref:3, tag:"Detail", a:3,
+    o:["die Angaben der Länder durch eigene Messungen ersetzt haben.","nur die zehn wichtigsten Kulturpflanzen untersucht haben.","über 800.000 Betriebe in 25 Ländern befragt haben.","unvollständige Daten rechnerisch ergänzt haben."],
+    w:"Beschrieben wird ein Rechenverfahren in drei Schritten, mit dem Lücken gefüllt und an die gemeldeten Gesamtmengen angepasst werden. Eigene Messungen gab es nicht. Erfasst sind 156 Kulturpflanzen; nur die feineren Reihen betreffen zehn Kulturen und 25 Länder. Die 800.000 sind Einzelwerte, keine befragten Betriebe."},
+   {stem:"Laut Absatz 4 ist der Mehrverbrauch von Stickstoff und Phosphor in den letzten zehn bis fünfzehn Jahren vor allem darauf zurückzuführen, dass …", ref:4, tag:"Zahlen deuten", a:0,
+    o:["die Anbauflächen gewachsen sind.","die Erträge pro Hektar gesunken sind.","immer mehr Länder Dünger einsetzen.","pro Hektar deutlich mehr gedüngt wird."],
+    w:"Der Gesamtverbrauch stieg um 52 bis 69 Prozent, die Menge pro Hektar aber nur um 18 bis 29 Prozent – der Rest kommt von der größeren Fläche, wie der Absatz ausdrücklich sagt. Option 4 vertauscht damit Ursache und Wirkung. Sinkende Erträge und neue Anwenderländer stehen nicht im Text."},
+   {stem:"Welche der folgenden Überschriften passt inhaltlich am besten zu Absatz 5?", ref:5, tag:"Hauptpunkt", a:1,
+    o:["Der Düngerverbrauch sinkt weltweit","Eine Entwicklung in zwei Richtungen","Europa düngt mehr als Asien","Zu wenig Dünger senkt die Erträge"],
+    w:"Der Absatz stellt sinkende Gaben in Europa und Ostasien den steigenden in bisher schwach versorgten Ländern gegenüber – zwei gegenläufige Trends. Ein weltweites Sinken des Verbrauchs widerspricht Absatz 4. Der Vergleich Europa–Asien steht so nicht im Text, und dass zu wenig Dünger die Erträge senkt, ist allgemein richtig, aber nicht der Punkt dieses Absatzes."},
+   {stem:"In Absatz 6 wird die weltweite Annäherung der Düngermengen …", ref:6, tag:"Sprachhandlung", a:2,
+    o:["als Beweis für Nachhaltigkeit gedeutet.","als Erfolg der Agrarpolitik gefeiert.","als möglicherweise irreführend bewertet.","als Vorbild für andere Regionen empfohlen."],
+    w:"Die Autoren <i>warnen</i> ausdrücklich davor, die Annäherung als Fortschritt in Richtung Nachhaltigkeit zu lesen – sie bewerten sie also als möglicherweise irreführend. Option 1 sagt das Gegenteil; gefeiert oder als Vorbild empfohlen wird hier nichts."},
+   {stem:"Hauptanliegen des Textes ist es, …", ref:0, tag:"Hauptanliegen", a:3,
+    o:["die Vorteile von Mineraldünger hervorzuheben.","für eine Senkung des weltweiten Düngerverbrauchs zu werben.","über den weltweiten Anstieg des Düngerverbrauchs zu informieren.","zu zeigen, dass Düngerprobleme regional verschieden sind."],
+    w:"Vom ersten Absatz („pauschale Forderungen gehen an der Sache vorbei“) bis zum Schluss („je nach Region etwas anderes“) geht es darum, dass die richtige Menge vom Ort abhängt. Über den Anstieg des Verbrauchs informiert der Text auch, aber das ist nur ein Teil und zu neutral. Eine generelle Senkung fordert er gerade nicht; die Vorteile des Düngers stehen nur in Absatz 1."}
+  ]},
+ {topic:"Katze und Herzschlag",
+  src:{t:"Zehn Minuten mit der Katze verändern Gefühl und Herzschlag", a:"Kathrin Klatt", p:"scinexx.de", d:"20.09.2026", u:"https://www.scinexx.de/news/psychologie/zehn-minuten-mit-der-katze-veraendern-gefuehl-und-herzschlag/"},
+  title:"Zehn Minuten mit der Katze",
+  paras:[
+   "Dass der Umgang mit Haustieren guttut, gilt vielen als selbstverständlich. Wer eine Katze streichelt, fühlt sich anschließend ruhiger, gelassener, weniger angespannt – so jedenfalls die verbreitete Erfahrung. Für Hunde ist dieser Eindruck in zahlreichen Untersuchungen geprüft worden. Bei Katzen dagegen weiß man erstaunlich wenig darüber, was ein ganz gewöhnlicher Kontakt im Alltag gleichzeitig mit den Gefühlen, den Hormonen und dem vegetativen Nervensystem des Menschen macht.",
+   "Der Grund für diese Lücke liegt in der Methode. Wer Menschen und Tiere in ein Labor holt, verändert genau das, was er messen möchte: Eine fremde Umgebung, unbekannte Geräte und anwesende Forschende beeinflussen beide Seiten. Nötig war deshalb eine Untersuchung unter Alltagsbedingungen, die das subjektive Erleben und die körperlichen Messwerte parallel erfasst – und zwar dort, wo Mensch und Katze ohnehin zusammenleben.",
+   "Genau das hat ein Team der Tokyo University of Agriculture um Hidehiko Uchiyama unternommen und die Ergebnisse im Fachmagazin Animals veröffentlicht. Zweiunddreißig Katzenhalterinnen und -halter nahmen teil, gemessen wurde in ihren eigenen Wohnungen. Jede Person durchlief an zwei verschiedenen Tagen in zufälliger Reihenfolge zwei Bedingungen: einmal zehn Minuten freie Interaktion, also streicheln, ansprechen, füttern, spielen, und einmal zehn Minuten Ruhe, bei der Mensch und Katze zwar im selben Raum blieben, Berührungen und Gespräche aber unterblieben. Vor und nach jeder Bedingung wurde die Stimmung mit einem standardisierten Test erfasst und Speichel auf Cortisol und Oxytocin untersucht; währenddessen liefen Messungen von Herzfrequenz und Herzratenvariabilität.",
+   "Die Ergebnisse gehen in zwei Richtungen. Nach der freien Interaktion war die selbst eingeschätzte emotionale Erregung deutlich niedriger – die Menschen fühlten sich also ruhiger. Der Körper zeigte das Gegenteil: Die mittlere Herzfrequenz stieg während des Kontakts von 73,5 auf 79,2 Schläge pro Minute und lag danach mit 73,1 wieder auf dem Ausgangswert. Ein Kennwert für die Aktivität des Parasympathikus, also des beruhigenden Teils des Nervensystems, nahm während der Interaktion ab, während er in der Ruhebedingung zunahm. Bei Cortisol und Oxytocin fanden sich keine signifikanten Unterschiede zwischen vorher und nachher.",
+   "Was folgt daraus? Offenbar lässt sich der Satz „Katzenkontakt beruhigt“ so nicht halten. Gefühl und Körper laufen auseinander: Der Mensch erlebt Entspannung, das Herz arbeitet schneller. Die gefundenen Zusammenhänge zwischen Herzfrequenz und Cortisol sind Korrelationen und erlauben noch keine Erklärung. Wichtig ist außerdem, was hier nicht untersucht wurde: Die Studie beschreibt, wie Menschen auf alltäglichen Kontakt reagieren, nicht, ob Katzen ihre Halter gezielt beeinflussen.",
+   "Die Reichweite dieser Befunde ist begrenzt, und das Team sagt es selbst. Zweiunddreißig Personen sind wenig, nur sechs davon waren Männer, und für einzelne Messgrößen lagen sogar noch weniger vollständige Datensätze vor. Bevor sich allgemeine Aussagen über gesundheitliche Wirkungen des Zusammenlebens mit Katzen treffen lassen, braucht es größere und ausgewogener zusammengesetzte Untersuchungen."
+  ],
+  q:[
+   {stem:"Über den Kontakt mit Katzen war laut Absatz 1 bisher wenig bekannt, …", ref:1, tag:"Hauptaussage", a:2,
+    o:["ob er Krankheiten vorbeugt.","ob Katzen dabei Stress empfinden.","wie er zugleich auf Gefühle und Körper wirkt.","wie oft Menschen ihre Katze streicheln."],
+    w:"Der Absatz nennt genau diese Lücke: was ein gewöhnlicher Kontakt „gleichzeitig mit den Gefühlen, den Hormonen und dem vegetativen Nervensystem“ macht. Für Hunde gibt es diese Forschung bereits."},
+   {stem:"Warum wurde laut Absatz 2 nicht im Labor gemessen?", ref:2, tag:"Detail", a:2,
+    o:["Die Geräte lassen sich dort schlecht aufbauen.","Die Katzen wären dort ruhiger gewesen.","Eine fremde Umgebung verändert die Reaktionen.","Im Labor fehlen die Halterinnen und Halter."],
+    w:"„Wer Menschen und Tiere in ein Labor holt, verändert genau das, was er messen möchte.“ Von Geräten oder ruhigeren Katzen ist nicht die Rede."},
+   {stem:"Laut Absatz 3 mussten die Teilnehmenden …", ref:3, tag:"Detail", a:0,
+    o:["an zwei Tagen zwei verschiedene Bedingungen durchlaufen.","eine Woche lang ein Tagebuch führen.","ihre Katze in ein Versuchszentrum bringen.","zehn Minuten lang bewegungslos sitzen."],
+    w:"„Jede Person durchlief an zwei verschiedenen Tagen in zufälliger Reihenfolge zwei Bedingungen.“ Bewegungslos sitzen musste niemand – in der Ruhebedingung waren nur Berührungen und Gespräche ausgeschlossen."},
+   {stem:"Die Herzfrequenz der Teilnehmenden …", ref:4, tag:"Zahlen deuten", a:1,
+    o:["blieb während des Kontakts unverändert.","lag nach dem Kontakt wieder beim Ausgangswert.","sank während des Kontakts deutlich.","stieg erst nach dem Kontakt an."],
+    w:"73,5 – 79,2 – 73,1: Der Wert stieg während des Kontakts und lag danach wieder dort, wo er begonnen hatte."},
+   {stem:"Welche Überschrift passt inhaltlich am besten zu Absatz 5?", ref:5, tag:"Hauptpunkt", a:3,
+    o:["Ein klarer Beleg für gesunde Haustiere","Hormone erklären die Wirkung","Katzen beruhigen ihre Menschen gezielt","Wenn Gefühl und Messwerte auseinandergehen"],
+    w:"Der Absatz betont genau diesen Widerspruch. Die Hormonwerte erklären nichts – sie veränderten sich gar nicht signifikant –, und ob Katzen gezielt wirken, war ausdrücklich nicht Gegenstand der Studie."},
+   {stem:"In Absatz 6 wird die Aussagekraft der Studie …", ref:6, tag:"Sprachhandlung", a:1,
+    o:["bestritten.","eingeschränkt.","hervorgehoben.","verteidigt."],
+    w:"„Die Reichweite dieser Befunde ist begrenzt, und das Team sagt es selbst.“ Das ist eine Einschränkung, keine Rücknahme und keine Verteidigung gegen Kritik."},
+   {stem:"Das Hauptziel des Textes besteht darin, …", ref:0, tag:"Hauptanliegen", a:3,
+    o:["die gesundheitliche Wirkung von Haustieren zu belegen.","vor zu viel Katzenkontakt zu warnen.","zu erklären, wie man Speichelproben auswertet.","zu zeigen, dass Gefühl und Messwerte auseinandergehen."],
+    w:"Der Text führt vom verbreiteten Eindruck über die Messwerte zu genau diesem Widerspruch – und schränkt am Ende ein. Belegt wird die gesundheitliche Wirkung gerade nicht."}
+  ]},
+ {topic:"Berge unter dem Eis",
+  src:{t:"Unter dem Eis der Antarktis gibt es Superberge aus der Gondwana-Zeit", a:"Robert Klatt", p:"scinexx.de", d:"20.09.2026", u:"https://www.scinexx.de/news/geowissen/unter-dem-eis-der-antarktis-gibt-es-superberge-aus-der-gondwana-zeit/"},
+  title:"Superberge unter dem Eis",
+  paras:[
+   "Neunundneunzig Komma fünf Prozent der Antarktis liegen unter Eis. Wer wissen will, welche Gesteine sich dort befinden und wie sie entstanden sind, kann also nur selten einen Hammer ansetzen. Die Forschung greift deshalb zu einem Umweg: zu Zirkonkristallen aus Sedimenten. Diese Minerale sind außergewöhnlich widerstandsfähig, sie überdauern Erosion und Transport, und ihr Gehalt an Uran und Blei verrät, wann das Ausgangsgestein entstanden ist. Ihre chemische Signatur zeigt zusätzlich, unter welchen Bedingungen es geprägt wurde.",
+   "Die offene Frage lautete, ob bei der Entstehung des Superkontinents Gondwana in der heutigen Antarktis große Gebirge aufgetürmt wurden – und ob deren Abtragung Folgen für die frühe Biosphäre hatte. Direkt prüfen lässt sich das nicht, denn falls es solche Gebirge gab, sind sie vollständig verschwunden. Übrig bleiben nur die Minerale, die ihre Erosion in die Sedimente getragen hat.",
+   "Ein Team der Australian National University in Canberra hat deshalb ein großes Mineralarchiv zusammengetragen und die Ergebnisse in der Zeitschrift Communications Earth & Environment veröffentlicht. Eintausendsiebenhundertzwölf antarktische Zirkone wurden neu untersucht und mit bereits erfassten Körnern verbunden, sodass der Datensatz insgesamt 5.469 Altersmessungen umfasst. Damit einzelne Regionen die Statistik nicht verzerren, wurden die Daten nach den Einzugsgebieten der Eisströme gewichtet. Zum Vergleich diente Südostaustralien, wo die Ablagerungen jener Zeit noch erhalten sind.",
+   "Auffällig ist ein Gipfel in der Altersverteilung: Rund 40 Prozent der datierten antarktischen Kristalle stammen aus der Zeit vor 650 bis 450 Millionen Jahren – genau aus der Phase, in der Gondwana zusammenwuchs. Isotopen- und Spurenelementdaten weisen auf eine intensive Umarbeitung älterer Erdkruste hin, und ein Teil der Kristalle trägt die chemischen Merkmale tiefer Gebirgswurzeln. Südostaustralien zeigt ähnliche Muster, doch in der Antarktis ist dieser Gipfel 4,5-mal stärker ausgeprägt.",
+   "Daraus ergibt sich ein Bild, das die Autoren vorsichtig weiterdenken. Bei der Kollision entstanden offenbar Gebirgsgürtel von der Größenordnung des heutigen Himalaya, die später restlos abgetragen wurden. Stark erodierende Gebirge liefern Phosphor und Eisen ins Meer, beides düngt Algen und Bakterien. Zugleich begraben große Sedimentmengen organischen Kohlenstoff, bevor dieser wieder Sauerstoff verbraucht. Der Sauerstoffgehalt könnte auf diese Weise gestiegen sein – und die kambrische Explosion, der rasche Aufstieg vielzelliger Tiere vor rund 538 Millionen Jahren, fällt in eben diese Abtragungsphase.",
+   "Ein Beweis ist das nicht, und der Text sagt es deutlich. Zeitliche Nähe allein begründet keine Ursache. Hinzu kommt, dass geochemische Hinweise auf Veränderungen im Sauerstoffhaushalt teilweise bis 800 Millionen Jahre zurückreichen und sich mit diesem Modell nicht vollständig erklären lassen. Die Gebirgserosion erscheint deshalb als möglicher Umweltfaktor, nicht als nachgewiesener Auslöser; weitere geochemische und sedimentologische Prüfungen stehen aus."
+  ],
+  q:[
+   {stem:"Zirkonkristalle sind für diese Forschung nützlich, weil sie …", ref:1, tag:"Detail", a:3,
+    o:["die ältesten bekannten Minerale sind.","im Eis besonders häufig vorkommen.","leicht aus dem Eis zu bohren sind.","überdauern und Alter wie Bedingungen verraten."],
+    w:"„Diese Minerale sind außergewöhnlich widerstandsfähig … ihr Gehalt an Uran und Blei verrät, wann das Ausgangsgestein entstanden ist.“"},
+   {stem:"Die Gebirge lassen sich laut Absatz 2 nur indirekt untersuchen, weil …", ref:2, tag:"Detail", a:1,
+    o:["das Eis die Messungen stört.","die Gebirge vollständig verschwunden sind.","die Proben zu alt für Messungen sind.","sie heute unter dem Meer liegen."],
+    w:"„falls es solche Gebirge gab, sind sie vollständig verschwunden“ – deshalb bleibt nur der Weg über die Minerale."},
+   {stem:"In Absatz 3 wird gesagt, dass die Forschenden …", ref:3, tag:"Detail", a:2,
+    o:["alle Eisströme der Antarktis kartiert haben.","mehrere Tausend Gesteinsproben aus dem Eis gebohrt haben.","neu untersuchte Kristalle mit bereits erfassten Daten verbunden haben.","Proben aus Südostaustralien neu datiert haben."],
+    w:"1.712 neu untersuchte Zirkone plus bereits erfasste Körner ergeben 5.469 Altersmessungen. Südostaustralien diente nur zum Vergleich."},
+   {stem:"Der auffällige Altersgipfel …", ref:4, tag:"Zahlen deuten", a:0,
+    o:["betrifft etwa 40 Prozent der untersuchten Kristalle.","fällt in die Zeit vor 538 Millionen Jahren.","ist in Australien stärker als in der Antarktis.","zeigt sich nur bei den neu untersuchten Körnern."],
+    w:"„Rund 40 Prozent der datierten antarktischen Kristalle stammen aus der Zeit vor 650 bis 450 Millionen Jahren.“ In der Antarktis ist der Gipfel 4,5-mal stärker als in Australien, und 538 Millionen Jahre gehören zur kambrischen Explosion."},
+   {stem:"Wie könnte die Erosion der Gebirge das frühe Leben beeinflusst haben?", ref:5, tag:"Mechanismus", a:3,
+    o:["Das Klima wurde dauerhaft kühler.","Der Meeresspiegel stieg stark an.","Die Kontinente rückten dadurch enger zusammen.","Nährstoffe gelangten ins Meer und förderten Algen."],
+    w:"„Stark erodierende Gebirge liefern Phosphor und Eisen ins Meer, beides düngt Algen und Bakterien.“ Zusammen mit dem Begraben von Kohlenstoff könnte so der Sauerstoffgehalt gestiegen sein."},
+   {stem:"In Absatz 6 wird der Zusammenhang mit der frühen Tierentwicklung …", ref:6, tag:"Sprachhandlung", a:1,
+    o:["als bewiesen dargestellt.","als möglich, aber ungesichert dargestellt.","auf spätere Zeiten verschoben.","ausdrücklich bestritten."],
+    w:"„Ein Beweis ist das nicht … Die Gebirgserosion erscheint deshalb als möglicher Umweltfaktor, nicht als nachgewiesener Auslöser.“"},
+   {stem:"Das Hauptziel des Textes besteht darin, …", ref:0, tag:"Hauptanliegen", a:1,
+    o:["das Verschwinden der antarktischen Gebirge zu erklären.","einen geologischen Befund vorzustellen und vorsichtig zu deuten.","für neue Bohrungen in der Antarktis zu werben.","vor Fehlschlüssen aus Mineraldaten zu warnen."],
+    w:"Der Text stellt den Altersgipfel und seine mögliche Bedeutung für die frühe Biosphäre vor – und markiert am Schluss deutlich, wo die Deutung endet."}
+  ]},
+ {topic:"KI und Umrisse",
+  src:{t:"Warum scheitern KI-Bildmodelle oft am Erkennen einfacher Silhouetten?", a:"Kathrin Klatt", p:"scinexx.de", d:"20.09.2026", u:"https://www.scinexx.de/news/technik/warum-scheitern-ki-bildmodelle-oft-am-erkennen-einfacher-silhouetten/"},
+  title:"Wenn der Umriss nicht genügt",
+  paras:[
+   "Bildmodelle erkennen Gegenstände auf Fotos inzwischen so zuverlässig, dass ihre Trefferquoten regelmäßig mit denen von Menschen verglichen werden. Daraus wird gern geschlossen, die Systeme sähen die Welt ähnlich wie wir. Dieser Schluss ist voreilig. Zwei Betrachter können dasselbe Tier auf demselben Bild benennen und sich dabei auf ganz verschiedene Merkmale stützen – der eine auf die Fellzeichnung, der andere auf die Körperhaltung. Solange nur das Endergebnis zählt, bleibt der Unterschied verborgen. Sichtbar wird er erst, wenn man die Bilder gezielt beschädigt.",
+   "Für den Menschen ist dabei vor allem die Gesamtgestalt wichtig. Ein schwarzer Umriss ohne jede Oberfläche genügt meistens, um eine Gießkanne von einem Wasserkocher zu unterscheiden; Muster und Farbe sind hilfreich, aber entbehrlich. Wie es bei künstlichen neuronalen Netzen aussieht, war dagegen lange unklar. In der Fachliteratur konkurrieren drei Kandidaten: die globale Form, die inneren Bestandteile eines Gegenstands und seine Oberflächentextur. Welcher dieser Hinweise wie stark in die Entscheidung eingeht, lässt sich an gewöhnlichen Fotos nicht ablesen, weil dort alle drei gleichzeitig vorhanden sind.",
+   "Ein Team der NYU Grossman School of Medicine um Biyu J. He hat die drei Hinweise deshalb auseinandergenommen. Die Forschenden legten einen Bildsatz an, in dem jedes Objekt in sieben verschiedenen Bearbeitungen erschien: mal blieb nur der Umriss übrig, mal wurden die Bestandteile vertauscht, mal die Textur ausgetauscht. Dieselben Bilder bekamen menschliche Versuchspersonen und mehr als 200 tiefe neuronale Netze vorgelegt, die sich in Architektur und Trainingsverfahren unterschieden. Verglichen wurde nicht in erster Linie, wer häufiger richtig lag, sondern wo genau die Fehler auftraten.",
+   "Kein einziges Netz bildete das Muster der menschlichen Fehler vollständig ab. Auch Modelle mit rekurrenten Verbindungen, die als besonders gehirnähnlich gelten, brachten es nicht zustande. Am deutlichsten war der Abstand dort, wo die Aufgabe allein über die Gesamtgestalt zu lösen war: In dieser Bedingung blieben sämtliche geprüften Systeme hinter den Versuchspersonen zurück. Daraus folgt allerdings nicht, dass Menschen beim Erkennen von Objekten generell besser abschneiden – gezeigt ist eine bestimmte, systematische Schwäche, keine allgemeine Überlegenheit.",
+   "Ganz ohne Annäherung blieb der Vergleich nicht. Am nächsten kamen dem menschlichen Muster jene nachträglich feinabgestimmten Modelle, die zuvor kontrastiv mit zusammengehörigen Bild-Text-Paaren trainiert worden waren; ihr Vorsprung hing nicht an einer bestimmten Architektur, sondern an dieser Art des Trainings. Sobald jedoch die globale Form gestört wurde, schrumpfte auch ihre Übereinstimmung. Ein weiterer Befund fällt aus dem Rahmen der üblichen Erwartungen: Wie gut ein Modell zu Messdaten aus dem ventralen visuellen Verarbeitungspfad passte, sagte nichts darüber aus, wie menschenähnlich es sich verhielt. Ebenso wenig half eine hohe allgemeine Trefferquote.",
+   "Für die Praxis ziehen die Autoren einen zurückhaltenden Schluss. Ihre Bildersammlung liefert vor allem ein Prüfverfahren: Sie macht sichtbar, worauf ein System seine Entscheidung stützt, und nicht nur, wie oft es richtig liegt. Wer die Fehlerprofile kennt, kann abschätzen, bei welchen Bildern ein Modell unzuverlässig wird. Ein Urteil über konkrete Anwendungen im Straßenverkehr, in der Robotik oder in der Medizin erlauben die Ergebnisse dagegen nicht, denn geprüft wurden allein kontrollierte Bildveränderungen im Labor. He fasst den Befund vorsichtig zusammen: Die heutigen Modelle seien, obwohl mit riesigen Mengen menschlicher Fotografien trainiert, eben nicht ganz menschenähnlich."
+  ],
+  q:[
+   {stem:"Welche Aussage gibt den Gedankengang von Absatz 1 am besten wieder?", ref:1, tag:"Absatz zusammenfassen", a:2,
+    o:["Bildmodelle erkennen Objekte inzwischen zuverlässiger als Menschen.","Die Trefferquote verrät, worauf ein System seine Entscheidung stützt.","Gleiche Antworten können auf ganz verschiedenen Merkmalen beruhen.","Menschen achten beim Sehen vor allem auf Farbe und Muster."],
+    w:"Der Absatz endet mit dem Beispiel der zwei Betrachter: dieselbe Benennung, verschiedene Merkmale. Dass die Systeme zuverlässiger seien als Menschen, sagt der Text nicht – er sagt nur, dass verglichen wird. Dass die Trefferquote gerade nichts über die Entscheidungsgrundlage verrät, ist der Punkt von Absatz 6."},
+   {stem:"Laut Absatz 2 lässt sich an gewöhnlichen Fotos nicht erkennen, …", ref:2, tag:"Detail", a:1,
+    o:["ob Menschen und Netze gleich schnell entscheiden.","welcher der drei möglichen Hinweise die Entscheidung trägt.","wie stark sich Farbe und Muster gegenseitig überlagern.","wie viele Objektarten ein Netz unterscheiden kann."],
+    w:"Begründung im Text: Auf gewöhnlichen Fotos sind Form, Bestandteile und Textur gleichzeitig vorhanden, ihr jeweiliger Anteil lässt sich daher nicht ablesen. Von Entscheidungsgeschwindigkeit oder der Zahl der Objektarten ist nirgends die Rede."},
+   {stem:"Wodurch unterschied sich der Bildsatz des Teams von gewöhnlichen Fotosammlungen?", ref:3, tag:"Methode", a:3,
+    o:["Alle drei Hinweise waren in jedem Bild gleichzeitig vorhanden.","Die Objekte wurden nur einmal, dafür in hoher Auflösung gezeigt.","Er enthielt ausschließlich schwarze Umrissbilder.","Jedes Objekt erschien in mehreren gezielt veränderten Fassungen."],
+    w:"„… in dem jedes Objekt in sieben verschiedenen Bearbeitungen erschien.“ Reine Umrissbilder waren nur eine dieser sieben Bedingungen – ein echtes Detail, aber zu eng. Dass alle drei Hinweise gleichzeitig vorhanden sind, kennzeichnet gerade die gewöhnlichen Fotos (Absatz 2)."},
+   {stem:"In Absatz 4 wird über die geprüften Netze gesagt, dass …", ref:4, tag:"Detail", a:1,
+    o:["die rekurrenten Modelle dem Menschen am nächsten kamen.","keines das menschliche Fehlermuster vollständig nachbildete.","sie bei allen Bedingungen schlechter abschnitten als Menschen.","sie Objekte insgesamt seltener richtig benannten."],
+    w:"„Kein einziges Netz bildete das Muster der menschlichen Fehler vollständig ab.“ Gerade die rekurrenten Modelle werden als Gegenbeispiel genannt; am nächsten kamen laut Absatz 5 die kontrastiv trainierten. Dass die Systeme überall schlechter seien, weist der Absatz ausdrücklich zurück."},
+   {stem:"Welcher Umstand erklärt laut Absatz 5 den Vorsprung der besten Modelle?", ref:5, tag:"Detail", a:0,
+    o:["Ihr Training mit zusammengehörigen Bild-Text-Paaren.","Sie besaßen eine besonders tiefe Architektur.","Sie erreichten insgesamt die höchsten Trefferquoten.","Sie stimmten besonders gut mit Hirnmessdaten überein."],
+    w:"„… ihr Vorsprung hing nicht an einer bestimmten Architektur, sondern an dieser Art des Trainings.“ Trefferquote und Übereinstimmung mit Messdaten aus dem ventralen Pfad sagten laut Text gerade nichts über die Menschenähnlichkeit aus."},
+   {stem:"Wie äußern sich die Forschenden in Absatz 6 zur Bedeutung ihrer Ergebnisse für den Straßenverkehr?", ref:6, tag:"Sprachhandlung", a:2,
+    o:["Sie kündigen entsprechende Prüfungen für die nächste Zeit an.","Sie sehen darin das wichtigste Anwendungsfeld.","Sie verweisen darauf, dass nur Laborbedingungen geprüft wurden.","Sie warnen ausdrücklich vor dem Einsatz solcher Systeme."],
+    w:"„… denn geprüft wurden allein kontrollierte Bildveränderungen im Labor.“ Die Begründung schließt die Übertragung aus – sie ist aber weder eine Warnung vor dem Einsatz noch die Ankündigung weiterer Tests."},
+   {stem:"Das Hauptanliegen des Textes besteht darin, …", ref:0, tag:"Hauptanliegen", a:0,
+    o:["an einem Beispiel zu zeigen, dass hohe Trefferquoten kein menschenähnliches Sehen belegen.","die Entwicklung sicherer Fahrassistenzsysteme zu fordern.","eine neue Netzwerkarchitektur für die Bilderkennung vorzustellen.","vor dem wachsenden Einfluss künstlicher Intelligenz zu warnen."],
+    w:"Der Text beginnt mit dem voreiligen Schluss von der Trefferquote auf die Wahrnehmung und zeigt anhand der Umrissbedingung, warum er nicht trägt. Eine neue Architektur wird nicht vorgestellt, und vor KI warnt der Text nicht."}
+  ]},
+ {topic:"Alzheimer-Risikogen und Evolution",
+  src:{t:"Evolution scheint das größte Alzheimer-Risikogen langsam auszusortieren", a:"Kathrin Klatt", p:"scinexx.de", d:"20.09.2026", u:"https://www.scinexx.de/news/medizin/evolution-scheint-das-groesste-alzheimer-risikogen-langsam-auszusortieren/"},
+  title:"Wirkt die Auslese noch?",
+  paras:[
+   "Ob die natürliche Auslese beim heutigen Menschen noch wirkt, lässt sich nicht unmittelbar beobachten. Ein Umweg führt über die Altersstruktur des Erbguts: Wenn eine Genvariante die Aussicht schmälert, ein hohes Alter zu erreichen, dann müsste sie unter alten Menschen seltener vorkommen als unter jungen. Diese Überlegung klingt einfach, ist in der Praxis aber heikel. Menschen verschiedener Jahrgänge unterscheiden sich auch in ihrer geografischen Herkunft, und die Messverfahren, mit denen Erbgut untersucht wird, erzeugen je nach Datensatz eigene Verzerrungen. Beides muss herausgerechnet werden, bevor ein Alterseffekt überhaupt sichtbar wird.",
+   "Ein Team der Columbia University um Hakhamanesh Mostafavi hat dafür ein Verfahren entwickelt und auf zwei große Datensammlungen angewandt. Geprüft wurde jeweils, ob sich die Häufigkeit einzelner Erbgutvarianten mit dem Alter der Trägerinnen und Träger verschiebt; Unterschiede in der Abstammung und Eigenheiten der Messtechnik glich die Rechnung aus. Joseph Pickrell, der an der Arbeit beteiligt war, beschreibt das Resultat als schwaches, aber erkennbares Zeichen dafür, dass Auslese auch in heutigen Bevölkerungen stattfindet.",
+   "Die erste Sammlung, die US-amerikanische GERA-Kohorte, umfasste nach der Qualitätsprüfung 57.696 Menschen europäischer Abstammung. Von allen untersuchten Stellen des Erbguts überschritt nur eine einzige Region die strenge Signifikanzschwelle: die Umgebung des Gens APOE. Die dort gelegene Risikovariante ε4 wurde von etwa 70 Jahren an immer seltener, und zwar bei Männern wie bei Frauen und unabhängig davon, ob jemand eine oder zwei Kopien trug. Bei 38.703 Teilnehmern ließen sich die drei Hauptformen ε2, ε3 und ε4 eindeutig bestimmen. Hier zeigte sich dasselbe Bild spiegelbildlich: ε4 nahm mit dem Alter ab, ε3 entsprechend zu, ε2 blieb unverändert.",
+   "Die zweite Sammlung, die britische UK Biobank mit 117.648 Personen, warf ein Problem auf: Ihre Teilnehmer waren bei der Aufnahme erst 45 bis 69 Jahre alt und damit für eine solche Analyse zu jung. Die Forschenden wichen deshalb auf das Sterbealter der Eltern aus, das für 88.595 Väter und 71.783 Mütter vorlag. Hier erreichte eine zweite Region das Signifikanzniveau: eine Variante im Bereich des Nikotinrezeptor-Gens CHRNA3, die bei Rauchern mit höherem Zigarettenverbrauch einhergeht. Väter mit hohem Sterbealter trugen sie seltener; bei den Müttern fiel derselbe Zusammenhang schwächer aus – vermutlich, weil Frauen früherer Jahrgänge anders rauchten als Männer.",
+   "Bemerkenswert ist aus Sicht der Forschenden weniger, was sie gefunden haben, als wie wenig es ist. Wären häufige Varianten mit deutlichem Überlebensnachteil für die Evolution gleichgültig, müsste man viele von ihnen antreffen. Dass sich nur zwei Regionen klar abheben, passt zu der Annahme einer reinigenden Auslese, die nachteilige Varianten über die Generationen hinweg ausdünnt. Warum sich ein langes Leben überhaupt vererben sollte, obwohl es sich erst nach dem Ende der Fortpflanzungszeit auswirkt, ist damit nicht beantwortet. Molly Przeworski erwägt zwei Möglichkeiten: Männer ohne solche Varianten könnten mehr Kinder bekommen, oder langlebige Großeltern erhöhen die Überlebenschancen ihrer Enkel.",
+   "Die Autoren selbst halten die Deutung offen. Aus einem Altersvergleich folgt nicht, dass ε4 tatsächlich aus dem Erbgut verschwindet: Wie viele Kinder die Trägerinnen und Träger bekommen und welchen Nutzen sie für ihre Verwandten haben, ist in den Daten nicht erfasst. Auch Geburtsjahrgang und Lebensumstände können Häufigkeiten verschieben. Und welche körperlichen Folgen das Signal antreiben, bleibt unklar; ε4 erhöht bekanntlich das Risiko für spät beginnende Alzheimer-Erkrankungen und für Herz-Kreislauf-Leiden, doch eine einzelne Todesursache lässt sich der Analyse nicht entnehmen. Mostafavi erinnert zudem daran, dass die Umwelt sich ständig verändert: Was heute das Leben verlängert, kann in einigen Generationen bedeutungslos sein."
+  ],
+  q:[
+   {stem:"Warum ist der in Absatz 1 beschriebene Umweg schwierig?", ref:1, tag:"Absatz zusammenfassen", a:1,
+    o:["Weil eine Variante erst im hohen Alter ihre Wirkung zeigt.","Weil Herkunft und Messtechnik das Ergebnis verfälschen können.","Weil sich das Erbgut im Lauf eines Lebens verändert.","Weil sich die Häufigkeit einer Variante nur über Generationen messen lässt."],
+    w:"Der Absatz nennt genau zwei Störquellen: die unterschiedliche geografische Herkunft der Jahrgänge und die Verzerrungen der Messverfahren. Dass sich das Erbgut selbst mit dem Alter ändert, behauptet der Text nicht – gerade darauf beruht ja die Überlegung."},
+   {stem:"Wie bewertet Pickrell laut Absatz 2 das Ergebnis?", ref:2, tag:"Sprachhandlung", a:2,
+    o:["Als Beleg dafür, dass Auslese beim Menschen nicht mehr nachweisbar ist.","Als Ergebnis, das sich allein aus der Herkunft der Teilnehmer erklärt.","Als Hinweis darauf, dass Auslese heute noch wirkt – wenn auch nur undeutlich.","Als klaren Beweis für eine rasche Evolution des Menschen."],
+    w:"„… ein schwaches, aber erkennbares Zeichen dafür, dass Auslese auch in heutigen Bevölkerungen stattfindet.“ Beides gehört zusammen: die Einschränkung <i>schwach</i> und die positive Aussage <i>erkennbar</i>. Herkunftsunterschiede wurden gerade herausgerechnet."},
+   {stem:"Was ergab die Auswertung der GERA-Kohorte?", ref:3, tag:"Detail", a:2,
+    o:["Bei Frauen sank der ε4-Anteil stärker als bei Männern.","Mehrere Genregionen zeigten einen deutlichen Alterseffekt.","Nur die Region um APOE erreichte die Signifikanzschwelle.","Träger zweier Kopien blieben unauffällig."],
+    w:"„… überschritt nur eine einzige Region die strenge Signifikanzschwelle.“ Der Rückgang zeigte sich bei beiden Geschlechtern und bei einer wie bei zwei Kopien – beide Angaben stehen im Text, aber verdreht. Die zweite Region (CHRNA3) stammt aus der anderen Sammlung."},
+   {stem:"Wie deutet der Text die Zunahme von ε3 im höheren Alter?", ref:3, tag:"Zahlen deuten", a:3,
+    o:["Als Beleg für eine eigene Schutzwirkung von ε3.","Als Folge davon, dass ε2 im Alter unverändert bleibt.","Als Hinweis auf eine bessere Versorgung älterer Jahrgänge.","Als notwendige Kehrseite der Abnahme von ε4."],
+    w:"„Hier zeigte sich dasselbe Bild spiegelbildlich.“ Wenn ε4 seltener wird und ε2 gleich bleibt, muss ε3 häufiger werden – das ist Arithmetik, keine Schutzwirkung."},
+   {stem:"Warum wichen die Forschenden bei der UK Biobank auf die Eltern aus?", ref:4, tag:"Methode", a:0,
+    o:["Weil die Altersspanne der Kohorte für den Vergleich nicht ausreichte.","Weil die Eltern aus anderen Regionen stammten.","Weil die Erbgutdaten der Teilnehmer lückenhaft waren.","Weil die Kohorte zu wenige Männer enthielt."],
+    w:"„Ihre Teilnehmer waren bei der Aufnahme erst 45 bis 69 Jahre alt und damit für eine solche Analyse zu jung.“ Eine Altersverschiebung zeigt sich erst, wenn auch sehr alte Menschen im Datensatz sind."},
+   {stem:"Wie äußert sich der Text zu der Frage, ob ε4 aus dem Erbgut verschwindet?", ref:6, tag:"Sprachhandlung", a:2,
+    o:["Er beantwortet sie mit einem klaren Ja.","Er hält ein Verschwinden für ausgeschlossen.","Er nennt Daten, die fehlen und einen sicheren Schluss verhindern.","Er sagt ein Verschwinden binnen weniger Generationen voraus."],
+    w:"Absatz 6 zählt auf, was nicht erfasst ist: Kinderzahl, Nutzen für Verwandte, Geburtsjahrgang, Lebensumstände. Damit bleibt die Frage offen – sie wird weder bejaht noch ausgeschlossen."},
+   {stem:"Das Hauptanliegen des Textes besteht darin, …", ref:0, tag:"Hauptanliegen", a:3,
+    o:["die Entstehung der Alzheimer-Krankheit zu erklären.","eine neue Methode der Genanalyse zu bewerben.","vor der Genvariante ε4 zu warnen.","zu zeigen, wie weit ein genetischer Befund trägt und wo er endet."],
+    w:"Der Text stellt den Altersbefund vor und widmet den ganzen Schluss der Frage, was daraus folgt und was nicht. Die Krankheitsentstehung erklärt er nicht, und vor ε4 warnt er nicht."}
+  ]}
+];
+
+const TIME = 900;
+let best = {};
+try { best = JSON.parse(localStorage.getItem("tdaf3-best") || "{}") || {}; } catch(e) { best = {}; }
+const state = EX.map(ex => ({pick: ex.q.map(() => null), checked:false, left:TIME}));
+let cur = 0;
+try { const c = parseInt(localStorage.getItem("tdaf3-cur"),10); if (c>=0 && c<EX.length) cur = c; } catch(e){}
+let focusPara = 0;
+
+const $nav = document.getElementById("nav"), $exam = document.getElementById("exam");
+const fmt = s => { s = Math.abs(s); return Math.floor(s/60) + ":" + String(s%60).padStart(2,"0"); };
+
+function renderNav(){
+  $nav.innerHTML = "";
+  EX.forEach((ex,i) => {
+    const b = document.createElement("button");
+    b.className = "chip"; b.type = "button";
+    b.setAttribute("aria-current", i===cur ? "true" : "false");
+    b.innerHTML = `<span class="n">${i+1}</span>${ex.topic}` + (best[i]!=null ? `<span class="best">${best[i]}/7</span>` : "");
+    b.onclick = () => { cur = i; focusPara = 0; try{localStorage.setItem("tdaf3-cur", i);}catch(e){} render(); window.scrollTo({top:0}); };
+    $nav.appendChild(b);
+  });
+}
+
+function render(){
+  if (!EX.length){ $exam.innerHTML = '<div class="instr"><p>Die Übungen werden noch vorbereitet.</p></div>'; return; }
+  renderNav();
+  const ex = EX[cur], st = state[cur];
+  const paras = ex.paras.map((p,i) => `<div class="para${focusPara===i+1?" hl":""}" id="para-${i+1}"><span class="pn">${i+1}</span><p>${p}</p></div>`).join("");
+  const qs = ex.q.map((q,k) => {
+    const pick = st.pick[k];
+    let cls = "q" + (st.checked ? (pick===q.a ? " ok" : " bad") : (pick!==null ? " done" : ""));
+    const opts = q.o.map((o,i) => {
+      let oc = "opt";
+      if (st.checked){ if (i===q.a) oc += " key"; else if (i===pick) oc += " miss"; }
+      return `<button type="button" class="${oc}" role="radio" aria-checked="${pick===i?"true":"false"}" data-q="${k}" data-o="${i}" ${st.checked?"disabled":""}><span class="box"></span><span>${o}</span></button>`;
+    }).join("");
+    const why = st.checked ? `<div class="why"><b>${q.o[q.a]}</b>${q.ref?` · Absatz ${q.ref}`:" · ganzer Text"}<span class="tag">${q.tag}</span><br>${q.w}</div>` : "";
+    return `<div class="${cls}" data-qi="${k}">
+      <div class="stem"><span class="qn">${k+1}</span><span>${q.stem}</span></div>
+      <div class="opts" role="radiogroup" aria-label="Frage ${k+1}">${opts}</div>${why}</div>`;
+  }).join("");
+  const answered = st.pick.filter(p => p!==null).length;
+  $exam.innerHTML = `
+    <div class="bar">
+      <div class="what"><span class="eyebrow">Übung ${cur+1} von ${EX.length}</span><h2>${ex.topic}</h2></div>
+      <div class="timer" id="timer"></div>
+    </div>
+    <div class="instr">
+      <p>Lesen Sie den Text.</p>
+      <p>Beantworten Sie die Fragen 1–7.</p>
+      <p>Klicken Sie die Fragen an und entscheiden Sie, welche Lösung passt.</p>
+      <p>Für jede Frage gibt es genau eine richtige Lösung.</p>
+      <p>Sie haben 15 Minuten Zeit.</p>
+    </div>
+    <div class="board">
+      <div class="col">
+        <div class="col-h">Text</div>
+        <div class="article"><h3>${ex.title}</h3>${paras}</div>
+      </div>
+      <div class="col">
+        <div class="col-h">Fragen · ${answered} von 7 beantwortet</div>
+        ${qs}
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn primary" id="check" type="button" ${st.checked?"disabled":""}>Auswerten</button>
+      <button class="btn" id="reset" type="button">Neu beginnen</button>
+      ${cur < EX.length-1 ? `<button class="btn" id="next" type="button">Nächste Übung →</button>` : ""}
+    </div>
+    ${st.checked ? `<div class="scorebar"><strong>${st.score} / 7</strong><span>${st.score>=6?"Sehr gut.":st.score>=4?"Lesen Sie die Begründungen zu den roten Fragen.":"Arbeiten Sie die Begründungen Absatz für Absatz durch."}</span><span>Zeit: ${fmt(st.used)}${st.used>TIME?" (über dem Limit)":" von 15:00"}</span></div>` : ""}
+    <footer class="src">Textgrundlage: „<a href="${ex.src.u}" target="_blank" rel="noopener">${ex.src.t}</a>“ von ${ex.src.a}, ${ex.src.p}, ${ex.src.d} (neu geschrieben und gekürzt).</footer>`;
+  document.getElementById("check").onclick = check;
+  document.getElementById("reset").onclick = () => { state[cur] = {pick: ex.q.map(() => null), checked:false, left:TIME}; focusPara = 0; render(); };
+  const nx = document.getElementById("next"); if (nx) nx.onclick = () => { cur++; focusPara = 0; try{localStorage.setItem("tdaf3-cur", cur);}catch(e){} render(); window.scrollTo({top:0}); };
+  updateTimer();
+}
+
+$exam.addEventListener("click", e => {
+  const opt = e.target.closest(".opt");
+  const st = state[cur];
+  if (opt && !st.checked){
+    st.pick[+opt.dataset.q] = +opt.dataset.o;
+    const ref = EX[cur].q[+opt.dataset.q].ref;
+    focusPara = ref || 0;
+    render(); return;
+  }
+  const q = e.target.closest(".q");
+  if (q && !opt){ focusPara = EX[cur].q[+q.dataset.qi].ref || 0; render(); }
+});
+
+function check(){
+  const ex = EX[cur], st = state[cur];
+  st.checked = true;
+  st.score = st.pick.filter((p,k) => p === ex.q[k].a).length;
+  st.used = TIME - st.left;
+  focusPara = 0;
+  if (best[cur]==null || st.score > best[cur]) { best[cur] = st.score; try{ localStorage.setItem("tdaf3-best", JSON.stringify(best)); }catch(e){} }
+  render();
+}
+
+function updateTimer(){
+  const t = document.getElementById("timer"); if (!t) return;
+  const st = state[cur];
+  t.textContent = st.left >= 0 ? fmt(st.left) : "Zeit abgelaufen +" + fmt(st.left);
+  t.classList.toggle("low", st.left <= 120 && st.left >= 0);
+  t.classList.toggle("over", st.left < 0);
+}
+setInterval(() => { if (!EX.length) return; const st = state[cur]; if (!st.checked && !document.hidden) { st.left--; updateTimer(); } }, 1000);
+
+render();
+</script>
+
+</body></html>
