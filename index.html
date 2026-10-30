@@ -231,7 +231,6 @@
     const repo = pagesHost && pathParts[0] && !pathParts[0].includes(".") ? pathParts[0] : configuredRepo;
     const siteBase = pagesHost ? `${window.location.origin}/${repo}/` : new URL("./", window.location.href).href;
     const apiUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`;
-    const githubBase = `https://github.com/${owner}/${repo}/blob/${encodeURIComponent(branch)}/`;
 
     const status = document.querySelector("#status");
     const tree = document.querySelector("#tree");
@@ -304,13 +303,7 @@
       open.href = siteBase + safePath(file.path);
       open.target = "_self";
       open.textContent = "Open";
-      const newTab = document.createElement("a");
-      newTab.className = "action";
-      newTab.href = githubBase + safePath(file.path);
-      newTab.target = "_blank";
-      newTab.rel = "noopener";
-      newTab.textContent = "New tab";
-      actions.append(open, newTab);
+      actions.append(open);
       row.append(spacer, icon, name, path, actions);
       item.append(row);
       return item;
